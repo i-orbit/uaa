@@ -5,17 +5,19 @@ spring:
     active: dev
   cloud:
     nacos:
-      server-addr: 192.168.26.130:8848
-      username: nacos
-      password: nacos
       discovery:
-        namespace: ${spring.profiles.active}
+        server-addr: 192.168.26.130:8848
+        namespace: orbit-${spring.profiles.active}
+        username: nacos
+        password: nacos
       config:
         server-addr: 192.168.26.130:8848
-        namespace: ${spring.profiles.active}
+        username: nacos
+        password: nacos
+        namespace: orbit-${spring.profiles.active}
         file-extension: yaml
         extension-configs:
           - common.yaml
           - redis.yaml
           - rabbitmq.yaml
-          - influxdb.yaml
+          - mysql.yaml

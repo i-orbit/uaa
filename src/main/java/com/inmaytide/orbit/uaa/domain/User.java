@@ -1,6 +1,8 @@
 package com.inmaytide.orbit.uaa.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Languages;
 import com.inmaytide.orbit.commons.consts.UserState;
@@ -28,6 +30,7 @@ public class User implements Serializable {
 
     @ApiModelProperty("唯一标识")
     @NotNull(groups = {Update.class})
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     @ApiModelProperty(value = "所属租户", accessMode = READ_ONLY, notes = "系统根据条件自动指定")
