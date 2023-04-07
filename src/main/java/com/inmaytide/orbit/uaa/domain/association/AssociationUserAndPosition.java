@@ -1,9 +1,11 @@
-package com.inmaytide.orbit.uaa.domain;
+package com.inmaytide.orbit.uaa.domain.association;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.consts.Is;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 
 /**
  * 用户与组织关联管理表(用户所属组织)
@@ -11,8 +13,8 @@ import io.swagger.annotations.ApiModelProperty;
  * @author inmaytide
  * @since 2023/4/4
  */
-@ApiModel("用户与组织关联管理表(用户所属组织)")
-public class AssociationUserAndOrganization {
+@ApiModel("用户与岗位关联管理表(用户岗位)")
+public class AssociationUserAndPosition implements Serializable {
 
     @ApiModelProperty("用户唯一标识")
     private Long userId;
@@ -21,14 +23,14 @@ public class AssociationUserAndOrganization {
     @TableField(exist = false)
     private String username;
 
-    @ApiModelProperty("组织唯一标识")
-    private Long organizationId;
+    @ApiModelProperty("岗位唯一标识")
+    private Long positionId;
 
-    @ApiModelProperty("组织名称")
+    @ApiModelProperty("岗位名称")
     @TableField(exist = false)
-    private String organizationName;
+    private String positionName;
 
-    @ApiModelProperty(value = "是否是该用户默认组织", notes = "一个用户只能有一个默认组织")
+    @ApiModelProperty(value = "是否是该用户默认岗位", notes = "一个用户只能有一个默认岗位")
     private Is isDefault;
 
     public Long getUserId() {
@@ -47,20 +49,20 @@ public class AssociationUserAndOrganization {
         this.username = username;
     }
 
-    public Long getOrganizationId() {
-        return organizationId;
+    public Long getPositionId() {
+        return positionId;
     }
 
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
+    public void setPositionId(Long positionId) {
+        this.positionId = positionId;
     }
 
-    public String getOrganizationName() {
-        return organizationName;
+    public String getPositionName() {
+        return positionName;
     }
 
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
     }
 
     public Is getIsDefault() {

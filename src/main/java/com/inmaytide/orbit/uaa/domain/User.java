@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Languages;
 import com.inmaytide.orbit.commons.consts.UserState;
+import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import com.inmaytide.orbit.commons.domain.validation.groups.Update;
+import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndOrganization;
+import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndPosition;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.Email;
@@ -14,7 +17,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -26,7 +28,7 @@ import static io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY;
  * @since 2023/4/3
  */
 @ApiModel("用户信息")
-public class User implements Serializable {
+public class User extends TombstoneEntity {
 
     @ApiModelProperty("唯一标识")
     @NotNull(groups = {Update.class})
@@ -78,7 +80,7 @@ public class User implements Serializable {
 
     @NotBlank
     @ApiModelProperty(value = "登录用户名", required = true)
-    private String loginName;
+    private String username;
 
     @ApiModelProperty(value = "登录密码", notes = "新建时默认密码根据配置指定")
     private String password;
@@ -243,12 +245,12 @@ public class User implements Serializable {
         this.identificationNumber = identificationNumber;
     }
 
-    public String getLoginName() {
-        return loginName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
