@@ -11,4 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "application")
 public class ApplicationProperties extends CommonProperties {
+
+    public boolean allowUsersToLoginSimultaneously;
+
+    public boolean isAllowUsersToLoginSimultaneously() {
+        return allowUsersToLoginSimultaneously;
+    }
+
+    public void setAllowUsersToLoginSimultaneously(boolean allowUsersToLoginSimultaneously) {
+        this.allowUsersToLoginSimultaneously = allowUsersToLoginSimultaneously;
+    }
 }

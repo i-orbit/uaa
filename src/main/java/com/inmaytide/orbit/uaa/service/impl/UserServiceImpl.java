@@ -3,6 +3,7 @@ package com.inmaytide.orbit.uaa.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.uaa.domain.User;
@@ -10,8 +11,11 @@ import com.inmaytide.orbit.uaa.mapper.UserMapper;
 import com.inmaytide.orbit.uaa.service.UserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -51,9 +55,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GlobalUser loadUserByUsername(String username) {
-        User user = findUserByUsername(username);
-
+    @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result != null")
+    public GlobalUser loadUserById(Serializable id) {
+        User user = mapper.selectById(id);
 
         GlobalUser globalUser = new GlobalUser();
         BeanUtils.copyProperties(user, globalUser);
@@ -70,6 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.USER_DETAILS, key = "#entity.id")
     public User update(User entity) {
         getMapper().updateById(entity);
         updated();

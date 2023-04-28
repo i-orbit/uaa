@@ -36,11 +36,11 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     }
 
     private String getAuthorizationStoreKey(String id) {
-        return CacheNames.AUTHORIZATION_STORE.getValue() + "::" + id;
+        return CacheNames.AUTHORIZATION_STORE + "::" + id;
     }
 
     private String getAccessTokenStoreKey(OAuth2AccessToken accessToken) {
-        return CacheNames.ACCESS_TOKEN_STORE.getValue() + "::" + accessToken.getTokenValue();
+        return CacheNames.ACCESS_TOKEN_STORE + "::" + accessToken.getTokenValue();
     }
 
     private void storeAuthorization(OAuth2Authorization authorization) {
@@ -93,7 +93,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     @Override
     public OAuth2Authorization findByToken(String token, @Nullable OAuth2TokenType tokenType) {
         Assert.hasText(token, "token cannot be empty");
-        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE.getValue() + "::*");
+        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE + "::*");
         if (CollectionUtils.isNotEmpty(keys)) {
             for (String key : keys) {
                 OAuth2Authorization authorization = authorizationStore.opsForValue().get(key);
@@ -123,7 +123,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     public List<OAuth2Authorization> findByUsernameAndPlatform(String username, String platform) {
         Assert.hasText(username, "username can't be empty");
         Assert.hasText(platform, "platform can't be empty");
-        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE.getValue() + "::*");
+        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE + "::*");
         List<OAuth2Authorization> res = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(keys)) {
             for (String key : keys) {

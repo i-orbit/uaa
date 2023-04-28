@@ -40,7 +40,7 @@ public class DefaultUserDetailsService implements org.springframework.security.c
             username = username.replaceAll(Marks.LOGIN_WITHOUT_PASSWORD.getValue(), "");
         }
         com.inmaytide.orbit.uaa.domain.User user = userService.findUserByUsername(username);
-        return User.withUsername(user.getUsername())
+        return User.withUsername(String.valueOf(user.getId()))
                 .password(withoutPassword ? passwordEncoder.encode(Marks.LOGIN_WITHOUT_PASSWORD.getValue()) : user.getPassword())
                 .accountLocked(user.getState() == UserState.LOCKED)
                 .disabled(user.getState() == UserState.DISABLED)

@@ -2,6 +2,7 @@ package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
 
 import com.inmaytide.exception.web.HttpResponseException;
 import com.inmaytide.orbit.commons.consts.Marks;
+import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.oauth2.service.RedisOAuth2AuthorizationService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,9 +29,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.carrot.commons.consts.Constants.CacheNames.REFRESH_TOKEN;
-import static com.carrot.commons.consts.Constants.Marks.USER_FORCE_LOGOUT;
 
 public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements AuthenticationProvider {
 
@@ -82,8 +80,8 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                 List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(username, platform);
 
                 if (properties.isEnableSuperAdministrator()
-                        && properties.isAllowAdministratorLogInMultipleTimes()
-                        && usernamePasswordAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(Constants.Roles.PREFIX_AUTHORITY_ROLE_TYPE + Constants.Roles.SUPER_ADMIN))) {
+                        && properties.isAllowUsersToLoginSimultaneously()
+                        && usernamePasswordAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ROLE_.name() + Roles.S_ADMINISTRATOR.name()))) {
                     // 如果超过允许同时登录的最大数量
                     // 将最老的剔除，并将token标记为强制登出
 //                    if (authorizations.size() >= env.getAllowAdministratorLogInMultipleTimesNumber()) {
@@ -129,9 +127,9 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                     .principalName(usernamePasswordAuthentication.getName())
                     .authorizationGrantType(AuthorizationGrantType.PASSWORD)
                     .accessToken(accessToken)
+                    .authorizedScopes(authorizedScopes)
                     .attribute(OAuth2ParameterNames.USERNAME, username)
                     .attribute(PARAMETER_NAME_PLATFORM, platform)
-                    .attribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME, authorizedScopes)
                     .attribute(Principal.class.getName(), usernamePasswordAuthentication);
 
 
