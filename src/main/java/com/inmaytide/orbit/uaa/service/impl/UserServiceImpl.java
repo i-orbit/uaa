@@ -1,11 +1,15 @@
 package com.inmaytide.orbit.uaa.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.uaa.domain.User;
 import com.inmaytide.orbit.uaa.mapper.UserMapper;
 import com.inmaytide.orbit.uaa.service.UserService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -33,20 +37,43 @@ public class UserServiceImpl implements UserService {
         return User.class;
     }
 
+    @Override
+    public User findUserByUsername(String username) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getDeleted, Is.N.name());
+        wrapper.or(w ->
+                w.eq(User::getUsername, username)
+                        .or().eq(User::getTelephoneNumber, username)
+                        .or().eq(User::getEmail, username)
+                        .or().eq(User::getEmployeeId, username)
+        );
+        return mapper.selectOne(wrapper);
+    }
 
     @Override
-    public GlobalUser findUserByUsername(String username) {
-        return null;
+    public GlobalUser loadUserByUsername(String username) {
+        User user = findUserByUsername(username);
+
+
+        GlobalUser globalUser = new GlobalUser();
+        BeanUtils.copyProperties(user, globalUser);
+//        globalUser.setRoles();
+//        globalUser.setAuthorities();
+        return globalUser;
     }
 
     @Override
     public User create(User entity) {
-        return null;
+        getMapper().insert(entity);
+        updated();
+        return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
 
     @Override
     public User update(User entity) {
-        return null;
+        getMapper().updateById(entity);
+        updated();
+        return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
 
     @Override

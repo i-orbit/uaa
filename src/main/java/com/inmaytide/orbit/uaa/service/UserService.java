@@ -10,6 +10,6 @@ import com.inmaytide.orbit.uaa.domain.User;
  */
 public interface UserService extends UserDetailsService, BasicService<User> {
 
-
+    User findUserByUsername(String username);
 
 }

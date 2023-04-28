@@ -110,6 +110,9 @@ public class User extends TombstoneEntity {
     @ApiModelProperty("用户状态")
     private UserState state;
 
+    @ApiModelProperty("状态修改时间")
+    private Instant stateTime;
+
     @ApiModelProperty(value = "任务代理人", notes = "用户外出/休假时代替处理相关任务的人员")
     private Long proxy;
 
@@ -123,6 +126,9 @@ public class User extends TombstoneEntity {
     @ApiModelProperty("人事状态描述")
     @TableField(exist = false)
     private String personnelStatusName;
+
+    @ApiModelProperty("员工编号")
+    private String employeeId;
 
     @ApiModelProperty("入职时间")
     private LocalDate joinDate;
@@ -339,6 +345,14 @@ public class User extends TombstoneEntity {
         return StringUtils.EMPTY;
     }
 
+    public Instant getStateTime() {
+        return stateTime;
+    }
+
+    public void setStateTime(Instant stateTime) {
+        this.stateTime = stateTime;
+    }
+
     public Long getProxy() {
         return proxy;
     }
@@ -369,6 +383,14 @@ public class User extends TombstoneEntity {
 
     public void setPersonnelStatusName(String personnelStatusName) {
         this.personnelStatusName = personnelStatusName;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
     }
 
     public LocalDate getJoinDate() {

@@ -5,8 +5,58 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <changeSet id="000000000000001" author="inmaytide">
+        <createTable tableName="tenant" remarks="租户表">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(32)" remarks="名称"/>
+            <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
+            <column name="state" type="int" remarks="状态"/>
+            <column name="logo" type="varchar(512)" remarks="logo图片地址"/>
+            <column name="menu_synced" type="varchar(2)" remarks="菜单是否已根据授权同步到菜单表"/>
+            <column name="license" type="text" remarks="授权信息"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
         <createTable tableName="user" remarks="用户表">
-            <column name="id" type="bigint" remarks="唯一标识" />
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant_id" type="bigint" remarks="所属租户"/>
+            <column name="is_tenant_administrator" type="varchar(2)" remarks="是否是租户管理员"/>
+            <column name="rank" type="varchar(64)" remarks="职级" />
+            <column name="weights" type="int" remarks="权重(用于排序)" />
+            <column name="name" type="varchar(16)" remarks="姓名" />
+            <column name="gender" type="varchar(64)" remarks="性别" />
+            <column name="birthday" type="date" remarks="生日" />
+            <column name="identification_number" type="varchar(32)" remarks="身份证号" />
+            <column name="username" type="varchar(64)" remarks="系统登录用户名" />
+            <column name="password" type="varchar(64)" remarks="系统登录密码" />
+            <column name="password_expire_at" type="timestamp" remarks="密码有效期至" />
+            <column name="telephone_number" type="varchar(32)" remarks="手机号码" />
+            <column name="email" type="varchar(128)" remarks="邮箱地址" />
+            <column name="lang" type="varchar(32)" remarks="系统语言" />
+            <column name="avatar" type="varchar(512)" remarks="用户头像存储地址" />
+            <column name="signature" type="varchar(512)" remarks="用户签名图片存储地址" />
+            <column name="photo" type="varchar(512)" remarks="用户个人照片存储地址" />
+            <column name="state" type="int" remarks="用户状态" />
+            <column name="state_time" type="timestamp" remarks="状态更改时间" />
+            <column name="proxy" type="bigint" remarks="代理人" />
+            <column name="personnel_status" type="varchar(64)" remarks="人事状态" />
+            <column name="employee_id" type="varchar(64)" remarks="员工编号" />
+            <column name="join_date" type="date" remarks="入职日期" />
+            <column name="employment_confirmation_date" type="date" remarks="转正日期" />
+            <column name="resignation_date" type="date" remarks="离职日期" />
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
+            <column name="version" type="int" remarks="版本"/>
         </createTable>
     </changeSet>
 

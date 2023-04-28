@@ -3,6 +3,8 @@ package com.inmaytide.orbit.uaa.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.orbit.uaa.domain.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * @author inmaytide
@@ -10,4 +12,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
+
 }
