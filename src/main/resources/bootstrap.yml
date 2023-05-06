@@ -18,6 +18,6 @@ spring:
         file-extension: yaml
         extension-configs:
           - common.yaml
-          - mysql.yaml
           - redis.yaml
+          - mysql.yaml
           - rabbitmq.yaml

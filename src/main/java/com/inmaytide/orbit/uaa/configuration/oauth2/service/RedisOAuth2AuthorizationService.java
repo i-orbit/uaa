@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 
 import com.inmaytide.orbit.commons.consts.CacheNames;
+import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,7 +21,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * @author inmaytide
+ * @since 2023/04/29
+ */
 @Component
 public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
@@ -36,11 +42,11 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     }
 
     private String getAuthorizationStoreKey(String id) {
-        return CacheNames.AUTHORIZATION_STORE + "::" + id;
+        return ValueCaches.getCacheKey(CacheNames.AUTHORIZATION_STORE, id);
     }
 
     private String getAccessTokenStoreKey(OAuth2AccessToken accessToken) {
-        return CacheNames.ACCESS_TOKEN_STORE + "::" + accessToken.getTokenValue();
+        return ValueCaches.getCacheKey(CacheNames.ACCESS_TOKEN_STORE, accessToken.getTokenValue());
     }
 
     private void storeAuthorization(OAuth2Authorization authorization) {
@@ -48,10 +54,23 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         OAuth2RefreshToken refreshToken = authorization.getRefreshToken() == null ? null : authorization.getRefreshToken().getToken();
         authorizationStore.opsForValue().set(getAuthorizationStoreKey(authorization.getId()), authorization, Duration.between(Instant.now(), refreshToken == null ? accessToken.getExpiresAt() : refreshToken.getExpiresAt()));
         storeAccessToken(accessToken);
+        storeAccessTokenAndRefreshTokenAssociation(authorization);
     }
 
     private void storeAccessToken(OAuth2AccessToken accessToken) {
         accessTokenStore.opsForValue().set(getAccessTokenStoreKey(accessToken), accessToken, Duration.between(Instant.now(), accessToken.getExpiresAt()));
+    }
+
+    private void storeAccessTokenAndRefreshTokenAssociation(OAuth2Authorization authorization) {
+        if (authorization.getRefreshToken() != null) {
+            ValueCaches.put(
+                    CacheNames.REFRESH_TOKEN_STORE,
+                    authorization.getAccessToken().getToken().getTokenValue(),
+                    authorization.getRefreshToken().getToken().getTokenValue(),
+                    Duration.between(Instant.now(), authorization.getAccessToken().getToken().getExpiresAt()).getSeconds() + 300,
+                    TimeUnit.SECONDS
+            );
+        }
     }
 
     @Override
@@ -62,6 +81,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
                 OAuth2Authorization old = findByToken(authorization.getRefreshToken().getToken().getTokenValue(), OAuth2TokenType.REFRESH_TOKEN);
                 if (old != null) {
                     authorizationStore.delete(getAuthorizationStoreKey(old.getId()));
+                    ValueCaches.delete(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue());
                 }
             }
             storeAuthorization(authorization);
@@ -114,7 +134,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         if (authorization == null) {
             return false;
         }
-        return Objects.equals(username, authorization.getAttribute(OAuth2ParameterNames.USERNAME))
+        return Objects.equals(username, authorization.getPrincipalName())
                 && Objects.equals(platform, authorization.getAttribute(OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
 
     }

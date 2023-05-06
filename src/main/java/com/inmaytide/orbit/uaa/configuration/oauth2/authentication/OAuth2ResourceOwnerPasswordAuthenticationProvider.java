@@ -1,9 +1,14 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
 
+import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.HttpResponseException;
+import com.inmaytide.orbit.commons.consts.CacheNames;
+import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Marks;
 import com.inmaytide.orbit.commons.consts.Roles;
+import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
+import com.inmaytide.orbit.uaa.configuration.ErrorCodes;
 import com.inmaytide.orbit.uaa.configuration.oauth2.service.RedisOAuth2AuthorizationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -38,6 +43,8 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
     public static final String PARAMETER_NAME_PLATFORM = "platform";
 
+    public static final String PARAMETER_NAME_FORCED_REPLACEMENT = "forcedReplacement";
+
     private final AuthenticationManager authenticationManager;
 
     private final OAuth2AuthorizationService authorizationService;
@@ -63,6 +70,8 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
         String username = (String) additionalParameters.get(OAuth2ParameterNames.USERNAME);
         String password = (String) additionalParameters.get(OAuth2ParameterNames.PASSWORD);
         String platform = (String) additionalParameters.get(PARAMETER_NAME_PLATFORM);
+        // 当用户在其他地方已登录时, 是否强制登录
+        String forcedReplacement = (String) additionalParameters.get(PARAMETER_NAME_FORCED_REPLACEMENT);
 
         // APP扫码免密码登录标记
         if (Objects.equals(password, Marks.LOGIN_WITHOUT_PASSWORD.getValue())) {
@@ -75,13 +84,12 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
             Authentication usernamePasswordAuthentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-            if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof RedisOAuth2AuthorizationService) {
-                RedisOAuth2AuthorizationService service = (RedisOAuth2AuthorizationService) authorizationService;
-                List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(username, platform);
+            if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof RedisOAuth2AuthorizationService service) {
+                List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(usernamePasswordAuthentication.getName(), platform);
 
                 if (properties.isEnableSuperAdministrator()
-                        && properties.isAllowUsersToLoginSimultaneously()
-                        && usernamePasswordAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ROLE_.name() + Roles.S_ADMINISTRATOR.name()))) {
+                        && usernamePasswordAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ROLE_.name() + Roles.S_ADMINISTRATOR.name()))
+                        && properties.isAllowUsersToLoginSimultaneously()) {
                     // 如果超过允许同时登录的最大数量
                     // 将最老的剔除，并将token标记为强制登出
 //                    if (authorizations.size() >= env.getAllowAdministratorLogInMultipleTimesNumber()) {
@@ -90,11 +98,15 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 //                        ValueCaches.put(REFRESH_TOKEN, authorization.getAccessToken().getToken().getTokenValue(), USER_FORCE_LOGOUT);
 //                    }
                 } else {
-                    // 非系统管理员账户同一用户同一平台同时只能登陆一次
-                    // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
-                    for (OAuth2Authorization authorization : authorizations) {
-                        service.remove(authorization);
-                        ValueCaches.put(REFRESH_TOKEN, authorization.getAccessToken().getToken().getTokenValue(), USER_FORCE_LOGOUT);
+                    // 当用户在其他地方已登录时, 强制登录
+                    if (Is.Y.name().equals(forcedReplacement)) {
+                        // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
+                        for (OAuth2Authorization authorization : authorizations) {
+                            service.remove(authorization);
+                            ValueCaches.put(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue(), Marks.USER_FORCE_LOGOUT.getValue());
+                        }
+                    } else {
+                        throw new AccessDeniedException(ErrorCodes.E_0x00100001);
                     }
                 }
             }
@@ -128,7 +140,6 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                     .authorizationGrantType(AuthorizationGrantType.PASSWORD)
                     .accessToken(accessToken)
                     .authorizedScopes(authorizedScopes)
-                    .attribute(OAuth2ParameterNames.USERNAME, username)
                     .attribute(PARAMETER_NAME_PLATFORM, platform)
                     .attribute(Principal.class.getName(), usernamePasswordAuthentication);
 

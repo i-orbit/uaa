@@ -6,10 +6,16 @@ import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationConverter;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,12 +23,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
@@ -30,7 +39,6 @@ import org.springframework.security.oauth2.server.authorization.web.authenticati
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -40,10 +48,10 @@ import java.util.Arrays;
  * @author inmaytide
  * @since 2023/4/12
  */
-@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
+@DependsOn("exceptionResolver")
+@Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfiguration {
-
 
     private final ApplicationProperties properties;
 
@@ -54,33 +62,64 @@ public class AuthorizationServerConfiguration {
         this.exceptionResolver = exceptionResolver;
     }
 
-//    @Bean
-//    @Order(Ordered.HIGHEST_PRECEDENCE)
-//    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, RegisteredClientRepository clientRepository, OAuth2AuthorizationService authorizationService) throws Exception {
-//        OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer<>();
-//        http.apply(authorizationServerConfigurer.tokenEndpoint((tokenEndpoint) -> tokenEndpoint.accessTokenRequestConverter(
-//                new DelegatingAuthenticationConverter(Arrays.asList(
-//                        new OAuth2AuthorizationCodeAuthenticationConverter(),
-//                        new OAuth2RefreshTokenAuthenticationConverter(),
-//                        new OAuth2ClientCredentialsAuthenticationConverter(),
-//                        new OAuth2ResourceOwnerPasswordAuthenticationConverter()))
-//        )));
-//        authorizationServerConfigurer.tokenIntrospectionEndpoint(endpoint -> {
-//            endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
-//        });
-//        authorizationServerConfigurer.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
-//        RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
-//        http.requestMatcher(endpointsMatcher)
-//                .authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
-//                .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-//                .apply(authorizationServerConfigurer);
-//        SecurityFilterChain securityFilterChain = http.formLogin().disable()
-//                .exceptionHandling().accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-//                .and().headers().httpStrictTransportSecurity().disable()
-//                .and().build();
-//        http.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(http.getSharedObject(AuthenticationManager.class), authorizationService, properties));
-//        return securityFilterChain;
-//    }
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().build();
+    }
+
+    @Bean("authorizationStore")
+    public RedisTemplate<String, OAuth2Authorization> authorizationStore(RedisConnectionFactory factory) {
+        RedisTemplate<String, OAuth2Authorization> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringRedisSerializer);
+        template.setValueSerializer(valueSerializer);
+        template.setHashKeySerializer(stringRedisSerializer);
+        template.setHashValueSerializer(valueSerializer);
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean("accessTokenStore")
+    public RedisTemplate<String, OAuth2AccessToken> accessTokenStore(RedisConnectionFactory factory) {
+        RedisTemplate<String, OAuth2AccessToken> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+        JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringRedisSerializer);
+        template.setValueSerializer(valueSerializer);
+        template.setHashKeySerializer(stringRedisSerializer);
+        template.setHashValueSerializer(valueSerializer);
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, RegisteredClientRepository clientRepository, OAuth2AuthorizationService authorizationService) throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        http.apply(authorizationServerConfigurer.tokenEndpoint((tokenEndpoint) -> tokenEndpoint.accessTokenRequestConverter(
+                new DelegatingAuthenticationConverter(Arrays.asList(
+                        new OAuth2AuthorizationCodeAuthenticationConverter(),
+                        new OAuth2RefreshTokenAuthenticationConverter(),
+                        new OAuth2ClientCredentialsAuthenticationConverter(),
+                        new OAuth2ResourceOwnerPasswordAuthenticationConverter()))
+        )));
+        authorizationServerConfigurer.tokenIntrospectionEndpoint(endpoint -> endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService)));
+        http.exceptionHandling()
+                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+        http.csrf().disable();
+        http.formLogin().disable();
+        http.authorizeHttpRequests()
+                .requestMatchers("/oauth2/**").permitAll()
+                .anyRequest().authenticated();
+        http.apply(authorizationServerConfigurer);
+        http.headers().httpStrictTransportSecurity().disable();
+        http.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(http.getSharedObject(AuthenticationManager.class), authorizationService, properties));
+        return http.build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

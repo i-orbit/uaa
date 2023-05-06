@@ -3,8 +3,6 @@ package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 import com.inmaytide.orbit.commons.consts.Marks;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.uaa.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,13 +14,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author luomiao
- * @since 2020/11/10
+ * @author inmaytide
+ * @since 2023/04/29
  */
 @Component
 public class DefaultUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
-
-    private static final Logger log = LoggerFactory.getLogger(DefaultUserDetailsService.class);
 
     private final UserService userService;
 
