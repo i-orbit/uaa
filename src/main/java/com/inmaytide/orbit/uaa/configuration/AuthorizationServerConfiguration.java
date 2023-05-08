@@ -6,6 +6,10 @@ import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationConverter;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
+import com.inmaytide.orbit.uaa.configuration.oauth2.service.DefaultUserDetailsService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +20,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -39,7 +48,10 @@ import org.springframework.security.oauth2.server.authorization.web.authenticati
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -49,6 +61,7 @@ import java.util.Arrays;
  * @since 2023/4/12
  */
 @EnableWebSecurity
+@EnableMethodSecurity
 @DependsOn("exceptionResolver")
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfiguration {
@@ -65,6 +78,11 @@ public class AuthorizationServerConfiguration {
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean("authorizationStore")
@@ -96,34 +114,43 @@ public class AuthorizationServerConfiguration {
     }
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, RegisteredClientRepository clientRepository, OAuth2AuthorizationService authorizationService) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-        http.apply(authorizationServerConfigurer.tokenEndpoint((tokenEndpoint) -> tokenEndpoint.accessTokenRequestConverter(
-                new DelegatingAuthenticationConverter(Arrays.asList(
-                        new OAuth2AuthorizationCodeAuthenticationConverter(),
-                        new OAuth2RefreshTokenAuthenticationConverter(),
-                        new OAuth2ClientCredentialsAuthenticationConverter(),
-                        new OAuth2ResourceOwnerPasswordAuthenticationConverter()))
-        )));
-        authorizationServerConfigurer.tokenIntrospectionEndpoint(endpoint -> endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService)));
-        http.exceptionHandling()
-                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-        http.csrf().disable();
-        http.formLogin().disable();
-        http.authorizeHttpRequests()
-                .requestMatchers("/oauth2/**").permitAll()
-                .anyRequest().authenticated();
-        http.apply(authorizationServerConfigurer);
-        http.headers().httpStrictTransportSecurity().disable();
-        http.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(http.getSharedObject(AuthenticationManager.class), authorizationService, properties));
-        return http.build();
+    public AuthenticationManager authenticationManager(DefaultUserDetailsService userDetailService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(provider);
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
+                                                          RegisteredClientRepository clientRepository,
+                                                          OAuth2AuthorizationService authorizationService,
+                                                          AuthenticationManager authenticationManager) throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        authorizationServerConfigurer.tokenEndpoint((endpoint) -> {
+            endpoint.accessTokenRequestConverter(new OAuth2ResourceOwnerPasswordAuthenticationConverter());
+            endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            endpoint.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
+        });
+        authorizationServerConfigurer.tokenIntrospectionEndpoint(endpoint -> {
+            endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
+        });
+        return http.csrf().disable()
+                .formLogin().disable()
+                .headers().httpStrictTransportSecurity().disable()
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .and()
+                .authorizeHttpRequests()
+                .requestMatchers("/oauth2/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .apply(authorizationServerConfigurer).and()
+                .build();
     }
 
     @Bean

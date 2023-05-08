@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -80,7 +81,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
         try {
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-            LOG.debug("got usernamePasswordAuthenticationToken=" + usernamePasswordAuthenticationToken);
+            LOG.debug("Got UsernamePasswordAuthenticationToken={}", usernamePasswordAuthenticationToken);
 
             Authentication usernamePasswordAuthentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
@@ -150,13 +151,15 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
             authorizationService.save(authorizationBuilder.build());
             LOG.debug("OAuth2Authorization saved successfully");
-            LOG.debug("returning OAuth2AccessTokenAuthenticationToken");
+            LOG.debug("Returning OAuth2AccessTokenAuthenticationToken");
             return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken);
 
         } catch (Exception ex) {
-            LOG.error("problem in authenticate", ex);
-            if (ex instanceof HttpResponseException) {
-                throw ex;
+            if (ex instanceof BadCredentialsException) {
+                throw new OAuth2AuthenticationException(
+                        new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST),
+                        new com.inmaytide.exception.web.BadCredentialsException(ErrorCodes.E_0x00100003)
+                );
             }
             throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR), ex);
         }
@@ -165,7 +168,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
     @Override
     public boolean supports(Class<?> authentication) {
         boolean supports = OAuth2ResourceOwnerPasswordAuthenticationToken.class.isAssignableFrom(authentication);
-        LOG.debug("supports authentication=" + authentication + " returning " + supports);
+        LOG.debug("Supports authentication=" + authentication + " returning " + supports);
         return supports;
     }
 

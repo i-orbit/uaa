@@ -45,13 +45,16 @@ public class User extends TombstoneEntity {
     @ApiModelProperty(value = "租户名称", accessMode = READ_ONLY)
     private Long tenantName;
 
+    @TableField(exist = false)
     @ApiModelProperty(value = "用户所属组织", notes = "同一个用户允许属于多个组织")
     private List<AssociationUserAndOrganization> organizations;
 
+    @TableField(exist = false)
     @ApiModelProperty(value = "用户岗位", notes = "同一个用户允许兼任多个岗位")
     private List<AssociationUserAndPosition> positions;
 
     @ApiModelProperty(value = "职级", notes = "取数据字典-职级")
+    @TableField("`rank`")
     private String rank;
 
     @TableField(exist = false)
