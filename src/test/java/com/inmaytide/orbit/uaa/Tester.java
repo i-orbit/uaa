@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Tester {
 
     public static void main(String... args) {
-        new BCryptPasswordEncoder().encode("Ssgm@12345");
+        System.out.println(new BCryptPasswordEncoder().encode("111111"));
     }
 
 }

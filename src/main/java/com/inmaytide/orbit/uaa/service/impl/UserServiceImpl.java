@@ -13,6 +13,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.util.Collection;
  * @author inmaytide
  * @since 2023/4/7
  */
+@Primary
 @Service
 public class UserServiceImpl implements UserService {
 

@@ -1,11 +1,9 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
 
 import com.inmaytide.exception.web.AccessDeniedException;
-import com.inmaytide.exception.web.HttpResponseException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Marks;
-import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCodes;
@@ -19,7 +17,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.*;
@@ -87,27 +84,19 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
             if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof RedisOAuth2AuthorizationService service) {
                 List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(usernamePasswordAuthentication.getName(), platform);
-
-                if (properties.isEnableSuperAdministrator()
-                        && usernamePasswordAuthentication.getAuthorities().contains(new SimpleGrantedAuthority(Roles.ROLE_.name() + Roles.S_ADMINISTRATOR.name()))
-                        && properties.isAllowUsersToLoginSimultaneously()) {
-                    // 如果超过允许同时登录的最大数量
-                    // 将最老的剔除，并将token标记为强制登出
-//                    if (authorizations.size() >= env.getAllowAdministratorLogInMultipleTimesNumber()) {
-//                        OAuth2Authorization authorization = authorizations.get(0);
-//                        service.remove(authorization);
-//                        ValueCaches.put(REFRESH_TOKEN, authorization.getAccessToken().getToken().getTokenValue(), USER_FORCE_LOGOUT);
-//                    }
-                } else {
-                    // 当用户在其他地方已登录时, 强制登录
-                    if (Is.Y.name().equals(forcedReplacement)) {
-                        // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
-                        for (OAuth2Authorization authorization : authorizations) {
-                            service.remove(authorization);
-                            ValueCaches.put(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue(), Marks.USER_FORCE_LOGOUT.getValue());
+                if (CollectionUtils.isNotEmpty(authorizations)) {
+                    // 不允许用户在多个地方同时登录
+                    if (!properties.isAllowUsersToLoginSimultaneously()) {
+                        // 当用户在其他地方已登录时, 强制登录
+                        if (Is.Y.name().equals(forcedReplacement)) {
+                            // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
+                            for (OAuth2Authorization authorization : authorizations) {
+                                service.remove(authorization);
+                                ValueCaches.put(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue(), Marks.USER_FORCE_LOGOUT.getValue());
+                            }
+                        } else {
+                            throw new AccessDeniedException(ErrorCodes.E_0x00100001);
                         }
-                    } else {
-                        throw new AccessDeniedException(ErrorCodes.E_0x00100001);
                     }
                 }
             }
