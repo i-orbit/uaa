@@ -3,7 +3,7 @@ package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 import com.inmaytide.exception.web.BadCredentialsException;
 import com.inmaytide.orbit.commons.consts.Marks;
 import com.inmaytide.orbit.commons.consts.UserState;
-import com.inmaytide.orbit.uaa.configuration.ErrorCodes;
+import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -39,7 +39,7 @@ public class DefaultUserDetailsService implements org.springframework.security.c
         }
         com.inmaytide.orbit.uaa.domain.User user = userService.findUserByUsername(username);
         if (user == null) {
-            throw new BadCredentialsException(ErrorCodes.E_0x00100002, username);
+            throw new BadCredentialsException(ErrorCode.E_0x00100002, username);
         }
         return User.withUsername(String.valueOf(user.getId()))
                 .password(withoutPassword ? passwordEncoder.encode(Marks.LOGIN_WITHOUT_PASSWORD.getValue()) : user.getPassword())

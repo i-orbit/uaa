@@ -6,7 +6,7 @@ import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Marks;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
-import com.inmaytide.orbit.uaa.configuration.ErrorCodes;
+import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.configuration.oauth2.service.RedisOAuth2AuthorizationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                                 ValueCaches.put(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue(), Marks.USER_FORCE_LOGOUT.getValue());
                             }
                         } else {
-                            throw new AccessDeniedException(ErrorCodes.E_0x00100001);
+                            throw new AccessDeniedException(ErrorCode.E_0x00100001);
                         }
                     }
                 }
@@ -147,7 +147,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
             if (ex instanceof BadCredentialsException) {
                 throw new OAuth2AuthenticationException(
                         new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST),
-                        new com.inmaytide.exception.web.BadCredentialsException(ErrorCodes.E_0x00100003)
+                        new com.inmaytide.exception.web.BadCredentialsException(ErrorCode.E_0x00100003)
                 );
             }
             throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR), ex);

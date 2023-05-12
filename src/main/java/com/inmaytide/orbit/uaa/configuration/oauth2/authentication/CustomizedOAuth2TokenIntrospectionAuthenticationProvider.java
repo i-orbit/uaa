@@ -55,8 +55,7 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements
 
         OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(tokenIntrospectionAuthentication);
 
-        OAuth2Authorization authorization = this.authorizationService.findByToken(
-                tokenIntrospectionAuthentication.getToken(), null);
+        OAuth2Authorization authorization = this.authorizationService.findByToken(tokenIntrospectionAuthentication.getToken(), null);
         if (authorization == null) {
             // Return the authentication request when token not found
             return tokenIntrospectionAuthentication;
