@@ -4,6 +4,8 @@ import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -29,6 +31,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2AuthorizationService.class);
 
     private final Map<String, OAuth2Authorization> initializedAuthorizations = new ConcurrentHashMap<>();
 
@@ -96,6 +100,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         if (isComplete(authorization)) {
             authorizationStore.delete(getAuthorizationStoreKey(authorization.getId()));
             accessTokenStore.delete(getAccessTokenStoreKey(authorization.getAccessToken().getToken()));
+            ValueCaches.delete(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue());
         } else {
             this.initializedAuthorizations.remove(authorization.getId(), authorization);
         }

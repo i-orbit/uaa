@@ -1,8 +1,11 @@
 package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.consts.Platforms;
+import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.commons.domain.dto.AffectedResult;
 import com.inmaytide.orbit.commons.domain.dto.PageResult;
+import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.domain.User;
 import com.inmaytide.orbit.uaa.domain.dto.UserQuery;
@@ -56,6 +59,18 @@ public class UserResource {
     @ApiOperation("查询指定用户信息")
     public User get(@PathVariable Long id) {
         return service.get(id).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(id)));
+    }
+
+    @GetMapping("/current")
+    @ApiOperation("获取当前登录用户信息")
+    public GlobalUser getCurrentUser() {
+        return SecurityUtils.getAuthorizedUser();
+    }
+
+    @GetMapping("/api/users/current/platform")
+    @ApiOperation("获取当前登录用户的登录平台")
+    public Platforms getCurrentPlatform() {
+        return SecurityUtils.getPlatform().orElse(null);
     }
 
 }
