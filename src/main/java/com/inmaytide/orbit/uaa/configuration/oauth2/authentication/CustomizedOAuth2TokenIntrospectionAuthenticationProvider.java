@@ -8,6 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.core.converter.ClaimConversionService;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenIntrospection;
@@ -24,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM;
 
 public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements AuthenticationProvider {
 
@@ -92,6 +95,9 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements
 
         tokenClaims.clientId(authorizedClient.getClientId());
         tokenClaims.username(authorization.getPrincipalName());
+        if (authorization.getAttribute(PARAMETER_NAME_PLATFORM) != null) {
+            tokenClaims.claim(PARAMETER_NAME_PLATFORM, authorization.getAttribute(PARAMETER_NAME_PLATFORM));
+        }
         UsernamePasswordAuthenticationToken principal = authorization.getAttribute("java.security.Principal");
         if (principal != null && org.apache.commons.collections4.CollectionUtils.isNotEmpty(principal.getAuthorities())) {
             tokenClaims.claim("authorities", principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));

@@ -3,6 +3,7 @@ package com.inmaytide.orbit.uaa.configuration;
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
 import com.inmaytide.orbit.commons.domain.OrbitClientDetails;
 import com.inmaytide.orbit.commons.domain.Robot;
+import com.inmaytide.orbit.commons.security.CustomizedOpaqueTokenIntrospector;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationConverter;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -38,6 +40,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -56,9 +59,12 @@ public class AuthorizationServerConfiguration {
 
     private final DefaultHandlerExceptionResolver exceptionResolver;
 
-    public AuthorizationServerConfiguration(ApplicationProperties properties, DefaultHandlerExceptionResolver exceptionResolver) {
+    private final RestTemplate restTemplate;
+
+    public AuthorizationServerConfiguration(ApplicationProperties properties, DefaultHandlerExceptionResolver exceptionResolver, RestTemplate restTemplate) {
         this.properties = properties;
         this.exceptionResolver = exceptionResolver;
+        this.restTemplate = restTemplate;
     }
 
     @Bean
@@ -107,23 +113,30 @@ public class AuthorizationServerConfiguration {
         return new ProviderManager(provider);
     }
 
+    private OAuth2AuthorizationServerConfigurer authorizationServerConfigurer(RegisteredClientRepository clientRepository,
+                                                                              OAuth2AuthorizationService authorizationService,
+                                                                              AuthenticationManager authenticationManager) {
+        return new OAuth2AuthorizationServerConfigurer()
+                .tokenEndpoint((endpoint) -> {
+                    endpoint.accessTokenRequestConverter(new OAuth2ResourceOwnerPasswordAuthenticationConverter());
+                    endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+                    endpoint.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
+                }).tokenIntrospectionEndpoint(endpoint -> {
+                    endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
+                });
+    }
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
                                                           RegisteredClientRepository clientRepository,
                                                           OAuth2AuthorizationService authorizationService,
                                                           AuthenticationManager authenticationManager) throws Exception {
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-        authorizationServerConfigurer.tokenEndpoint((endpoint) -> {
-            endpoint.accessTokenRequestConverter(new OAuth2ResourceOwnerPasswordAuthenticationConverter());
-            endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-            endpoint.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
-        });
-        authorizationServerConfigurer.tokenIntrospectionEndpoint(endpoint -> {
-            endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
-        });
-        return http.csrf().disable()
+        http.apply(authorizationServerConfigurer(clientRepository, authorizationService, authenticationManager)).and()
+                .csrf().disable()
                 .formLogin().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .headers().httpStrictTransportSecurity().disable()
                 .and()
                 .exceptionHandling()
@@ -135,8 +148,12 @@ public class AuthorizationServerConfiguration {
                 .requestMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .apply(authorizationServerConfigurer).and()
-                .build();
+                .oauth2ResourceServer()
+                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
+                .opaqueToken()
+                .introspector(new CustomizedOpaqueTokenIntrospector(restTemplate));
+        return http.build();
     }
 
     @Bean

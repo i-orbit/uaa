@@ -67,7 +67,7 @@ public class UserResource {
         return SecurityUtils.getAuthorizedUser();
     }
 
-    @GetMapping("/api/users/current/platform")
+    @GetMapping("/current/platform")
     @ApiOperation("获取当前登录用户的登录平台")
     public Platforms getCurrentPlatform() {
         return SecurityUtils.getPlatform().orElse(null);

@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result != null")
+    @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result == null")
     public GlobalUser loadUserById(Serializable id) {
         User user = mapper.selectById(id);
 
