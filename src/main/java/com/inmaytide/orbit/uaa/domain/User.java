@@ -1,20 +1,16 @@
 package com.inmaytide.orbit.uaa.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Languages;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
-import com.inmaytide.orbit.commons.domain.validation.groups.Update;
 import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndOrganization;
 import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndPosition;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
@@ -29,11 +25,6 @@ import static io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY;
  */
 @ApiModel("用户信息")
 public class User extends TombstoneEntity {
-
-    @ApiModelProperty("唯一标识")
-    @NotNull(groups = {Update.class})
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
 
     @ApiModelProperty(value = "所属租户", accessMode = READ_ONLY, notes = "系统根据条件自动指定")
     private Long tenantId;
@@ -64,7 +55,7 @@ public class User extends TombstoneEntity {
     @ApiModelProperty(value = "权重", notes = "影响用户排序(数值倒序), 可为空(为空时排序在不为空的用户后面, 多个为空按用户创建时间正序排列)")
     private Integer weights;
 
-    @NotBlank
+    @NotBlank(message = "用户姓名不能为空")
     @ApiModelProperty(value = "姓名", required = true)
     private String name;
 
@@ -81,7 +72,7 @@ public class User extends TombstoneEntity {
     @ApiModelProperty("身份证号码")
     private String identificationNumber;
 
-    @NotBlank
+    @NotBlank(message = "用户登录名不能为空")
     @ApiModelProperty(value = "登录用户名", required = true)
     private String username;
 
@@ -94,7 +85,7 @@ public class User extends TombstoneEntity {
     @ApiModelProperty("手机号码")
     private String telephoneNumber;
 
-    @Email
+    @Email(message = "邮箱地址格式错误")
     @ApiModelProperty("电子邮箱")
     private String email;
 
@@ -141,14 +132,6 @@ public class User extends TombstoneEntity {
 
     @ApiModelProperty("离职日期")
     private LocalDate resignationDate;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getTenantId() {
         return tenantId;

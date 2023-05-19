@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2023/4/7
  */
 @RestController
-@Api(tags = "用户信息管理接口")
+@Api(tags = "用户信息管理")
 @RequestMapping("/api/users")
 public class UserResource {
 
@@ -71,6 +71,12 @@ public class UserResource {
     @ApiOperation("获取当前登录用户的登录平台")
     public Platforms getCurrentPlatform() {
         return SecurityUtils.getPlatform().orElse(null);
+    }
+
+    @GetMapping("/id")
+    public Long getIdByUsername(@RequestParam("username") String username) {
+        User user = service.findUserByUsername(username);
+        return user != null ? user.getId() : null;
     }
 
 }

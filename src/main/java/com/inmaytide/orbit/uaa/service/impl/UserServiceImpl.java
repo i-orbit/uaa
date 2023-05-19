@@ -2,10 +2,12 @@ package com.inmaytide.orbit.uaa.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.uaa.domain.User;
 import com.inmaytide.orbit.uaa.mapper.UserMapper;
 import com.inmaytide.orbit.uaa.service.UserService;
@@ -18,6 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author inmaytide
@@ -81,6 +87,19 @@ public class UserServiceImpl implements UserService {
         getMapper().updateById(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
+    }
+
+    @Override
+    public Map<Long, String> findNamesByIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery(User.class);
+        wrapper.select(User::getId, User::getName);
+        wrapper.in(User::getId, ids);
+        return getMapper().selectList(wrapper)
+                .stream()
+                .collect(Collectors.toMap(Entity::getId, User::getName));
     }
 
     @Override

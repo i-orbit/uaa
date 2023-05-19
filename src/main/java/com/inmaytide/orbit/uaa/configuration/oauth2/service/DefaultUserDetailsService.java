@@ -2,18 +2,23 @@ package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 
 import com.inmaytide.exception.web.BadCredentialsException;
 import com.inmaytide.orbit.commons.consts.Marks;
+import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
+import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.service.AuthorityService;
+import com.inmaytide.orbit.uaa.service.RoleService;
 import com.inmaytide.orbit.uaa.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author inmaytide
@@ -26,9 +31,15 @@ public class DefaultUserDetailsService implements org.springframework.security.c
 
     private final PasswordEncoder passwordEncoder;
 
-    public DefaultUserDetailsService(UserService userService, PasswordEncoder passwordEncoder) {
+    private final AuthorityService authorityService;
+
+    private final RoleService roleService;
+
+    public DefaultUserDetailsService(UserService userService, PasswordEncoder passwordEncoder, AuthorityService authorityService, RoleService roleService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.authorityService = authorityService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -37,11 +48,11 @@ public class DefaultUserDetailsService implements org.springframework.security.c
         if (withoutPassword) {
             username = username.replaceAll(Marks.LOGIN_WITHOUT_PASSWORD.getValue(), "");
         }
-        com.inmaytide.orbit.uaa.domain.User user = userService.findUserByUsername(username);
+        User user = userService.findUserByUsername(username);
         if (user == null) {
             throw new BadCredentialsException(ErrorCode.E_0x00100002, username);
         }
-        return User.withUsername(String.valueOf(user.getId()))
+        return org.springframework.security.core.userdetails.User.withUsername(String.valueOf(user.getId()))
                 .password(withoutPassword ? passwordEncoder.encode(Marks.LOGIN_WITHOUT_PASSWORD.getValue()) : user.getPassword())
                 .accountLocked(user.getState() == UserState.LOCKED)
                 .disabled(user.getState() == UserState.DISABLED)
@@ -49,12 +60,10 @@ public class DefaultUserDetailsService implements org.springframework.security.c
                 .build();
     }
 
-
-    public List<GrantedAuthority> createAuthoritiesWithUser(com.inmaytide.orbit.uaa.domain.User user) {
-        return Collections.emptyList();
-
-//        return Stream.concat(user.getAuthorities().stream(), user.getRoles().stream().map(e -> Constants.Roles.PREFIX_AUTHORITY_ROLE_TYPE + e))
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
+    private List<GrantedAuthority> createAuthoritiesWithUser(User user) {
+        return Stream.concat(authorityService.findAuthoritiesByUser(user).stream(), roleService.findRoleCodesByUser(user).stream())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
+
 }

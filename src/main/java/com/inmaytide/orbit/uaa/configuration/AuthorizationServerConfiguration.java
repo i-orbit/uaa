@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.configuration;
 
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
+import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.domain.OrbitClientDetails;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.security.CustomizedOpaqueTokenIntrospector;
@@ -17,6 +18,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -145,7 +147,12 @@ public class AuthorizationServerConfiguration {
                 .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
                 .and()
                 .authorizeHttpRequests()
+                // 所有oauth2相关不需要登录
                 .requestMatchers("/oauth2/**").permitAll()
+                // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息
+                .requestMatchers(HttpMethod.PUT, "/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_T_ADMINISTRATOR.name())
+                // 只有超级管理员 和 机器人可以调用租户管理相关接口
+                .requestMatchers("/api/tenants/**").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_ROBOT.name())
                 .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer()
