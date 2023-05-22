@@ -147,10 +147,16 @@ public class AuthorizationServerConfiguration {
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
         });
         http.authorizeHttpRequests(c -> {
+            // api 文档不需要登录
+            c.requestMatchers("/v3/api-docs/**").permitAll();
+            c.requestMatchers("/swagger-ui/**").permitAll();
+            c.requestMatchers("/swagger/**").permitAll();
             // 所有oauth2相关不需要登录
             c.requestMatchers("/oauth2/**").permitAll();
             // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息
             c.requestMatchers(HttpMethod.PUT, "/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_T_ADMINISTRATOR.name());
+            // 租户其他接口只有超级管理员或机器人可以调用
+            c.requestMatchers("/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_ROBOT.name());
             // 剩余所有接口需要登录
             c.anyRequest().authenticated();
         });

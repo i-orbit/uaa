@@ -1,10 +1,13 @@
 package com.inmaytide.orbit.uaa.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.TenantState;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.utils.Assert;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author inmaytide
@@ -78,6 +82,18 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public Map<Long, String> getNamesByIds(String ids) {
+        List<Long> params = CommonUtils.splitToLongByCommas(ids);
+        if (CollectionUtils.isEmpty(params)) {
+            return Collections.emptyMap();
+        }
+        LambdaQueryWrapper<Tenant> wrapper = Wrappers.lambdaQuery(Tenant.class)
+                .select(Tenant::getId, Tenant::getName)
+                .in(Tenant::getId, params);
+        return getMapper().selectList(wrapper).stream().collect(Collectors.toMap(Entity::getId, Tenant::getName));
+    }
+
+    @Override
     public void setExtraAttributes(Collection<Tenant> entities) {
         if (CollectionUtils.isEmpty(entities)) {
             return;
@@ -88,7 +104,5 @@ public class TenantServiceImpl implements TenantService {
             entity.setCreatedByName(usernames.get(entity.getCreatedBy()));
             entity.setModifiedByName(usernames.get(entity.getModifiedBy()));
         }
-
-
     }
 }

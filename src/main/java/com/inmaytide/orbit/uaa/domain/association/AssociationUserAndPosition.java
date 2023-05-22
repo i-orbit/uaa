@@ -2,8 +2,7 @@ package com.inmaytide.orbit.uaa.domain.association;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.consts.Is;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -13,24 +12,24 @@ import java.io.Serializable;
  * @author inmaytide
  * @since 2023/4/4
  */
-@ApiModel("用户与岗位关联管理表(用户岗位)")
+@Schema(title = "用户与岗位关联管理表(用户岗位)")
 public class AssociationUserAndPosition implements Serializable {
 
-    @ApiModelProperty("用户唯一标识")
+    @Schema(title = "用户唯一标识")
     private Long userId;
 
-    @ApiModelProperty("用户姓名")
+    @Schema(title = "用户姓名")
     @TableField(exist = false)
     private String username;
 
-    @ApiModelProperty("岗位唯一标识")
+    @Schema(title = "岗位唯一标识")
     private Long positionId;
 
-    @ApiModelProperty("岗位名称")
+    @Schema(title = "岗位名称")
     @TableField(exist = false)
     private String positionName;
 
-    @ApiModelProperty(value = "是否是该用户默认岗位", notes = "一个用户只能有一个默认岗位")
+    @Schema(title = "是否是该用户默认岗位", description = "一个用户只能有一个默认岗位")
     private Is isDefault;
 
     public Long getUserId() {

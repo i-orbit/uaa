@@ -9,7 +9,8 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
     E_0x00100001("0x00100001", "用户已在其他地方登录"),
     E_0x00100002("0x00100002", "系统中不存在用户名为 {0} 的用户信息"),
     E_0x00100003("0x00100003", "用户密码输入错误"),
-    E_0x00100004("0x00100004", "修改数据时, 唯一标识不能为空");;
+    E_0x00100004("0x00100004", "修改数据时, 唯一标识不能为空"),
+    ;
 
     private final String value;
 

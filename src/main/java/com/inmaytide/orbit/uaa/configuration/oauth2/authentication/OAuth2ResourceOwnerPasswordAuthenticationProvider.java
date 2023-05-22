@@ -71,7 +71,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
         // 当用户在其他地方已登录时, 是否强制登录
         String forcedReplacement = (String) additionalParameters.get(PARAMETER_NAME_FORCED_REPLACEMENT);
 
-        // APP扫码免密码登录标记
+        // 免密码登录标记
         if (Objects.equals(password, Marks.LOGIN_WITHOUT_PASSWORD.getValue())) {
             username += Marks.LOGIN_WITHOUT_PASSWORD.getValue();
         }

@@ -2,8 +2,7 @@ package com.inmaytide.orbit.uaa.domain.association;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.consts.Is;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -13,24 +12,24 @@ import java.io.Serializable;
  * @author inmaytide
  * @since 2023/4/4
  */
-@ApiModel("用户与组织关联管理表(用户所属组织)")
+@Schema(title = "用户与组织关联管理表(用户所属组织)")
 public class AssociationUserAndOrganization implements Serializable {
 
-    @ApiModelProperty("用户唯一标识")
+    @Schema(title = "用户唯一标识")
     private Long userId;
 
-    @ApiModelProperty("用户姓名")
+    @Schema(title = "用户姓名")
     @TableField(exist = false)
     private String username;
 
-    @ApiModelProperty("组织唯一标识")
+    @Schema(title = "组织唯一标识")
     private Long organizationId;
 
-    @ApiModelProperty("组织名称")
+    @Schema(title = "组织名称")
     @TableField(exist = false)
     private String organizationName;
 
-    @ApiModelProperty(value = "是否是该用户默认组织", notes = "一个用户只能有一个默认组织")
+    @Schema(title = "是否是该用户默认组织", description = "一个用户只能有一个默认组织")
     private Is isDefault;
 
     public Long getUserId() {

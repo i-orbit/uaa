@@ -3,34 +3,33 @@ package com.inmaytide.orbit.uaa.domain;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.TenantState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author inmaytide
  * @since 2023/4/7
  */
-@ApiModel("租户信息")
+@Schema(title = "租户信息")
 public class Tenant extends TombstoneEntity {
 
     @NotBlank
-    @ApiModelProperty("租户名称")
+    @Schema(title = "租户名称")
     private String name;
 
-    @ApiModelProperty(value = "租户别名(简称)", notes = "不填默认等于租户名称")
+    @Schema(title = "租户别名(简称)", description = "不填默认等于租户名称")
     private String alias;
 
-    @ApiModelProperty("租户状态")
+    @Schema(title = "租户状态")
     private TenantState state;
 
-    @ApiModelProperty("LOGO图片存储地址")
+    @Schema(title = "LOGO图片存储地址")
     private String logo;
 
-    @ApiModelProperty(value = "定制化菜单是否已同步生成", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @Schema(title = "定制化菜单是否已同步生成", accessMode = Schema.AccessMode.READ_ONLY)
     private Is menuSynced;
 
-    @ApiModelProperty("license文件地址或license内容")
+    @Schema(title = "license文件地址或license内容")
     private String license;
 
     public String getName() {

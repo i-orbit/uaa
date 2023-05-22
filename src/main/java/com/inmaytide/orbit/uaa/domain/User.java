@@ -7,8 +7,7 @@ import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndOrganization;
 import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndPosition;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.lang3.StringUtils;
@@ -17,120 +16,120 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-import static io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY;
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 /**
  * @author inmaytide
  * @since 2023/4/3
  */
-@ApiModel("用户信息")
+@Schema(title = "用户信息")
 public class User extends TombstoneEntity {
 
-    @ApiModelProperty(value = "所属租户", accessMode = READ_ONLY, notes = "系统根据条件自动指定")
+    @Schema(title = "所属租户", accessMode = READ_ONLY, description = "系统根据条件自动指定")
     private Long tenantId;
 
-    @ApiModelProperty(value = "是否是租户管理员", notes = "只有超级管理员或租住管理员可以修改该字段")
+    @Schema(title = "是否是租户管理员", description = "只有超级管理员或租住管理员可以修改该字段")
     private Is isTenantAdministrator;
 
     @TableField(exist = false)
-    @ApiModelProperty(value = "租户名称", accessMode = READ_ONLY)
+    @Schema(title = "租户名称", accessMode = READ_ONLY)
     private Long tenantName;
 
     @TableField(exist = false)
-    @ApiModelProperty(value = "用户所属组织", notes = "同一个用户允许属于多个组织")
+    @Schema(title = "用户所属组织", description = "同一个用户允许属于多个组织")
     private List<AssociationUserAndOrganization> organizations;
 
     @TableField(exist = false)
-    @ApiModelProperty(value = "用户岗位", notes = "同一个用户允许兼任多个岗位")
+    @Schema(title = "用户岗位", description = "同一个用户允许兼任多个岗位")
     private List<AssociationUserAndPosition> positions;
 
-    @ApiModelProperty(value = "职级", notes = "取数据字典-职级")
+    @Schema(title = "职级", description = "取数据字典-职级")
     @TableField("`rank`")
     private String rank;
 
     @TableField(exist = false)
-    @ApiModelProperty("职级描述")
+    @Schema(title = "职级描述")
     private String rankName;
 
-    @ApiModelProperty(value = "权重", notes = "影响用户排序(数值倒序), 可为空(为空时排序在不为空的用户后面, 多个为空按用户创建时间正序排列)")
+    @Schema(title = "权重", description = "影响用户排序(数值倒序), 可为空(为空时排序在不为空的用户后面, 多个为空按用户创建时间正序排列)")
     private Integer weights;
 
     @NotBlank(message = "用户姓名不能为空")
-    @ApiModelProperty(value = "姓名", required = true)
+    @Schema(title = "姓名", required = true)
     private String name;
 
-    @ApiModelProperty(value = "性别", notes = "取数据字典-职级")
+    @Schema(title = "性别", description = "取数据字典-职级")
     private String gender;
 
-    @ApiModelProperty("性别中文描述")
+    @Schema(title = "性别中文描述")
     @TableField(exist = false)
     private String genderName;
 
-    @ApiModelProperty("生日")
+    @Schema(title = "生日")
     private LocalDate birthday;
 
-    @ApiModelProperty("身份证号码")
+    @Schema(title = "身份证号码")
     private String identificationNumber;
 
     @NotBlank(message = "用户登录名不能为空")
-    @ApiModelProperty(value = "登录用户名", required = true)
+    @Schema(title = "登录用户名", nullable = false)
     private String username;
 
-    @ApiModelProperty(value = "登录密码", notes = "新建时默认密码根据配置指定")
+    @Schema(title = "登录密码", description = "新建时默认密码根据配置指定")
     private String password;
 
-    @ApiModelProperty("密码有效期至")
+    @Schema(title = "密码有效期至")
     private Instant passwordExpireAt;
 
-    @ApiModelProperty("手机号码")
+    @Schema(title = "手机号码")
     private String telephoneNumber;
 
     @Email(message = "邮箱地址格式错误")
-    @ApiModelProperty("电子邮箱")
+    @Schema(title = "电子邮箱")
     private String email;
 
-    @ApiModelProperty("用户系统语言")
+    @Schema(title = "用户系统语言")
     private Languages lang;
 
-    @ApiModelProperty("用户头像图片地址")
+    @Schema(title = "用户头像图片地址")
     private String avatar;
 
-    @ApiModelProperty("用户电子签名图片地址")
+    @Schema(title = "用户电子签名图片地址")
     private String signature;
 
-    @ApiModelProperty("个人照片")
+    @Schema(title = "个人照片")
     private String photo;
 
-    @ApiModelProperty("用户状态")
+    @Schema(title = "用户状态")
     private UserState state;
 
-    @ApiModelProperty("状态修改时间")
+    @Schema(title = "状态修改时间")
     private Instant stateTime;
 
-    @ApiModelProperty(value = "任务代理人", notes = "用户外出/休假时代替处理相关任务的人员")
+    @Schema(title = "任务代理人", description = "用户外出/休假时代替处理相关任务的人员")
     private Long proxy;
 
     @TableField(exist = false)
-    @ApiModelProperty("任务代理人姓名")
+    @Schema(title = "任务代理人姓名")
     private String proxyName;
 
-    @ApiModelProperty(value = "人事状态", notes = "取数据字典-人事状态")
+    @Schema(title = "人事状态", description = "取数据字典-人事状态")
     private String personnelStatus;
 
-    @ApiModelProperty("人事状态描述")
+    @Schema(title = "人事状态描述")
     @TableField(exist = false)
     private String personnelStatusName;
 
-    @ApiModelProperty("员工编号")
+    @Schema(title = "员工编号")
     private String employeeId;
 
-    @ApiModelProperty("入职时间")
+    @Schema(title = "入职时间")
     private LocalDate joinDate;
 
-    @ApiModelProperty("转正日期")
+    @Schema(title = "转正日期")
     private LocalDate employmentConfirmationDate;
 
-    @ApiModelProperty("离职日期")
+    @Schema(title = "离职日期")
     private LocalDate resignationDate;
 
     public Long getTenantId() {
