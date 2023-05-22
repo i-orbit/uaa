@@ -25,6 +25,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -134,32 +136,29 @@ public class AuthorizationServerConfiguration {
                                                           RegisteredClientRepository clientRepository,
                                                           OAuth2AuthorizationService authorizationService,
                                                           AuthenticationManager authenticationManager) throws Exception {
-        http.apply(authorizationServerConfigurer(clientRepository, authorizationService, authenticationManager)).and()
-                .csrf().disable()
-                .formLogin().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .headers().httpStrictTransportSecurity().disable()
-                .and()
-                .exceptionHandling()
-                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .and()
-                .authorizeHttpRequests()
-                // 所有oauth2相关不需要登录
-                .requestMatchers("/oauth2/**").permitAll()
-                // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息
-                .requestMatchers(HttpMethod.PUT, "/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_T_ADMINISTRATOR.name())
-                // 只有超级管理员 和 机器人可以调用租户管理相关接口
-                .requestMatchers("/api/tenants/**").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_ROBOT.name())
-                .anyRequest().authenticated()
-                .and()
-                .oauth2ResourceServer()
-                .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
-                .opaqueToken()
-                .introspector(new CustomizedOpaqueTokenIntrospector(restTemplate));
+        http.apply(authorizationServerConfigurer(clientRepository, authorizationService, authenticationManager));
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.formLogin(AbstractHttpConfigurer::disable);
+        http.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.headers(c -> c.httpStrictTransportSecurity(HeadersConfigurer.HstsConfig::disable));
+        http.exceptionHandling(c -> {
+            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+        });
+        http.authorizeHttpRequests(c -> {
+            // 所有oauth2相关不需要登录
+            c.requestMatchers("/oauth2/**").permitAll();
+            // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息
+            c.requestMatchers(HttpMethod.PUT, "/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_T_ADMINISTRATOR.name());
+            // 剩余所有接口需要登录
+            c.anyRequest().authenticated();
+        });
+        http.oauth2ResourceServer(c -> {
+            c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(restTemplate)));
+        });
         return http.build();
     }
 

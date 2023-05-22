@@ -83,7 +83,11 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
             Authentication usernamePasswordAuthentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
             if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof RedisOAuth2AuthorizationService service) {
+                // 移除已过期的
                 List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(usernamePasswordAuthentication.getName(), platform);
+                authorizations.stream().filter(e -> e.getAccessToken().isExpired()).forEach(authorizationService::remove);
+                authorizations = service.findByUsernameAndPlatform(usernamePasswordAuthentication.getName(), platform);
+
                 if (CollectionUtils.isNotEmpty(authorizations)) {
                     // 不允许用户在多个地方同时登录
                     if (!properties.isAllowUsersToLoginSimultaneously()) {

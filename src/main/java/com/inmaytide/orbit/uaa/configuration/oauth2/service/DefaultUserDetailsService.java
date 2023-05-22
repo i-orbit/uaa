@@ -2,7 +2,6 @@ package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 
 import com.inmaytide.exception.web.BadCredentialsException;
 import com.inmaytide.orbit.commons.consts.Marks;
-import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.User;
