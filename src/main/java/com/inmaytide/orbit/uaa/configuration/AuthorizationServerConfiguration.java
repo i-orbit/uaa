@@ -150,7 +150,6 @@ public class AuthorizationServerConfiguration {
             // api 文档不需要登录
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
-            c.requestMatchers("/swagger/**").permitAll();
             // 所有oauth2相关不需要登录
             c.requestMatchers("/oauth2/**").permitAll();
             // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息

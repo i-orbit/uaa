@@ -18,8 +18,9 @@ public class UaaApplication {
     }
 
     @Bean
-    public OpenAPI springShopOpenAPI() {
+    public OpenAPI openAPI() {
         return new OpenAPI()
+                .specVersion(SpecVersion.V30)
                 .info(
                         new Info().title("Orbit UAA API")
                                 .description("User Account and Authentication Service For Orbit System")
@@ -29,7 +30,7 @@ public class UaaApplication {
                 .externalDocs(
                         new ExternalDocumentation()
                                 .description("UAA Wiki Documentation")
-                                .url("https://github.com/i-orbit")
+                                .url("https://github.com/i-orbit/uaa")
                 );
     }
 
