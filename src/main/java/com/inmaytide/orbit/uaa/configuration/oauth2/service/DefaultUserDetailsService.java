@@ -44,13 +44,8 @@ public class DefaultUserDetailsService implements org.springframework.security.c
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         boolean withoutPassword = username.endsWith(Marks.LOGIN_WITHOUT_PASSWORD.getValue());
-        if (withoutPassword) {
-            username = username.replaceAll(Marks.LOGIN_WITHOUT_PASSWORD.getValue(), "");
-        }
-        User user = userService.findUserByUsername(username);
-        if (user == null) {
-            throw new BadCredentialsException(ErrorCode.E_0x00100002, username);
-        }
+        final String loginName = withoutPassword ? username.replaceAll(Marks.LOGIN_WITHOUT_PASSWORD.getValue(), "") : username;
+        User user = userService.findUserByUsername(loginName).orElseThrow(() -> new BadCredentialsException(ErrorCode.E_0x00100002, loginName));
         return org.springframework.security.core.userdetails.User.withUsername(String.valueOf(user.getId()))
                 .password(withoutPassword ? passwordEncoder.encode(Marks.LOGIN_WITHOUT_PASSWORD.getValue()) : user.getPassword())
                 .accountLocked(user.getState() == UserState.LOCKED)

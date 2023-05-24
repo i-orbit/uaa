@@ -5,6 +5,7 @@ import com.inmaytide.orbit.commons.consts.Platforms;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.commons.domain.dto.AffectedResult;
 import com.inmaytide.orbit.commons.domain.dto.PageResult;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.domain.User;
@@ -13,6 +14,7 @@ import com.inmaytide.orbit.uaa.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +53,7 @@ public class UserResource {
 
     @GetMapping
     @Operation(summary = "分页查询用户信息列表")
-    public PageResult<User> pagination(@ModelAttribute UserQuery params) {
+    public PageResult<User> pagination(@ParameterObject @ModelAttribute UserQuery params) {
         return service.pagination(params);
     }
 
@@ -76,8 +78,7 @@ public class UserResource {
     @GetMapping("/id")
     @Operation(summary = "根据用户登录名获取用户ID")
     public Long getIdByUsername(@RequestParam("username") String username) {
-        User user = service.findUserByUsername(username);
-        return user != null ? user.getId() : null;
+        return service.findUserByUsername(username).map(Entity::getId).orElse(null);
     }
 
 }

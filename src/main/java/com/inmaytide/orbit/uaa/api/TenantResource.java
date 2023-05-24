@@ -2,8 +2,6 @@ package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
-import com.inmaytide.orbit.commons.consts.Roles;
-import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.Tenant;
 import com.inmaytide.orbit.uaa.service.TenantService;
@@ -14,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author inmaytide
@@ -38,12 +35,11 @@ public class TenantResource {
     }
 
     @PutMapping
-    @Operation(summary = "租户管理员修改租户信息接口-仅支持修改名称/别名/LOGO信息", method = "PUT")
+    @Operation(summary = "租户管理员修改租户信息接口", description = "仅支持修改名称/别名/LOGO信息")
     public Tenant update(@RequestBody @Validated Tenant tenant) {
-        GlobalUser operator = SecurityUtils.getAuthorizedUser();
-        if (operator.getRoles().contains(Roles.ROLE_S_ADMINISTRATOR.name())
-                || operator.getRoles().contains(Roles.ROLE_ROBOT.name())
-                || (operator.getRoles().contains(Roles.ROLE_T_ADMINISTRATOR.name()) && Objects.equals(tenant.getId(), operator.getTenantId()))) {
+        if (SecurityUtils.isSuperAdministrator()
+                || SecurityUtils.isRobot()
+                || SecurityUtils.isTenantAdministrator(tenant.getId())) {
             return service.update(tenant);
         }
         throw new AccessDeniedException();
