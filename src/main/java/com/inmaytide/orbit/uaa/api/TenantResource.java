@@ -2,6 +2,7 @@ package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.log.annotation.OperationLogging;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.Tenant;
 import com.inmaytide.orbit.uaa.service.TenantService;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @since 2023/5/19
  */
 @RestController
-@Tag(name = "租户信息管理")
+@Tag(name = "租户信息")
 @RequestMapping("/api/tenants")
 public class TenantResource {
 
@@ -29,12 +30,14 @@ public class TenantResource {
     }
 
     @PostMapping
+    @OperationLogging
     @Operation(summary = "创建租户信息")
     public Tenant create(@RequestBody @Validated Tenant tenant) {
         return service.create(tenant);
     }
 
     @PutMapping
+    @OperationLogging
     @Operation(summary = "租户管理员修改租户信息接口", description = "仅支持修改名称/别名/LOGO信息")
     public Tenant update(@RequestBody @Validated Tenant tenant) {
         if (SecurityUtils.isSuperAdministrator()
@@ -57,6 +60,7 @@ public class TenantResource {
         return service.getNamesByIds(ids);
     }
 
+    @OperationLogging
     @GetMapping("{id}")
     @Operation(summary = "查询指定租户详细信息")
     public Tenant get(@PathVariable Long id) {

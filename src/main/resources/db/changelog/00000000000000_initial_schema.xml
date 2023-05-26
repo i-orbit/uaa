@@ -60,7 +60,7 @@
         </createTable>
         <sql>
             INSERT INTO `uaa`.`user` (`id`, `tenant_id`, `is_tenant_administrator`, `rank`, `weights`, `name`, `gender`, `birthday`, `identification_number`, `username`, `password`, `password_expire_at`, `telephone_number`, `email`, `lang`, `avatar`, `signature`, `photo`, `state`, `state_time`, `proxy`, `personnel_status`, `employee_id`, `join_date`, `employment_confirmation_date`, `resignation_date`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
-                VALUES (9999, NULL, 'N', NULL, 100, 'Administrator', NULL, NULL, NULL, 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', NULL, '16866666666', 'inmaytide@gmail.com', 'SIMPLIFIED_CHINESE', NULL, NULL, NULL, 10000, '2023-01-01 00:00:59', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01 00:00:59', 9999, '2023-01-01 00:00:59', 9999, 'N', 1);
+                VALUES (9999, 3721, 'N', NULL, 100, 'Administrator', NULL, NULL, NULL, 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', NULL, '16866666666', 'inmaytide@gmail.com', 'SIMPLIFIED_CHINESE', NULL, NULL, NULL, 10000, '2023-01-01 00:00:59', NULL, NULL, NULL, NULL, NULL, NULL, '2023-01-01 00:00:59', 9999, '2023-01-01 00:00:59', 9999, 'N', 1);
         </sql>
     </changeSet>
 

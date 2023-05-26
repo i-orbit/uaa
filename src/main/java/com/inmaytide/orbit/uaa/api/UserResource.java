@@ -75,10 +75,10 @@ public class UserResource {
         return SecurityUtils.getPlatform().orElse(null);
     }
 
-    @GetMapping("/id")
+    @GetMapping("/by-username")
     @Operation(summary = "根据用户登录名获取用户ID")
-    public Long getIdByUsername(@RequestParam("username") String username) {
-        return service.findUserByUsername(username).map(Entity::getId).orElse(null);
+    public User getIdByUsername(@RequestParam("username") String username) {
+        return service.findUserByUsername(username).orElse(null);
     }
 
 }

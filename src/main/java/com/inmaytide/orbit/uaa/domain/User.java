@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +25,9 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
  */
 @Schema(title = "用户信息")
 public class User extends TombstoneEntity {
+
+    @Serial
+    private static final long serialVersionUID = -8283756438301534620L;
 
     @Schema(title = "所属租户", accessMode = READ_ONLY, description = "系统根据条件自动指定")
     private Long tenantId;
