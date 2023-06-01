@@ -99,17 +99,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result == null")
-    public GlobalUser loadUserById(Serializable id) {
-        User user = mapper.selectById(id);
-        GlobalUser globalUser = new GlobalUser();
-        BeanUtils.copyProperties(user, globalUser);
-        globalUser.setRoles(roleService.findRoleCodesByUser(user));
-        globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
-        return globalUser;
-    }
-
-    @Override
     public User create(User entity) {
         if (exist(entity)) {
             throw new BadRequestException(E_0x00100005);
@@ -166,4 +155,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result == null")
+    public GlobalUser get(Serializable id) {
+        User user = mapper.selectById(id);
+        GlobalUser globalUser = new GlobalUser();
+        BeanUtils.copyProperties(user, globalUser);
+        globalUser.setRoles(roleService.findRoleCodesByUser(user));
+        globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
+        return globalUser;
+    }
 }

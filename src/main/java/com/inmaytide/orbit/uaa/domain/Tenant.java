@@ -29,6 +29,9 @@ public class Tenant extends TombstoneEntity {
     @Schema(title = "定制化菜单是否已同步生成", accessMode = Schema.AccessMode.READ_ONLY)
     private Is menuSynced;
 
+    @Schema(title = "操作日志保留时长", description = "单位: 天, 等于-1时表示永久保留")
+    private Integer operationLogRetentionTime;
+
     @Schema(title = "license文件地址或license内容")
     private String license;
 
@@ -70,6 +73,14 @@ public class Tenant extends TombstoneEntity {
 
     public void setMenuSynced(Is menuSynced) {
         this.menuSynced = menuSynced;
+    }
+
+    public Integer getOperationLogRetentionTime() {
+        return operationLogRetentionTime;
+    }
+
+    public void setOperationLogRetentionTime(Integer operationLogRetentionTime) {
+        this.operationLogRetentionTime = operationLogRetentionTime;
     }
 
     public String getLicense() {

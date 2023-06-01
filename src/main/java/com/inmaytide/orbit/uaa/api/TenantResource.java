@@ -2,9 +2,11 @@ package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.commons.log.annotation.OperationLogging;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.Tenant;
+import com.inmaytide.orbit.uaa.domain.dto.TenantQuery;
 import com.inmaytide.orbit.uaa.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,6 +68,13 @@ public class TenantResource {
     @Operation(summary = "查询指定租户详细信息")
     public Tenant get(@PathVariable Long id) {
         return service.get(id).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(id)));
+    }
+
+    @OperationLogging
+    @GetMapping
+    @Operation(summary = "查询租户信息列表")
+    public PageResult<Tenant> pagination(@ModelAttribute TenantQuery query) {
+        return service.pagination(query);
     }
 
 

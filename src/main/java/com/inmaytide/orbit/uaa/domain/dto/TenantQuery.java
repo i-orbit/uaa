@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author inmaytide
- * @since 2023/4/7
+ * @since 2023/6/1
  */
-@Schema(title = "用户查询请求参数")
-public class UserQuery extends Pageable {
+@Schema(title = "租户列表查询接口参数")
+public class TenantQuery extends Pageable {
 }
