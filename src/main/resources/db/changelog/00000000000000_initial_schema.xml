@@ -14,9 +14,6 @@
             <column name="state" type="int" remarks="状态"/>
             <column name="logo" type="varchar(512)" remarks="logo图片地址"/>
             <column name="menu_synced" type="varchar(2)" remarks="菜单是否已根据授权同步到菜单表"/>
-            <column name="operation_log_retention_time" type="int" remarks="操作日志保留时长(单位:天)" defaultValue="180">
-                <constraints nullable="false" />
-            </column>
             <column name="license" type="text" remarks="授权信息"/>
             <column name="created_time" type="timestamp" remarks="创建时间"/>
             <column name="created_by" type="bigint" remarks="创建人"/>
