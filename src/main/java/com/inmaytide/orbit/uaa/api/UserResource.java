@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2023/4/7
  */
 @RestController
-@Tag(name = "用户信息管理")
+@Tag(name = "用户信息")
 @RequestMapping("/api/users")
 public class UserResource {
 

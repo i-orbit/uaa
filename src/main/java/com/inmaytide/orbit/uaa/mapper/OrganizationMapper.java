@@ -1,14 +1,13 @@
 package com.inmaytide.orbit.uaa.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.Organization;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author inmaytide
- * @since 2023/4/6
+ * @since 2023/6/27
  */
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
-
+public interface OrganizationMapper extends BaseMapper<Organization> {
 }

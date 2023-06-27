@@ -64,4 +64,51 @@
         </sql>
     </changeSet>
 
+    <changeSet id="000000000000002" author="inmaytide">
+        <createTable tableName="organization" remarks="组织信息">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="parent" type="bigint" remarks="父级组织唯一标识" />
+            <column name="name" type="varchar(32)" remarks="名称"/>
+            <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
+            <column name="cover" type="varchar(256)" remarks="简介封面图片"/>
+            <column name="description" type="varchar(512)" remarks="简介说明"/>
+            <column name="address" type="varchar(256)" remarks="地址"/>
+            <column name="principal" type="bigint" remarks="负责人"/>
+            <column name="type" type="int" remarks="组织类型" />
+            <column name="sequence" type="int" remarks="排序" />
+            <column name="path" type="varchar" remarks="树路径" />
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="area" remarks="区域位置">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="parent" type="bigint" remarks="父级区域唯一标识" />
+            <column name="name" type="varchar(32)" remarks="名称"/>
+            <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
+            <column name="cover" type="varchar(256)" remarks="简介封面图片"/>
+            <column name="description" type="varchar(512)" remarks="简介说明"/>
+            <column name="address" type="varchar(256)" remarks="地址"/>
+            <column name="type" type="int" remarks="区域类型" />
+            <column name="category" type="varchar(64)" remarks="区域分类"/>
+            <column name="sequence" type="int" remarks="排序" />
+            <column name="path" type="varchar" remarks="树路径" />
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

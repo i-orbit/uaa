@@ -12,6 +12,7 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
     E_0x00100004("0x00100004", "修改数据时, 唯一标识不能为空"),
     E_0x00100005("0x00100005", "用户已存在(登录名/手机号码/邮箱地址/员工编号重复)"),
     E_0x00100006("0x00100006", "您没有权限创建/修改该用户信息"),
+    E_0x00100007("0x00100007", "区域位置名称重复"),
     ;
 
     private final String value;
