@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain;
+package com.inmaytide.orbit.uaa.domain.user;
 
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;

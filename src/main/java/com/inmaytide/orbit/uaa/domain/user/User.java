@@ -1,12 +1,10 @@
-package com.inmaytide.orbit.uaa.domain;
+package com.inmaytide.orbit.uaa.domain.user;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Languages;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
-import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndOrganization;
-import com.inmaytide.orbit.uaa.domain.association.AssociationUserAndPosition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

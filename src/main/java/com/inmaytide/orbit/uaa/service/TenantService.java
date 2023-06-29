@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.service;
 
 import com.inmaytide.orbit.commons.business.BasicService;
-import com.inmaytide.orbit.uaa.domain.Tenant;
+import com.inmaytide.orbit.uaa.domain.tenant.Tenant;
 
 import java.util.Map;
 

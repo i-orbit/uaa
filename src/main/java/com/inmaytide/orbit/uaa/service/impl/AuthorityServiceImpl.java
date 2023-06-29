@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa.service.impl;
 
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,7 @@ package com.inmaytide.orbit.uaa.service;
 
 import com.inmaytide.orbit.commons.business.BasicService;
 import com.inmaytide.orbit.commons.provider.UserDetailsProvider;
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.user.User;
 
 import java.util.List;
 import java.util.Map;

@@ -5,8 +5,8 @@ import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
-import com.inmaytide.orbit.uaa.domain.Role;
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.role.Role;
+import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.service.RoleService;
 import org.springframework.stereotype.Service;
 

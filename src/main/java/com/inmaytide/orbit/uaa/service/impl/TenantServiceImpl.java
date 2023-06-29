@@ -11,7 +11,7 @@ import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.utils.Assert;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
-import com.inmaytide.orbit.uaa.domain.Tenant;
+import com.inmaytide.orbit.uaa.domain.tenant.Tenant;
 import com.inmaytide.orbit.uaa.mapper.TenantMapper;
 import com.inmaytide.orbit.uaa.service.TenantService;
 import com.inmaytide.orbit.uaa.service.UserService;

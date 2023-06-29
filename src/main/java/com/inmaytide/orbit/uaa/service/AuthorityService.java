@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa.service;
 
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.user.User;
 
 import java.util.List;
 

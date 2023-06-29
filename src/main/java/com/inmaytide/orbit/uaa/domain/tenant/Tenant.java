@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain;
+package com.inmaytide.orbit.uaa.domain.tenant;
 
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.TenantState;

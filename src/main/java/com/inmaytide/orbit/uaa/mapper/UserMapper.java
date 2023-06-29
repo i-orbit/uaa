@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.user.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain.association;
+package com.inmaytide.orbit.uaa.domain.user;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.consts.Is;

@@ -9,12 +9,14 @@ import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
+import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
-import com.inmaytide.orbit.uaa.domain.User;
+import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.mapper.UserMapper;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
+import com.inmaytide.orbit.uaa.service.OrganizationService;
 import com.inmaytide.orbit.uaa.service.RoleService;
 import com.inmaytide.orbit.uaa.service.UserService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -45,10 +47,13 @@ public class UserServiceImpl implements UserService {
 
     private final AuthorityService authorityService;
 
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService) {
+    private final OrganizationService organizationService;
+
+    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService) {
         this.mapper = mapper;
         this.roleService = roleService;
         this.authorityService = authorityService;
+        this.organizationService = organizationService;
     }
 
     @Override
@@ -163,6 +168,15 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, globalUser);
         globalUser.setRoles(roleService.findRoleCodesByUser(user));
         globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
+
+        Perspective perspective = new Perspective();
+        globalUser.setPerspective(perspective);
+//        perspective.setAuthorizedOrganizations();
+//        perspective.setOrganizations();
+//
+//        perspective.setAuthorizedAreas();
+//        perspective.setAreas();
+
         return globalUser;
     }
 }

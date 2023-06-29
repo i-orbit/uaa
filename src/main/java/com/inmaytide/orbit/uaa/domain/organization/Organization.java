@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain;
+package com.inmaytide.orbit.uaa.domain.organization;
 
 import com.inmaytide.orbit.commons.domain.GeographicCoordinate;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
@@ -9,24 +9,34 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author inmaytide
  * @since 2023/4/7
  */
+@Schema(title = "组织信息")
 public class Organization extends TombstoneEntity {
 
+    @Schema(title = "所属组织")
     private Long tenant;
 
+    @Schema(title = "父级组织", description = "根目录值为 0")
     private Long parent;
 
+    @Schema(title = "组织名称")
     private String name;
 
+    @Schema(title = "组织别名/简称")
     private String alias;
 
+    @Schema(title = "组织简介照片存储路径")
     private String cover;
 
+    @Schema(title = "组织简介")
     private String description;
 
+    @Schema(title = "组织地址")
     private String address;
 
+    @Schema(title = "负责人")
     private Long principal;
 
+    @Schema(title = "组织类型")
     private OrganizationType type;
 
     @Schema(title = "在同级别下的排序")
@@ -35,6 +45,7 @@ public class Organization extends TombstoneEntity {
     @Schema(title = "组织所在树的ID路径", description = "自动根据数据结构生成, 其他方式修改无效", accessMode = Schema.AccessMode.READ_ONLY)
     private String path;
 
+    @Schema(title = "地理位置")
     private GeographicCoordinate geolocation;
 
     public Long getTenant() {
