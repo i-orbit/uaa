@@ -7,7 +7,7 @@ import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import com.inmaytide.orbit.uaa.service.RoleService;
-import com.inmaytide.orbit.uaa.service.UserService;
+import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -14,7 +14,7 @@ import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.tenant.Tenant;
 import com.inmaytide.orbit.uaa.mapper.TenantMapper;
 import com.inmaytide.orbit.uaa.service.TenantService;
-import com.inmaytide.orbit.uaa.service.UserService;
+import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;

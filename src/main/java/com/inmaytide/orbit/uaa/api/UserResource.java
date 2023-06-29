@@ -9,7 +9,7 @@ import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserQuery;
-import com.inmaytide.orbit.uaa.service.UserService;
+import com.inmaytide.orbit.uaa.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

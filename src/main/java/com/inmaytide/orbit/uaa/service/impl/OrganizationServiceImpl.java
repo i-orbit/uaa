@@ -15,6 +15,7 @@ import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.organization.Organization;
 import com.inmaytide.orbit.uaa.mapper.OrganizationMapper;
 import com.inmaytide.orbit.uaa.service.OrganizationService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,17 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<Long> authorizedIds = SecurityUtils.getAuthorizedUser().getPerspective().getOrganizations();
         List<Long> requiredIds = getRequiredIds(authorizedIds, all);
         return getChildren(NumberUtils.createLong(Marks.TREE_ROOT.getValue()), all, authorizedIds, requiredIds);
+    }
+
+    @Override
+    public Map<Long, String> findNamesByIds(List<Long> ids) {
+        if (CollectionUtils.isNotEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Organization::getId, Organization::getName);
+        wrapper.in(Organization::getId, ids);
+        return mapper.selectList(wrapper).stream().collect(Collectors.toMap(Entity::getId, Organization::getName));
     }
 
     private List<TreeNode<Organization>> getChildren(Long parent, List<Organization> all, List<Long> authorizedIds, List<Long> requiredIds) {

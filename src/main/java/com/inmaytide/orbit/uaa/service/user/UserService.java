@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.service;
+package com.inmaytide.orbit.uaa.service.user;
 
 import com.inmaytide.orbit.commons.business.BasicService;
 import com.inmaytide.orbit.commons.provider.UserDetailsProvider;

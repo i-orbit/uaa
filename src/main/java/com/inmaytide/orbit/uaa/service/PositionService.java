@@ -1,19 +1,16 @@
 package com.inmaytide.orbit.uaa.service;
 
 import com.inmaytide.orbit.commons.business.BasicService;
-import com.inmaytide.orbit.uaa.domain.role.Role;
-import com.inmaytide.orbit.uaa.domain.user.User;
+import com.inmaytide.orbit.uaa.domain.Position;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author inmaytide
- * @since 2023/5/19
+ * @since 2023/6/29
  */
-public interface RoleService extends BasicService<Role> {
-
-    List<String> findRoleCodesByUser(User user);
+public interface PositionService extends BasicService<Position> {
 
     Map<Long, String> findNamesByIds(List<Long> ids);
 

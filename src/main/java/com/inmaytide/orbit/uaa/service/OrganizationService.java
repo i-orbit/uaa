@@ -5,6 +5,7 @@ import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.uaa.domain.organization.Organization;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author inmaytide
@@ -19,4 +20,6 @@ public interface OrganizationService extends BasicService<Organization> {
     List<Organization> all(Long tenant);
 
     List<TreeNode<Organization>> getTreeOfOrganizations();
+
+    Map<Long, String> findNamesByIds(List<Long> ids);
 }

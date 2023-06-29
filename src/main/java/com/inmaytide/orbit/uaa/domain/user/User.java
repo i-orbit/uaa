@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serial;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
@@ -35,7 +36,7 @@ public class User extends TombstoneEntity {
 
     @TableField(exist = false)
     @Schema(title = "租户名称", accessMode = READ_ONLY)
-    private Long tenantName;
+    private String tenantName;
 
     @TableField(exist = false)
     @Schema(title = "用户所属组织", description = "同一个用户允许属于多个组织")
@@ -44,6 +45,10 @@ public class User extends TombstoneEntity {
     @TableField(exist = false)
     @Schema(title = "用户岗位", description = "同一个用户允许兼任多个岗位")
     private List<AssociationUserAndPosition> positions;
+
+    @TableField(exist = false)
+    @Schema(title = "用户角色", description = "同一个用户用于多个角色")
+    private List<AssociationUserAndRole> roles;
 
     @Schema(title = "职级", description = "取数据字典-职级")
     @TableField("`rank`")
@@ -57,10 +62,10 @@ public class User extends TombstoneEntity {
     private Integer weights;
 
     @NotBlank(message = "用户姓名不能为空")
-    @Schema(title = "姓名", required = true)
+    @Schema(title = "姓名", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
-    @Schema(title = "性别", description = "取数据字典-职级")
+    @Schema(title = "性别", description = "取数据字典-性别")
     private String gender;
 
     @Schema(title = "性别中文描述")
@@ -74,7 +79,7 @@ public class User extends TombstoneEntity {
     private String identificationNumber;
 
     @NotBlank(message = "用户登录名不能为空")
-    @Schema(title = "登录用户名", nullable = false)
+    @Schema(title = "登录用户名", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
 
     @Schema(title = "登录密码", description = "新建时默认密码根据配置指定")
@@ -150,15 +155,18 @@ public class User extends TombstoneEntity {
         this.isTenantAdministrator = isTenantAdministrator;
     }
 
-    public Long getTenantName() {
+    public String getTenantName() {
         return tenantName;
     }
 
-    public void setTenantName(Long tenantName) {
+    public void setTenantName(String tenantName) {
         this.tenantName = tenantName;
     }
 
     public List<AssociationUserAndOrganization> getOrganizations() {
+        if (organizations == null) {
+            organizations = Collections.emptyList();
+        }
         return organizations;
     }
 
@@ -167,11 +175,25 @@ public class User extends TombstoneEntity {
     }
 
     public List<AssociationUserAndPosition> getPositions() {
+        if (positions == null) {
+            positions = Collections.emptyList();
+        }
         return positions;
     }
 
     public void setPositions(List<AssociationUserAndPosition> positions) {
         this.positions = positions;
+    }
+
+    public List<AssociationUserAndRole> getRoles() {
+        if (roles == null) {
+            roles = Collections.emptyList();
+        }
+        return roles;
+    }
+
+    public void setRoles(List<AssociationUserAndRole> roles) {
+        this.roles = roles;
     }
 
     public String getRank() {

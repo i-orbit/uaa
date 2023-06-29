@@ -1,18 +1,21 @@
 package com.inmaytide.orbit.uaa.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.domain.Robot;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.domain.role.Role;
 import com.inmaytide.orbit.uaa.domain.user.User;
+import com.inmaytide.orbit.uaa.mapper.role.RoleMapper;
 import com.inmaytide.orbit.uaa.service.RoleService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author inmaytide
@@ -23,18 +26,21 @@ public class RoleServiceImpl implements RoleService {
 
     private final ApplicationProperties properties;
 
-    public RoleServiceImpl(ApplicationProperties properties) {
+    private final RoleMapper mapper;
+
+    public RoleServiceImpl(ApplicationProperties properties, RoleMapper mapper) {
         this.properties = properties;
+        this.mapper = mapper;
     }
 
     @Override
     public BaseMapper<Role> getMapper() {
-        return null;
+        return mapper;
     }
 
     @Override
     public Class<Role> getEntityClass() {
-        return null;
+        return Role.class;
     }
 
     @Override
@@ -53,5 +59,16 @@ public class RoleServiceImpl implements RoleService {
             res.add(Roles.ROLE_ROBOT.name());
         }
         return res;
+    }
+
+    @Override
+    public Map<Long, String> findNamesByIds(List<Long> ids) {
+        if (CollectionUtils.isNotEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(Role::getId, Role::getName);
+        wrapper.in(Role::getId, ids);
+        return mapper.selectList(wrapper).stream().collect(Collectors.toMap(Entity::getId, Role::getName));
     }
 }

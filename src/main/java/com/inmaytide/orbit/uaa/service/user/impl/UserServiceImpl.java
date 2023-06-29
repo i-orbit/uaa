@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.service.impl;
+package com.inmaytide.orbit.uaa.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -14,11 +14,14 @@ import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.user.User;
-import com.inmaytide.orbit.uaa.mapper.UserMapper;
+import com.inmaytide.orbit.uaa.mapper.user.UserMapper;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import com.inmaytide.orbit.uaa.service.OrganizationService;
 import com.inmaytide.orbit.uaa.service.RoleService;
-import com.inmaytide.orbit.uaa.service.UserService;
+import com.inmaytide.orbit.uaa.service.user.AssociationUserAndOrganizationService;
+import com.inmaytide.orbit.uaa.service.user.AssociationUserAndPositionService;
+import com.inmaytide.orbit.uaa.service.user.AssociationUserAndRoleService;
+import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -49,11 +52,20 @@ public class UserServiceImpl implements UserService {
 
     private final OrganizationService organizationService;
 
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService) {
+    private final AssociationUserAndRoleService associationUserAndRoleService;
+
+    private final AssociationUserAndPositionService associationUserAndPositionService;
+
+    private final AssociationUserAndOrganizationService associationUserAndOrganizationService;
+
+    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, AssociationUserAndRoleService associationUserAndRoleService, AssociationUserAndPositionService associationUserAndPositionService, AssociationUserAndOrganizationService associationUserAndOrganizationService) {
         this.mapper = mapper;
         this.roleService = roleService;
         this.authorityService = authorityService;
         this.organizationService = organizationService;
+        this.associationUserAndRoleService = associationUserAndRoleService;
+        this.associationUserAndPositionService = associationUserAndPositionService;
+        this.associationUserAndOrganizationService = associationUserAndOrganizationService;
     }
 
     @Override
@@ -103,6 +115,12 @@ public class UserServiceImpl implements UserService {
         return mapper.selectCount(wrapper) > 0;
     }
 
+    private void persistAssociations(User entity) {
+        associationUserAndRoleService.save(entity.getId(), entity.getRoles());
+        associationUserAndPositionService.save(entity.getId(), entity.getPositions());
+        associationUserAndOrganizationService.save(entity.getId(), entity.getOrganizations());
+    }
+
     @Override
     public User create(User entity) {
         if (exist(entity)) {
@@ -115,6 +133,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         getMapper().insert(entity);
+        persistAssociations(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
@@ -136,6 +155,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         getMapper().updateById(entity);
+        persistAssociations(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
