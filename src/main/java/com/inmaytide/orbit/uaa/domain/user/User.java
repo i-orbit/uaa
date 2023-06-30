@@ -40,15 +40,15 @@ public class User extends TombstoneEntity {
 
     @TableField(exist = false)
     @Schema(title = "用户所属组织", description = "同一个用户允许属于多个组织")
-    private List<AssociationUserAndOrganization> organizations;
+    private List<UserAssociation> organizations;
 
     @TableField(exist = false)
     @Schema(title = "用户岗位", description = "同一个用户允许兼任多个岗位")
-    private List<AssociationUserAndPosition> positions;
+    private List<UserAssociation> positions;
 
     @TableField(exist = false)
     @Schema(title = "用户角色", description = "同一个用户用于多个角色")
-    private List<AssociationUserAndRole> roles;
+    private List<UserAssociation> roles;
 
     @Schema(title = "职级", description = "取数据字典-职级")
     @TableField("`rank`")
@@ -163,36 +163,36 @@ public class User extends TombstoneEntity {
         this.tenantName = tenantName;
     }
 
-    public List<AssociationUserAndOrganization> getOrganizations() {
+    public List<UserAssociation> getOrganizations() {
         if (organizations == null) {
             organizations = Collections.emptyList();
         }
         return organizations;
     }
 
-    public void setOrganizations(List<AssociationUserAndOrganization> organizations) {
+    public void setOrganizations(List<UserAssociation> organizations) {
         this.organizations = organizations;
     }
 
-    public List<AssociationUserAndPosition> getPositions() {
+    public List<UserAssociation> getPositions() {
         if (positions == null) {
             positions = Collections.emptyList();
         }
         return positions;
     }
 
-    public void setPositions(List<AssociationUserAndPosition> positions) {
+    public void setPositions(List<UserAssociation> positions) {
         this.positions = positions;
     }
 
-    public List<AssociationUserAndRole> getRoles() {
+    public List<UserAssociation> getRoles() {
         if (roles == null) {
             roles = Collections.emptyList();
         }
         return roles;
     }
 
-    public void setRoles(List<AssociationUserAndRole> roles) {
+    public void setRoles(List<UserAssociation> roles) {
         this.roles = roles;
     }
 

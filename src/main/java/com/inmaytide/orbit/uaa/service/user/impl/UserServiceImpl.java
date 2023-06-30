@@ -13,14 +13,15 @@ import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
+import com.inmaytide.orbit.commons.utils.CommonUtils;
+import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.user.User;
+import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserMapper;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import com.inmaytide.orbit.uaa.service.OrganizationService;
 import com.inmaytide.orbit.uaa.service.RoleService;
-import com.inmaytide.orbit.uaa.service.user.AssociationUserAndOrganizationService;
-import com.inmaytide.orbit.uaa.service.user.AssociationUserAndPositionService;
-import com.inmaytide.orbit.uaa.service.user.AssociationUserAndRoleService;
+import com.inmaytide.orbit.uaa.service.user.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,12 +30,15 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.inmaytide.orbit.uaa.configuration.ErrorCode.*;
+import static com.inmaytide.orbit.uaa.configuration.ErrorCode.E_0x00100005;
+import static com.inmaytide.orbit.uaa.configuration.ErrorCode.E_0x00100006;
 
 /**
  * @author inmaytide
@@ -52,21 +56,16 @@ public class UserServiceImpl implements UserService {
 
     private final OrganizationService organizationService;
 
-    private final AssociationUserAndRoleService associationUserAndRoleService;
+    private final UserAssociationService associationService;
 
-    private final AssociationUserAndPositionService associationUserAndPositionService;
-
-    private final AssociationUserAndOrganizationService associationUserAndOrganizationService;
-
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, AssociationUserAndRoleService associationUserAndRoleService, AssociationUserAndPositionService associationUserAndPositionService, AssociationUserAndOrganizationService associationUserAndOrganizationService) {
+    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService) {
         this.mapper = mapper;
         this.roleService = roleService;
         this.authorityService = authorityService;
         this.organizationService = organizationService;
-        this.associationUserAndRoleService = associationUserAndRoleService;
-        this.associationUserAndPositionService = associationUserAndPositionService;
-        this.associationUserAndOrganizationService = associationUserAndOrganizationService;
+        this.associationService = associationService;
     }
+
 
     @Override
     public BaseMapper<User> getMapper() {
@@ -115,13 +114,8 @@ public class UserServiceImpl implements UserService {
         return mapper.selectCount(wrapper) > 0;
     }
 
-    private void persistAssociations(User entity) {
-        associationUserAndRoleService.save(entity.getId(), entity.getRoles());
-        associationUserAndPositionService.save(entity.getId(), entity.getPositions());
-        associationUserAndOrganizationService.save(entity.getId(), entity.getOrganizations());
-    }
-
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public User create(User entity) {
         if (exist(entity)) {
             throw new BadRequestException(E_0x00100005);
@@ -133,13 +127,14 @@ public class UserServiceImpl implements UserService {
             }
         }
         getMapper().insert(entity);
-        persistAssociations(entity);
+        associationService.persistForUser(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
 
     @Override
     @CacheEvict(cacheNames = CacheNames.USER_DETAILS, key = "#entity.id")
+    @Transactional(rollbackFor = Throwable.class)
     public User update(User entity) {
         User original = mapper.selectById(entity.getId());
         if (original == null) {
@@ -149,13 +144,13 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(E_0x00100005);
         }
         // 修改租户管理员时验证权限
-        if (entity.getIsTenantAdministrator() != original.getIsTenantAdministrator() || original.getIsTenantAdministrator() == Is.Y) {
+        if (entity.getIsTenantAdministrator() != original.getIsTenantAdministrator()) {
             if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenantId())) {
                 throw new AccessDeniedException(E_0x00100006);
             }
         }
         getMapper().updateById(entity);
-        persistAssociations(entity);
+        associationService.persistForUser(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
     }
@@ -178,6 +173,16 @@ public class UserServiceImpl implements UserService {
         if (CollectionUtils.isEmpty(entities)) {
             return;
         }
+        List<Long> ids = CommonUtils.map(entities, Function.identity(), User::getId);
+        Map<Long, Map<UserAssociationCategory, List<UserAssociation>>> allUserAssociations = associationService.findByUsers(ids);
+        entities.forEach(user -> {
+            Map<UserAssociationCategory, List<UserAssociation>> associations = allUserAssociations.get(user.getId());
+            if (associations != null) {
+                user.setOrganizations(associations.get(UserAssociationCategory.ORGANIZATION));
+                user.setPositions(associations.get(UserAssociationCategory.POSITION));
+                user.setRoles(associations.get(UserAssociationCategory.ROLE));
+            }
+        });
     }
 
     @Override
@@ -189,6 +194,11 @@ public class UserServiceImpl implements UserService {
         globalUser.setRoles(roleService.findRoleCodesByUser(user));
         globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
 
+
+
+//        globalUser.setDefaultUnderOrganization();
+//        globalUser.setUnderOrganizations();
+
         Perspective perspective = new Perspective();
         globalUser.setPerspective(perspective);
 //        perspective.setAuthorizedOrganizations();
@@ -199,4 +209,5 @@ public class UserServiceImpl implements UserService {
 
         return globalUser;
     }
+
 }

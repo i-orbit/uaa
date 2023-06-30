@@ -10,23 +10,23 @@ import java.io.Serializable;
  * @since 2023/6/29
  */
 @Schema(title = "角色关联的权限信息(包括功能权限和数据权限)")
-public class AssociationRoleAndAuthority {
+public class RoleAssociation {
 
     @Schema(title = "角色唯一标识")
-    private Long roleId;
+    private Long role;
 
     @Schema(title = "权限分类")
     private AuthorityCategory category;
 
     @Schema(title = "关联权限实例标识", description = "组织唯一标识/菜单编码/功能权限编码等")
-    private Serializable association;
+    private Serializable associated;
 
-    public Long getRoleId() {
-        return roleId;
+    public Long getRole() {
+        return role;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setRole(Long role) {
+        this.role = role;
     }
 
     public AuthorityCategory getCategory() {
@@ -37,11 +37,11 @@ public class AssociationRoleAndAuthority {
         this.category = category;
     }
 
-    public Serializable getAssociation() {
-        return association;
+    public Serializable getAssociated() {
+        return associated;
     }
 
-    public void setAssociation(Serializable association) {
-        this.association = association;
+    public void setAssociated(Serializable associated) {
+        this.associated = associated;
     }
 }
