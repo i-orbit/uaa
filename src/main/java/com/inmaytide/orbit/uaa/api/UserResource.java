@@ -7,6 +7,7 @@ import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
+import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserQuery;
 import com.inmaytide.orbit.uaa.service.user.UserService;
@@ -78,6 +79,14 @@ public class UserResource {
     @Operation(summary = "根据用户登录名获取用户ID")
     public User getIdByUsername(@RequestParam("username") String username) {
         return service.findUserByUsername(username).orElse(null);
+    }
+
+    public AffectedResult changePasswordWithOriginalPassword(@RequestBody ChangePassword body) {
+
+    }
+
+    public AffectedResult changePasswordWithoutOriginalPassword(@RequestBody ChangePassword body) {
+
     }
 
 }
