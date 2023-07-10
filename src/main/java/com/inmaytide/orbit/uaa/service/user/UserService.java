@@ -1,7 +1,9 @@
 package com.inmaytide.orbit.uaa.service.user;
 
 import com.inmaytide.orbit.commons.business.BasicService;
+import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.provider.UserDetailsProvider;
+import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
 
 import java.util.List;
@@ -24,4 +26,7 @@ public interface UserService extends UserDetailsProvider, BasicService<User> {
 
     Map<Long, String> findNamesByIds(List<Long> ids);
 
+    AffectedResult changePasswordWithOriginalPassword(ChangePassword body);
+
+    AffectedResult changePasswordWithCaptcha(ChangePassword body);
 }

@@ -81,12 +81,14 @@ public class UserResource {
         return service.findUserByUsername(username).orElse(null);
     }
 
-    public AffectedResult changePasswordWithOriginalPassword(@RequestBody ChangePassword body) {
-
+    @PutMapping("/change-password-with-original-password")
+    public AffectedResult changePasswordWithOriginalPassword(@Validated @RequestBody ChangePassword body) {
+        return service.changePasswordWithOriginalPassword(body);
     }
 
-    public AffectedResult changePasswordWithoutOriginalPassword(@RequestBody ChangePassword body) {
-
+    @PutMapping("/change-password-with-captcha")
+    public AffectedResult changePasswordWithCaptcha(@Validated @RequestBody ChangePassword body) {
+        return service.changePasswordWithCaptcha(body);
     }
 
 }

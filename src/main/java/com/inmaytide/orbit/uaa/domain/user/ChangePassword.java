@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.domain.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 import java.io.Serializable;
 
@@ -14,9 +15,11 @@ public class ChangePassword implements Serializable {
     @Schema(title = "原密码", description = "通过原密码修改密码时不能为空")
     private String originalValue;
 
+    @NotBlank
     @Schema(title = "新密码", requiredMode = Schema.RequiredMode.REQUIRED)
     private String newValue;
 
+    @NotBlank
     @Schema(title = "确认新密码", requiredMode = Schema.RequiredMode.REQUIRED)
     private String confirmValue;
 

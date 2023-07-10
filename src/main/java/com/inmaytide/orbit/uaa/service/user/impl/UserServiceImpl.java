@@ -11,10 +11,12 @@ import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
+import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserMapper;
@@ -210,4 +212,13 @@ public class UserServiceImpl implements UserService {
         return globalUser;
     }
 
+    @Override
+    public AffectedResult changePasswordWithOriginalPassword(ChangePassword body) {
+        return null;
+    }
+
+    @Override
+    public AffectedResult changePasswordWithCaptcha(ChangePassword body) {
+        return null;
+    }
 }
