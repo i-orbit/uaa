@@ -34,7 +34,7 @@ public class ChangePassword implements Serializable {
 
     public String getOriginalValue() {
         try {
-            return CodecUtils.decrypt(originalValue, CodecUtils.RSA_PUBLIC_KEY);
+            return CodecUtils.decrypt(originalValue, CodecUtils.RSA_PRIVATE_KEY);
         } catch (Exception e) {
             throw new BadRequestException(ErrorCode.E_0x00100008);
         }
@@ -46,7 +46,7 @@ public class ChangePassword implements Serializable {
 
     public String getNewValue() {
         try {
-            return CodecUtils.decrypt(newValue, CodecUtils.RSA_PUBLIC_KEY);
+            return CodecUtils.decrypt(newValue, CodecUtils.RSA_PRIVATE_KEY);
         } catch (Exception e) {
             throw new BadRequestException(ErrorCode.E_0x00100008);
         }
@@ -58,7 +58,7 @@ public class ChangePassword implements Serializable {
 
     public String getConfirmValue() {
         try {
-            return CodecUtils.decrypt(confirmValue, CodecUtils.RSA_PUBLIC_KEY);
+            return CodecUtils.decrypt(confirmValue, CodecUtils.RSA_PRIVATE_KEY);
         } catch (Exception e) {
             throw new BadRequestException(ErrorCode.E_0x00100008);
         }
