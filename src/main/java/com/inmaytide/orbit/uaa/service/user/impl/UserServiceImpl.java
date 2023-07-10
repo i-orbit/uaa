@@ -8,6 +8,7 @@ import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
 import com.inmaytide.orbit.commons.consts.Is;
+import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
 import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
@@ -15,6 +16,7 @@ import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
+import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
@@ -31,10 +33,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -60,12 +64,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserAssociationService associationService;
 
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService, PasswordEncoder passwordEncoder) {
         this.mapper = mapper;
         this.roleService = roleService;
         this.authorityService = authorityService;
         this.organizationService = organizationService;
         this.associationService = associationService;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -197,7 +204,6 @@ public class UserServiceImpl implements UserService {
         globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
 
 
-
 //        globalUser.setDefaultUnderOrganization();
 //        globalUser.setUnderOrganizations();
 
@@ -213,12 +219,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.USER_DETAILS)
     public AffectedResult changePasswordWithOriginalPassword(ChangePassword body) {
-        return null;
+        User user = mapper.selectById(SecurityUtils.getAuthorizedUser().getId());
+        if (!passwordEncoder.matches(body.getOriginalValue(), user.getPassword())) {
+            throw new BadRequestException(ErrorCode.E_0x00100009);
+        }
+        if (!Objects.equals(body.getNewValue(), body.getConfirmValue())) {
+            throw new BadRequestException(ErrorCode.E_0x00100010);
+        }
+        if (!REG_PASSWORD.matcher(body.getNewValue()).matches()) {
+            throw new BadRequestException(ErrorCode.E_0x00100011);
+        }
+        user.setPassword(passwordEncoder.encode(body.getNewValue()));
+        if (user.getState() == UserState.INITIALIZATION) {
+            user.setState(UserState.NORMAL);
+            user.setStateTime(Instant.now());
+        }
+        return AffectedResult.of(mapper.updateById(user));
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.USER_DETAILS)
     public AffectedResult changePasswordWithCaptcha(ChangePassword body) {
+        if (!Objects.equals(body.getNewValue(), body.getConfirmValue())) {
+            throw new BadRequestException(ErrorCode.E_0x00100010);
+        }
+        if (!REG_PASSWORD.matcher(body.getNewValue()).matches()) {
+            throw new BadRequestException(ErrorCode.E_0x00100011);
+        }
         return null;
     }
 }

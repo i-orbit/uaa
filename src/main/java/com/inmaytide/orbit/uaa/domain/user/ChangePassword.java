@@ -1,5 +1,8 @@
 package com.inmaytide.orbit.uaa.domain.user;
 
+import com.inmaytide.exception.web.BadRequestException;
+import com.inmaytide.orbit.commons.utils.CodecUtils;
+import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -30,7 +33,11 @@ public class ChangePassword implements Serializable {
     private String username;
 
     public String getOriginalValue() {
-        return originalValue;
+        try {
+            return CodecUtils.decrypt(originalValue, CodecUtils.RSA_PUBLIC_KEY);
+        } catch (Exception e) {
+            throw new BadRequestException(ErrorCode.E_0x00100008);
+        }
     }
 
     public void setOriginalValue(String originalValue) {
@@ -38,7 +45,11 @@ public class ChangePassword implements Serializable {
     }
 
     public String getNewValue() {
-        return newValue;
+        try {
+            return CodecUtils.decrypt(newValue, CodecUtils.RSA_PUBLIC_KEY);
+        } catch (Exception e) {
+            throw new BadRequestException(ErrorCode.E_0x00100008);
+        }
     }
 
     public void setNewValue(String newValue) {
@@ -46,7 +57,11 @@ public class ChangePassword implements Serializable {
     }
 
     public String getConfirmValue() {
-        return confirmValue;
+        try {
+            return CodecUtils.decrypt(confirmValue, CodecUtils.RSA_PUBLIC_KEY);
+        } catch (Exception e) {
+            throw new BadRequestException(ErrorCode.E_0x00100008);
+        }
     }
 
     public void setConfirmValue(String confirmValue) {
