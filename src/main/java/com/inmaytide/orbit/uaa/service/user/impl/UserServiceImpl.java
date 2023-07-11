@@ -7,6 +7,7 @@ import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.consts.CacheNames;
+import com.inmaytide.orbit.commons.consts.Constants;
 import com.inmaytide.orbit.commons.consts.Is;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.commons.domain.GlobalUser;
@@ -15,6 +16,7 @@ import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
+import com.inmaytide.orbit.commons.service.library.SystemPropertyService;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
@@ -39,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -66,13 +70,16 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService, PasswordEncoder passwordEncoder) {
+    private final SystemPropertyService propertyService;
+
+    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService, PasswordEncoder passwordEncoder, SystemPropertyService propertyService) {
         this.mapper = mapper;
         this.roleService = roleService;
         this.authorityService = authorityService;
         this.organizationService = organizationService;
         this.associationService = associationService;
         this.passwordEncoder = passwordEncoder;
+        this.propertyService = propertyService;
     }
 
 
@@ -219,7 +226,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(cacheNames = CacheNames.USER_DETAILS)
+    @CacheEvict(cacheNames = CacheNames.USER_DETAILS, allEntries = true)
     public AffectedResult changePasswordWithOriginalPassword(ChangePassword body) {
         User user = mapper.selectById(SecurityUtils.getAuthorizedUser().getId());
         if (!passwordEncoder.matches(body.getOriginalValue(), user.getPassword())) {
@@ -232,6 +239,8 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(ErrorCode.E_0x00100011);
         }
         user.setPassword(passwordEncoder.encode(body.getNewValue()));
+        int passwordValidDays = propertyService.getIntValue(Constants.SPK_USER_PASS_VALID_IN_DAYS).orElse(180);
+        user.setPasswordExpireAt(LocalDate.now().plusDays(passwordValidDays).atStartOfDay().toInstant(ZoneOffset.ofHours(8)));
         if (user.getState() == UserState.INITIALIZATION) {
             user.setState(UserState.NORMAL);
             user.setStateTime(Instant.now());
