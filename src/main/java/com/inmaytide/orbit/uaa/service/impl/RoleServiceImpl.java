@@ -44,6 +44,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public Role create(Role entity) {
+        setDefaultValueForFields(entity);
+        mapper.insert(entity);
+
+        return entity;
+    }
+
+    @Override
     public List<String> findRoleCodesByUser(User user) {
         List<String> res = new ArrayList<>();
         // 如果系统启用了超级管理员
@@ -70,5 +78,11 @@ public class RoleServiceImpl implements RoleService {
         wrapper.select(Role::getId, Role::getName);
         wrapper.in(Role::getId, ids);
         return mapper.selectList(wrapper).stream().collect(Collectors.toMap(Entity::getId, Role::getName));
+    }
+
+    private void setDefaultValueForFields(Role entity) {
+        if (entity.getWeights() == null) {
+            entity.setWeights(100);
+        }
     }
 }

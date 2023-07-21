@@ -29,7 +29,7 @@ public class User extends TombstoneEntity {
     private static final long serialVersionUID = -8283756438301534620L;
 
     @Schema(title = "所属租户", accessMode = READ_ONLY, description = "系统根据条件自动指定")
-    private Long tenantId;
+    private Long tenant;
 
     @Schema(title = "是否是租户管理员", description = "只有超级管理员或租住管理员可以修改该字段")
     private Is isTenantAdministrator;
@@ -139,12 +139,12 @@ public class User extends TombstoneEntity {
     @Schema(title = "离职日期")
     private LocalDate resignationDate;
 
-    public Long getTenantId() {
-        return tenantId;
+    public Long getTenant() {
+        return tenant;
     }
 
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
     }
 
     public Is getIsTenantAdministrator() {

@@ -128,7 +128,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (entity.getParent() == null) {
             entity.setParent(NumberUtils.createLong(Marks.TREE_ROOT.getValue()));
         }
-        entity.setTenant(SecurityUtils.getAuthorizedUser().getTenantId());
         // 生成树路径信息
         Map<Long, Organization> all = ApplicationContextHolder.getInstance() // 这里不适用this是因为使用this会导致AOP代理失效, 缓存失效
                 .getBean(OrganizationService.class)

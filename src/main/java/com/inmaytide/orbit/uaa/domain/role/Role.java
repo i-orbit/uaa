@@ -1,10 +1,13 @@
 package com.inmaytide.orbit.uaa.domain.role;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author inmaytide
@@ -13,7 +16,8 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(title = "角色信息")
 public class Role extends TombstoneEntity {
 
-    @Schema(title = "所属租户")
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(title = "所属租户", accessMode = Schema.AccessMode.READ_ONLY)
     private Long tenant;
 
     @NotBlank
@@ -24,11 +28,12 @@ public class Role extends TombstoneEntity {
     @Schema(title = "角色编码", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 64)
     private String code;
 
+    @Length(max = 512)
     @Schema(title = "角色描述", maxLength = 512)
     private String description;
 
-    @Max(100)
     @Min(0)
+    @Max(100)
     @Schema(title = "角色权重", description = "影响角色列表排序", defaultValue = "100", maximum = "100", minimum = "0")
     private Integer weights;
 
