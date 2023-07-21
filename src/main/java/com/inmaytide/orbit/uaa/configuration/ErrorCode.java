@@ -17,6 +17,7 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
     E_0x00100009("0x00100009", "原密码输入错误"),
     E_0x00100010("0x00100010", "两次输入的密码不一致"),
     E_0x00100011("0x00100011", "密码长度最少 8 位且至少包含1个字母、1个数字和1个特殊字符"),
+    E_0x00100012("0x00100012", "角色名称或编码重复")
     ;
 
     private final String value;

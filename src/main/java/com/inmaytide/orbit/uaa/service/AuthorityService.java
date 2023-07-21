@@ -1,7 +1,5 @@
 package com.inmaytide.orbit.uaa.service;
 
-import com.inmaytide.orbit.uaa.domain.user.User;
-
 import java.util.List;
 
 /**
@@ -10,6 +8,6 @@ import java.util.List;
  */
 public interface AuthorityService {
 
-    List<String> findAuthoritiesByUser(User user);
+    List<String> findCodesByIds(List<Long> ids);
 
 }

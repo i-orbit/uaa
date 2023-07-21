@@ -21,6 +21,15 @@ public class RoleAssociation {
     @Schema(title = "关联权限实例标识", description = "组织唯一标识/菜单编码/功能权限编码等")
     private Serializable associated;
 
+    public RoleAssociation() {
+    }
+
+    public RoleAssociation(Long role, AuthorityCategory category, Serializable associated) {
+        this.role = role;
+        this.category = category;
+        this.associated = associated;
+    }
+
     public Long getRole() {
         return role;
     }

@@ -20,13 +20,14 @@ import com.inmaytide.orbit.commons.service.library.SystemPropertyService;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.role.RoleAssociation;
 import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserMapper;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import com.inmaytide.orbit.uaa.service.OrganizationService;
-import com.inmaytide.orbit.uaa.service.RoleService;
+import com.inmaytide.orbit.uaa.service.role.RoleService;
 import com.inmaytide.orbit.uaa.service.user.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
         }
         // 添加租户管理员时验证权限
         if (entity.getIsTenantAdministrator() == Is.Y) {
-            if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenantId())) {
+            if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenant())) {
                 throw new AccessDeniedException(E_0x00100006);
             }
         }
@@ -161,7 +162,7 @@ public class UserServiceImpl implements UserService {
         }
         // 修改租户管理员时验证权限
         if (entity.getIsTenantAdministrator() != original.getIsTenantAdministrator()) {
-            if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenantId())) {
+            if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenant())) {
                 throw new AccessDeniedException(E_0x00100006);
             }
         }
@@ -208,7 +209,14 @@ public class UserServiceImpl implements UserService {
         GlobalUser globalUser = new GlobalUser();
         BeanUtils.copyProperties(user, globalUser);
         globalUser.setRoles(roleService.findRoleCodesByUser(user));
-        globalUser.setAuthorities(authorityService.findAuthoritiesByUser(user));
+
+        List<RoleAssociation> roleAssociations = roleService.findAssociationsByCodes(globalUser.getRoles());
+
+
+
+
+
+        globalUser.setAuthorities(authorityService.findCodesByIds(roleAssociations.stream().map(e -> (Long) e.getAssociated()).collect(Collectors.toList())));
 
 
 //        globalUser.setDefaultUnderOrganization();

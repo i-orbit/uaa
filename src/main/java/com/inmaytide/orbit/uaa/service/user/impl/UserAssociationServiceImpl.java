@@ -8,7 +8,7 @@ import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserAssociationMapper;
 import com.inmaytide.orbit.uaa.service.OrganizationService;
 import com.inmaytide.orbit.uaa.service.PositionService;
-import com.inmaytide.orbit.uaa.service.RoleService;
+import com.inmaytide.orbit.uaa.service.role.RoleService;
 import com.inmaytide.orbit.uaa.service.user.UserAssociationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.lang.NonNull;

@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 /**
  * @author inmaytide
  * @since 2023/4/7
@@ -36,6 +38,22 @@ public class Role extends TombstoneEntity {
     @Max(100)
     @Schema(title = "角色权重", description = "影响角色列表排序", defaultValue = "100", maximum = "100", minimum = "0")
     private Integer weights;
+
+    @TableField(exist = false)
+    @Schema(title = "角色拥有的组织权限")
+    public List<Long> organizations;
+
+    @TableField(exist = false)
+    @Schema(title = "角色的Web菜单权限")
+    private List<Long> webMenus;
+
+    @TableField(exist = false)
+    @Schema(title = "角色的App菜单权限")
+    private List<Long> appMenus;
+
+    @TableField(exist = false)
+    @Schema(title = "角色的功能权限")
+    private List<Long> authorities;
 
     public Long getTenant() {
         return tenant;
@@ -75,5 +93,37 @@ public class Role extends TombstoneEntity {
 
     public void setWeights(Integer weights) {
         this.weights = weights;
+    }
+
+    public List<Long> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(List<Long> organizations) {
+        this.organizations = organizations;
+    }
+
+    public List<Long> getWebMenus() {
+        return webMenus;
+    }
+
+    public void setWebMenus(List<Long> webMenus) {
+        this.webMenus = webMenus;
+    }
+
+    public List<Long> getAppMenus() {
+        return appMenus;
+    }
+
+    public void setAppMenus(List<Long> appMenus) {
+        this.appMenus = appMenus;
+    }
+
+    public List<Long> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<Long> authorities) {
+        this.authorities = authorities;
     }
 }

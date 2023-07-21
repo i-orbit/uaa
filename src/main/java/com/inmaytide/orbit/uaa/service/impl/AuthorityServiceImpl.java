@@ -1,10 +1,8 @@
 package com.inmaytide.orbit.uaa.service.impl;
 
-import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.service.AuthorityService;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,8 +11,10 @@ import java.util.List;
  */
 @Service
 public class AuthorityServiceImpl implements AuthorityService {
+
     @Override
-    public List<String> findAuthoritiesByUser(User user) {
-        return Collections.emptyList();
+    public List<String> findAuthorityCodesByRoles(List<String> roleCodes) {
+        return null;
     }
+
 }
