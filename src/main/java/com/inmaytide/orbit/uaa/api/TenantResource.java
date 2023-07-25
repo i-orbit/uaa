@@ -7,7 +7,7 @@ import com.inmaytide.orbit.commons.log.annotation.OperationLogging;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.tenant.Tenant;
 import com.inmaytide.orbit.uaa.domain.tenant.TenantQuery;
-import com.inmaytide.orbit.uaa.service.TenantService;
+import com.inmaytide.orbit.uaa.service.tenant.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +40,7 @@ public class TenantResource {
 
     @PutMapping
     @OperationLogging
-    @Operation(summary = "租户管理员修改租户信息接口", description = "仅支持修改名称/别名/LOGO信息")
+    @Operation(summary = "修改租户基本信息(名称/别名/LOGO图片)接口", description = "仅允许超级管理员和该租户的租户管理员修改")
     public Tenant update(@RequestBody @Validated Tenant tenant) {
         if (SecurityUtils.isSuperAdministrator()
                 || SecurityUtils.isRobot()

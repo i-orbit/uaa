@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.service.user;
 
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
-import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.user.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 

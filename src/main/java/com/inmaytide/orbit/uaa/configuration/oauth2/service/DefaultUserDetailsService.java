@@ -5,8 +5,8 @@ import com.inmaytide.orbit.commons.consts.Marks;
 import com.inmaytide.orbit.commons.consts.UserState;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.user.User;
-import com.inmaytide.orbit.uaa.service.AuthorityService;
-import com.inmaytide.orbit.uaa.service.role.RoleService;
+import com.inmaytide.orbit.uaa.service.permission.AuthorityService;
+import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -55,7 +55,9 @@ public class DefaultUserDetailsService implements org.springframework.security.c
     }
 
     private List<GrantedAuthority> createAuthoritiesWithUser(User user) {
-        return Stream.concat(authorityService.findAuthoritiesByUser(user).stream(), roleService.findRoleCodesByUser(user).stream())
+        List<String> roleCodes = roleService.findCodesByUser(user);
+        List<String> authorityCodes = authorityService.findCodesByRoleCodes(roleCodes);
+        return Stream.concat(roleCodes.stream().map(e -> !e.startsWith("ROLE_") ? "ROLE_" + e : e), authorityCodes.stream())
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

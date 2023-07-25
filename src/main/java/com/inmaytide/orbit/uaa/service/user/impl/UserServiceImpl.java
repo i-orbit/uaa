@@ -1,8 +1,8 @@
 package com.inmaytide.orbit.uaa.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
@@ -19,15 +19,16 @@ import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.library.SystemPropertyService;
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
-import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
-import com.inmaytide.orbit.uaa.domain.role.RoleAssociation;
+import com.inmaytide.orbit.uaa.domain.permission.AuthorityCategory;
+import com.inmaytide.orbit.uaa.domain.user.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
 import com.inmaytide.orbit.uaa.domain.user.ChangePassword;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserMapper;
-import com.inmaytide.orbit.uaa.service.AuthorityService;
-import com.inmaytide.orbit.uaa.service.OrganizationService;
-import com.inmaytide.orbit.uaa.service.role.RoleService;
+import com.inmaytide.orbit.uaa.service.permission.AuthorityService;
+import com.inmaytide.orbit.uaa.service.permission.OrganizationService;
+import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import com.inmaytide.orbit.uaa.service.user.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.user.UserService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,15 +58,12 @@ import static com.inmaytide.orbit.uaa.configuration.ErrorCode.E_0x00100006;
  */
 @Primary
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    private final UserMapper mapper;
 
     private final RoleService roleService;
 
     private final AuthorityService authorityService;
-
-    private final OrganizationService organizationService;
 
     private final UserAssociationService associationService;
 
@@ -73,25 +71,12 @@ public class UserServiceImpl implements UserService {
 
     private final SystemPropertyService propertyService;
 
-    public UserServiceImpl(UserMapper mapper, RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService, PasswordEncoder passwordEncoder, SystemPropertyService propertyService) {
-        this.mapper = mapper;
+    public UserServiceImpl(RoleService roleService, AuthorityService authorityService, OrganizationService organizationService, UserAssociationService associationService, PasswordEncoder passwordEncoder, SystemPropertyService propertyService) {
         this.roleService = roleService;
         this.authorityService = authorityService;
-        this.organizationService = organizationService;
         this.associationService = associationService;
         this.passwordEncoder = passwordEncoder;
         this.propertyService = propertyService;
-    }
-
-
-    @Override
-    public BaseMapper<User> getMapper() {
-        return mapper;
-    }
-
-    @Override
-    public Class<User> getEntityClass() {
-        return User.class;
     }
 
     @Override
@@ -104,7 +89,7 @@ public class UserServiceImpl implements UserService {
                         .or().eq(User::getEmail, username)
                         .or().eq(User::getEmployeeId, username)
         );
-        return Optional.ofNullable(mapper.selectOne(wrapper));
+        return Optional.ofNullable(baseMapper.selectOne(wrapper));
     }
 
     private boolean exist(User user) {
@@ -128,7 +113,7 @@ public class UserServiceImpl implements UserService {
                 w.or().eq(User::getEmployeeId, user.getEmployeeId());
             }
         });
-        return mapper.selectCount(wrapper) > 0;
+        return baseMapper.selectCount(wrapper) > 0;
     }
 
     @Override
@@ -143,7 +128,7 @@ public class UserServiceImpl implements UserService {
                 throw new AccessDeniedException(E_0x00100006);
             }
         }
-        getMapper().insert(entity);
+        baseMapper.insert(entity);
         associationService.persistForUser(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
@@ -153,7 +138,7 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(cacheNames = CacheNames.USER_DETAILS, key = "#entity.id")
     @Transactional(rollbackFor = Throwable.class)
     public User update(User entity) {
-        User original = mapper.selectById(entity.getId());
+        User original = baseMapper.selectById(entity.getId());
         if (original == null) {
             throw new ObjectNotFoundException(String.valueOf(entity.getId()));
         }
@@ -166,7 +151,7 @@ public class UserServiceImpl implements UserService {
                 throw new AccessDeniedException(E_0x00100006);
             }
         }
-        getMapper().updateById(entity);
+        baseMapper.updateById(entity);
         associationService.persistForUser(entity);
         updated();
         return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(entity.getId())));
@@ -180,7 +165,7 @@ public class UserServiceImpl implements UserService {
         LambdaQueryWrapper<User> wrapper = Wrappers.lambdaQuery(User.class);
         wrapper.select(User::getId, User::getName);
         wrapper.in(User::getId, ids);
-        return getMapper().selectList(wrapper)
+        return baseMapper.selectList(wrapper)
                 .stream()
                 .collect(Collectors.toMap(Entity::getId, User::getName));
     }
@@ -205,18 +190,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(cacheNames = CacheNames.USER_DETAILS, key = "#id", unless = "#result == null")
     public GlobalUser get(Serializable id) {
-        User user = mapper.selectById(id);
+        User user = baseMapper.selectById(id);
         GlobalUser globalUser = new GlobalUser();
         BeanUtils.copyProperties(user, globalUser);
-        globalUser.setRoles(roleService.findRoleCodesByUser(user));
+        globalUser.setRoles(roleService.findCodesByUser(user));
 
         List<RoleAssociation> roleAssociations = roleService.findAssociationsByCodes(globalUser.getRoles());
-
-
-
-
-
-        globalUser.setAuthorities(authorityService.findCodesByIds(roleAssociations.stream().map(e -> (Long) e.getAssociated()).collect(Collectors.toList())));
+        globalUser.setAuthorities(authorityService.findCodesByIds(roleAssociations.stream().filter(e -> e.getCategory() == AuthorityCategory.AUTHORITY).map(e -> (Long) e.getAssociated()).collect(Collectors.toList())));
 
 
 //        globalUser.setDefaultUnderOrganization();
@@ -236,7 +216,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(cacheNames = CacheNames.USER_DETAILS, allEntries = true)
     public AffectedResult changePasswordWithOriginalPassword(ChangePassword body) {
-        User user = mapper.selectById(SecurityUtils.getAuthorizedUser().getId());
+        User user = baseMapper.selectById(SecurityUtils.getAuthorizedUser().getId());
         if (!passwordEncoder.matches(body.getOriginalValue(), user.getPassword())) {
             throw new BadRequestException(ErrorCode.E_0x00100009);
         }
@@ -253,7 +233,7 @@ public class UserServiceImpl implements UserService {
             user.setState(UserState.NORMAL);
             user.setStateTime(Instant.now());
         }
-        return AffectedResult.of(mapper.updateById(user));
+        return AffectedResult.of(baseMapper.updateById(user));
     }
 
     @Override

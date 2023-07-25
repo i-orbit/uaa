@@ -2,15 +2,17 @@ package com.inmaytide.orbit.uaa.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
-import com.inmaytide.orbit.uaa.domain.consts.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.user.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.user.User;
 import com.inmaytide.orbit.uaa.domain.user.UserAssociation;
 import com.inmaytide.orbit.uaa.mapper.user.UserAssociationMapper;
-import com.inmaytide.orbit.uaa.service.OrganizationService;
-import com.inmaytide.orbit.uaa.service.PositionService;
-import com.inmaytide.orbit.uaa.service.role.RoleService;
+import com.inmaytide.orbit.uaa.service.permission.OrganizationService;
+import com.inmaytide.orbit.uaa.service.user.PositionService;
+import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import com.inmaytide.orbit.uaa.service.user.UserAssociationService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +32,20 @@ public class UserAssociationServiceImpl implements UserAssociationService {
 
     private final OrganizationService organizationService;
 
-    private final RoleService roleService;
-
     private final PositionService positionService;
 
-    public UserAssociationServiceImpl(UserAssociationMapper mapper, OrganizationService organizationService, RoleService roleService, PositionService positionService) {
+    private RoleService roleService;
+
+    public UserAssociationServiceImpl(UserAssociationMapper mapper, OrganizationService organizationService, PositionService positionService) {
         this.mapper = mapper;
         this.organizationService = organizationService;
-        this.roleService = roleService;
         this.positionService = positionService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     @Override

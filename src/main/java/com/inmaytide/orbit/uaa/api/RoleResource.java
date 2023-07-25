@@ -1,8 +1,8 @@
 package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.orbit.commons.domain.validation.groups.Add;
-import com.inmaytide.orbit.uaa.domain.role.Role;
-import com.inmaytide.orbit.uaa.service.role.RoleService;
+import com.inmaytide.orbit.uaa.domain.permission.Role;
+import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
