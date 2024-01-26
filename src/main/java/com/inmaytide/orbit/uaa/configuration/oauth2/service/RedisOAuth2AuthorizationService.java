@@ -1,12 +1,9 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 
-import com.inmaytide.orbit.commons.consts.CacheNames;
-import com.inmaytide.orbit.commons.utils.ValueCaches;
+import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.inmaytide.orbit.uaa.configuration.oauth2.store.OAuth2AccessTokenStore;
+import com.inmaytide.orbit.uaa.configuration.oauth2.store.OAuth2AuthorizationStore;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -19,11 +16,12 @@ import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author inmaytide
@@ -32,49 +30,20 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2AuthorizationService.class);
-
     private final Map<String, OAuth2Authorization> initializedAuthorizations = new ConcurrentHashMap<>();
 
-    private final RedisTemplate<String, OAuth2Authorization> authorizationStore;
+    private final OAuth2AuthorizationStore authorizationStore;
 
-    private final RedisTemplate<String, OAuth2AccessToken> accessTokenStore;
+    private final OAuth2AccessTokenStore accessTokenStore;
 
-    public RedisOAuth2AuthorizationService(RedisTemplate<String, OAuth2Authorization> authorizationStore, RedisTemplate<String, OAuth2AccessToken> accessTokenStore) {
+    public RedisOAuth2AuthorizationService(OAuth2AuthorizationStore authorizationStore, OAuth2AccessTokenStore accessTokenStore) {
         this.authorizationStore = authorizationStore;
         this.accessTokenStore = accessTokenStore;
     }
 
-    private String getAuthorizationStoreKey(String id) {
-        return ValueCaches.getCacheKey(CacheNames.AUTHORIZATION_STORE, id);
-    }
-
-    private String getAccessTokenStoreKey(OAuth2AccessToken accessToken) {
-        return ValueCaches.getCacheKey(CacheNames.ACCESS_TOKEN_STORE, accessToken.getTokenValue());
-    }
-
     private void storeAuthorization(OAuth2Authorization authorization) {
-        OAuth2AccessToken accessToken = authorization.getAccessToken().getToken();
-        OAuth2RefreshToken refreshToken = authorization.getRefreshToken() == null ? null : authorization.getRefreshToken().getToken();
-        authorizationStore.opsForValue().set(getAuthorizationStoreKey(authorization.getId()), authorization, Duration.between(Instant.now(), refreshToken == null ? accessToken.getExpiresAt() : refreshToken.getExpiresAt()));
-        storeAccessToken(accessToken);
-        storeAccessTokenAndRefreshTokenAssociation(authorization);
-    }
-
-    private void storeAccessToken(OAuth2AccessToken accessToken) {
-        accessTokenStore.opsForValue().set(getAccessTokenStoreKey(accessToken), accessToken, Duration.between(Instant.now(), accessToken.getExpiresAt()));
-    }
-
-    private void storeAccessTokenAndRefreshTokenAssociation(OAuth2Authorization authorization) {
-        if (authorization.getRefreshToken() != null) {
-            ValueCaches.put(
-                    CacheNames.REFRESH_TOKEN_STORE,
-                    authorization.getAccessToken().getToken().getTokenValue(),
-                    authorization.getRefreshToken().getToken().getTokenValue(),
-                    Duration.between(Instant.now(), authorization.getAccessToken().getToken().getExpiresAt()).getSeconds() + 300,
-                    TimeUnit.SECONDS
-            );
-        }
+        authorizationStore.store(authorization);
+        accessTokenStore.store(authorization.getAccessToken().getToken());
     }
 
     @Override
@@ -84,8 +53,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
             if (authorization.getRefreshToken() != null) {
                 OAuth2Authorization old = findByToken(authorization.getRefreshToken().getToken().getTokenValue(), OAuth2TokenType.REFRESH_TOKEN);
                 if (old != null) {
-                    authorizationStore.delete(getAuthorizationStoreKey(old.getId()));
-                    ValueCaches.delete(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue());
+                    authorizationStore.remove(old);
                 }
             }
             storeAuthorization(authorization);
@@ -98,9 +66,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     public void remove(OAuth2Authorization authorization) {
         Assert.notNull(authorization, "authorization cannot be null");
         if (isComplete(authorization)) {
-            authorizationStore.delete(getAuthorizationStoreKey(authorization.getId()));
-            accessTokenStore.delete(getAccessTokenStoreKey(authorization.getAccessToken().getToken()));
-            ValueCaches.delete(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue());
+            authorizationStore.remove(authorization);
+            accessTokenStore.remove(authorization.getAccessToken().getToken());
         } else {
             this.initializedAuthorizations.remove(authorization.getId(), authorization);
         }
@@ -110,60 +77,35 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     @Override
     public OAuth2Authorization findById(String id) {
         Assert.hasText(id, "id cannot be empty");
-        OAuth2Authorization authorization = authorizationStore.opsForValue().get(getAuthorizationStoreKey(id));
-        return authorization == null ? initializedAuthorizations.get(id) : authorization;
+        return authorizationStore.get(id).orElse(initializedAuthorizations.get(id));
     }
 
     @Nullable
     @Override
     public OAuth2Authorization findByToken(String token, @Nullable OAuth2TokenType tokenType) {
         Assert.hasText(token, "token cannot be empty");
-        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE + "::*");
-        if (CollectionUtils.isNotEmpty(keys)) {
-            for (String key : keys) {
-                OAuth2Authorization authorization = authorizationStore.opsForValue().get(key);
-                if (authorization != null && hasToken(authorization, token, tokenType)) {
-                    return authorization;
-                }
-            }
-        }
-        for (OAuth2Authorization authorization : this.initializedAuthorizations.values()) {
-            if (hasToken(authorization, token, tokenType)) {
-                return authorization;
-            }
-        }
-        return null;
+        return Stream.concat(authorizationStore.all().stream(), initializedAuthorizations.values().stream())
+                .filter(authorization -> hasToken(authorization, token, tokenType))
+                .findFirst()
+                .orElse(null);
     }
 
-    public boolean matchUsernameAndPlatform(OAuth2Authorization authorization, String username, String platform) {
+    public boolean matchUsernameAndPlatform(OAuth2Authorization authorization, String username, Platforms platform) {
         if (authorization == null) {
             return false;
         }
         return Objects.equals(username, authorization.getPrincipalName())
-                && Objects.equals(platform, authorization.getAttribute(OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
+                && platform == Platforms.valueOf(authorization.getAttribute(OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
 
     }
 
     @NonNull
-    public List<OAuth2Authorization> findByUsernameAndPlatform(String username, String platform) {
+    public List<OAuth2Authorization> findByUsernameAndPlatform(String username, Platforms platform) {
         Assert.hasText(username, "username can't be empty");
-        Assert.hasText(platform, "platform can't be empty");
-        Set<String> keys = authorizationStore.keys(CacheNames.AUTHORIZATION_STORE + "::*");
-        List<OAuth2Authorization> res = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(keys)) {
-            for (String key : keys) {
-                OAuth2Authorization authorization = authorizationStore.opsForValue().get(key);
-                if (matchUsernameAndPlatform(authorization, username, platform)) {
-                    res.add(authorization);
-                }
-            }
-        }
-        for (OAuth2Authorization authorization : this.initializedAuthorizations.values()) {
-            if (matchUsernameAndPlatform(authorization, username, platform)) {
-                res.add(authorization);
-            }
-        }
-        return res;
+        Assert.notNull(platform, "platform can't be null");
+        return Stream.concat(authorizationStore.all().stream(), initializedAuthorizations.values().stream())
+                .filter(authorization -> matchUsernameAndPlatform(authorization, username, platform))
+                .collect(Collectors.toList());
     }
 
     private static boolean isComplete(OAuth2Authorization authorization) {
@@ -172,10 +114,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 
     private static boolean hasToken(OAuth2Authorization authorization, String token, @Nullable OAuth2TokenType tokenType) {
         if (tokenType == null) {
-            return matchesState(authorization, token) ||
-                    matchesAuthorizationCode(authorization, token) ||
-                    matchesAccessToken(authorization, token) ||
-                    matchesRefreshToken(authorization, token);
+            return matchesState(authorization, token) || matchesAuthorizationCode(authorization, token) || matchesAccessToken(authorization, token) || matchesRefreshToken(authorization, token);
         } else if (OAuth2ParameterNames.STATE.equals(tokenType.getValue())) {
             return matchesState(authorization, token);
         } else if (OAuth2ParameterNames.CODE.equals(tokenType.getValue())) {
@@ -193,20 +132,17 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     }
 
     private static boolean matchesAuthorizationCode(OAuth2Authorization authorization, String token) {
-        OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
-                authorization.getToken(OAuth2AuthorizationCode.class);
+        OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode = authorization.getToken(OAuth2AuthorizationCode.class);
         return authorizationCode != null && authorizationCode.getToken().getTokenValue().equals(token);
     }
 
     private static boolean matchesAccessToken(OAuth2Authorization authorization, String token) {
-        OAuth2Authorization.Token<OAuth2AccessToken> accessToken =
-                authorization.getToken(OAuth2AccessToken.class);
+        OAuth2Authorization.Token<OAuth2AccessToken> accessToken = authorization.getToken(OAuth2AccessToken.class);
         return accessToken != null && accessToken.getToken().getTokenValue().equals(token);
     }
 
     private static boolean matchesRefreshToken(OAuth2Authorization authorization, String token) {
-        OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken =
-                authorization.getToken(OAuth2RefreshToken.class);
+        OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken = authorization.getToken(OAuth2RefreshToken.class);
         return refreshToken != null && refreshToken.getToken().getTokenValue().equals(token);
     }
 

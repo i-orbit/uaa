@@ -7,10 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.util.Assert;
 
+import java.io.Serial;
 import java.util.*;
 
 public class OAuth2ResourceOwnerPasswordAuthenticationToken extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = -8824025217860487220L;
 
     private final AuthorizationGrantType authorizationGrantType;

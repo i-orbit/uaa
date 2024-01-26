@@ -11,10 +11,9 @@
             </column>
             <column name="name" type="varchar(32)" remarks="名称"/>
             <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
-            <column name="state" type="int" remarks="状态"/>
+            <column name="state" type="varchar(20)" remarks="状态"/>
             <column name="logo" type="varchar(512)" remarks="logo图片地址"/>
-            <column name="menu_synced" type="varchar(2)" remarks="菜单是否已根据授权同步到菜单表"/>
-            <column name="license" type="text" remarks="授权信息"/>
+            <column name="license" type="text" remarks="授权码"/>
             <column name="created_time" type="timestamp" remarks="创建时间"/>
             <column name="created_by" type="bigint" remarks="创建人"/>
             <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
@@ -29,12 +28,12 @@
             <column name="tenant" type="bigint" remarks="所属租户"/>
             <column name="is_tenant_administrator" type="varchar(2)" remarks="是否是租户管理员"/>
             <column name="rank" type="varchar(64)" remarks="职级" />
-            <column name="weights" type="int" remarks="权重(用于排序)" />
+            <column name="sequence" type="int" remarks="排序" />
             <column name="name" type="varchar(16)" remarks="姓名" />
             <column name="gender" type="varchar(64)" remarks="性别" />
             <column name="birthday" type="date" remarks="生日" />
             <column name="identification_number" type="varchar(32)" remarks="身份证号" />
-            <column name="username" type="varchar(64)" remarks="系统登录用户名" />
+            <column name="login_name" type="varchar(64)" remarks="系统登录用户名" />
             <column name="password" type="varchar(64)" remarks="系统登录密码" />
             <column name="password_expire_at" type="timestamp" remarks="密码有效期至" />
             <column name="telephone_number" type="varchar(32)" remarks="手机号码" />
@@ -69,84 +68,6 @@
             INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `rank`, `weights`, `name`, `gender`, `birthday`, `identification_number`, `username`, `password`, `password_expire_at`, `telephone_number`, `email`, `lang`, `avatar`, `signature`, `photo`, `state`, `state_time`, `proxy`, `personnel_status`, `employee_id`, `join_date`, `employment_confirmation_date`, `resignation_date`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
                 VALUES (9999, 3721, 'Y', NULL, 100, 'Administrator', NULL, NULL, NULL, 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', TIMESTAMPADD(month, 6, now()), '16866666666', 'inmaytide@gmail.com', 'SIMPLIFIED_CHINESE', NULL, NULL, NULL, 10000, now(), NULL, NULL, NULL, NULL, NULL, NULL, now(), 9999, now(), 9999, 'N', 1);
         </sql>
-    </changeSet>
-
-    <changeSet id="000000000000002" author="inmaytide">
-        <createTable tableName="organization" remarks="组织信息">
-            <column name="id" type="bigint" remarks="唯一标识">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
-            <column name="parent" type="bigint" remarks="父级组织唯一标识"/>
-            <column name="name" type="varchar(32)" remarks="名称"/>
-            <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
-            <column name="cover" type="varchar(256)" remarks="简介封面图片"/>
-            <column name="description" type="varchar(512)" remarks="简介说明"/>
-            <column name="address" type="varchar(256)" remarks="地址"/>
-            <column name="principal" type="bigint" remarks="负责人"/>
-            <column name="type" type="int" remarks="组织类型"/>
-            <column name="sequence" type="int" remarks="排序"/>
-            <column name="path" type="varchar(256)" remarks="树路径"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
-            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
-            <column name="version" type="int" remarks="版本"/>
-        </createTable>
-        <createTable tableName="area" remarks="区域位置">
-            <column name="id" type="bigint" remarks="唯一标识">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
-            <column name="parent" type="bigint" remarks="父级区域唯一标识"/>
-            <column name="name" type="varchar(32)" remarks="名称"/>
-            <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
-            <column name="cover" type="varchar(256)" remarks="简介封面图片"/>
-            <column name="description" type="varchar(512)" remarks="简介说明"/>
-            <column name="address" type="varchar(256)" remarks="地址"/>
-            <column name="type" type="int" remarks="区域类型"/>
-            <column name="category" type="varchar(64)" remarks="区域分类"/>
-            <column name="sequence" type="int" remarks="排序"/>
-            <column name="path" type="varchar(256)" remarks="树路径"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
-            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
-            <column name="version" type="int" remarks="版本"/>
-        </createTable>
-        <createTable tableName="organization_association" remarks="组织与区域关联关系表">
-            <column name="organization" type="bigint" remarks="组织唯一标识"/>
-            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
-            <column name="category" type="varchar(16)" remarks="关联数据类型"/>
-        </createTable>
-        <addPrimaryKey tableName="organization_association" columnNames="organization, associated, category"/>
-    </changeSet>
-
-    <changeSet id="000000000000003" author="inmaytide">
-        <createTable tableName="role" remarks="角色信息">
-            <column name="id" type="bigint" remarks="唯一标识">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
-            <column name="name" type="varchar(64)" remarks="名称"/>
-            <column name="code" type="varchar(64)" remarks="编码"/>
-            <column name="description" type="varchar(512)" remarks="角色描述"/>
-            <column name="weights" type="int" remarks="权重(用于排序)"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
-            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
-            <column name="version" type="int" remarks="版本"/>
-        </createTable>
-        <createTable tableName="role_association" remarks="角色关联其他数据实例关联关系表">
-            <column name="role" type="bigint" remarks="角色唯一标识"/>
-            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
-            <column name="category" type="varchar(16)" remarks="关联数据类型"/>
-        </createTable>
-        <addPrimaryKey tableName="role_association" columnNames="role, associated, category"/>
     </changeSet>
 
 </databaseChangeLog>

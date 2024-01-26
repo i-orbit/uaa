@@ -15,9 +15,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -32,9 +29,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
-import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -81,34 +76,6 @@ public class AuthorizationServerConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean("authorizationStore")
-    public RedisTemplate<String, OAuth2Authorization> authorizationStore(RedisConnectionFactory factory) {
-        RedisTemplate<String, OAuth2Authorization> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
-        JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(valueSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setHashValueSerializer(valueSerializer);
-        template.afterPropertiesSet();
-        return template;
-    }
-
-    @Bean("accessTokenStore")
-    public RedisTemplate<String, OAuth2AccessToken> accessTokenStore(RedisConnectionFactory factory) {
-        RedisTemplate<String, OAuth2AccessToken> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
-        JdkSerializationRedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(valueSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setHashValueSerializer(valueSerializer);
-        template.afterPropertiesSet();
-        return template;
-    }
-
     @Bean
     public AuthenticationManager authenticationManager(DefaultUserDetailsService userDetailService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -137,6 +104,7 @@ public class AuthorizationServerConfiguration {
                                                           OAuth2AuthorizationService authorizationService,
                                                           AuthenticationManager authenticationManager) throws Exception {
         http.apply(authorizationServerConfigurer(clientRepository, authorizationService, authenticationManager));
+        http.apply()
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
         http.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -203,7 +171,7 @@ public class AuthorizationServerConfiguration {
                 .reuseRefreshTokens(true)
                 .build();
         return RegisteredClient.withId(Robot.ROBOT_CLIENT_ID)
-                .clientId(Robot.getInstance().getUsername())
+                .clientId(Robot.getInstance().getLoginName())
                 .clientSecret(passwordEncoder.encode(Robot.getInstance().getPassword()))
                 .authorizationGrantType(new AuthorizationGrantType(Robot.ROBOT_GRANT_TYPE))
                 .clientAuthenticationMethods(consumer -> {

@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa.configuration;
 
-import com.inmaytide.orbit.commons.configuration.CommonProperties;
+import com.inmaytide.orbit.commons.configuration.GlobalProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "application")
-public class ApplicationProperties extends CommonProperties {
+public class ApplicationProperties extends GlobalProperties {
 
     public boolean allowUsersToLoginSimultaneously;
 

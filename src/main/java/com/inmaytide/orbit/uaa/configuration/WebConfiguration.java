@@ -10,7 +10,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

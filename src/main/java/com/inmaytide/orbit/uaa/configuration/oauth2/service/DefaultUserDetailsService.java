@@ -1,13 +1,12 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.service;
 
 import com.inmaytide.exception.web.BadCredentialsException;
-import com.inmaytide.orbit.commons.consts.Marks;
-import com.inmaytide.orbit.commons.consts.UserState;
+import com.inmaytide.orbit.commons.constants.Constants;
+import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
-import com.inmaytide.orbit.uaa.domain.user.User;
-import com.inmaytide.orbit.uaa.service.permission.AuthorityService;
-import com.inmaytide.orbit.uaa.service.permission.RoleService;
-import com.inmaytide.orbit.uaa.service.user.UserService;
+import com.inmaytide.orbit.uaa.domain.account.User;
+import com.inmaytide.orbit.uaa.service.account.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,28 +26,25 @@ import java.util.stream.Stream;
 @Component
 public class DefaultUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
+    public static final String ROLE_PREFIX = "ROLE_";
+
     private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthorityService authorityService;
-
-    private final RoleService roleService;
-
-    public DefaultUserDetailsService(UserService userService, PasswordEncoder passwordEncoder, AuthorityService authorityService, RoleService roleService) {
+    public DefaultUserDetailsService(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        this.authorityService = authorityService;
-        this.roleService = roleService;
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        boolean withoutPassword = username.endsWith(Marks.LOGIN_WITHOUT_PASSWORD.getValue());
-        final String loginName = withoutPassword ? username.replaceAll(Marks.LOGIN_WITHOUT_PASSWORD.getValue(), "") : username;
-        User user = userService.findUserByUsername(loginName).orElseThrow(() -> new BadCredentialsException(ErrorCode.E_0x00100002, loginName));
+        boolean withoutPassword = username.endsWith(Constants.Markers.LOGIN_WITHOUT_PASSWORD);
+        final String loginName = withoutPassword ? StringUtils.removeEnd(username, Constants.Markers.LOGIN_WITHOUT_PASSWORD) : username;
+        User user = userService.findByLoginName(loginName).orElseThrow(() -> new BadCredentialsException(ErrorCode.E_0x00100002, loginName));
         return org.springframework.security.core.userdetails.User.withUsername(String.valueOf(user.getId()))
-                .password(withoutPassword ? passwordEncoder.encode(Marks.LOGIN_WITHOUT_PASSWORD.getValue()) : user.getPassword())
+                .password(withoutPassword ? passwordEncoder.encode(Constants.Markers.LOGIN_WITHOUT_PASSWORD) : user.getPassword())
                 .accountLocked(user.getState() == UserState.LOCKED)
                 .disabled(user.getState() == UserState.DISABLED)
                 .authorities(createAuthoritiesWithUser(user))
@@ -55,11 +52,13 @@ public class DefaultUserDetailsService implements org.springframework.security.c
     }
 
     private List<GrantedAuthority> createAuthoritiesWithUser(User user) {
-        List<String> roleCodes = roleService.findCodesByUser(user);
-        List<String> authorityCodes = authorityService.findCodesByRoleCodes(roleCodes);
-        return Stream.concat(roleCodes.stream().map(e -> !e.startsWith("ROLE_") ? "ROLE_" + e : e), authorityCodes.stream())
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+//        List<String> roleCodes = roleService.findCodesByUser(user);
+//        List<String> authorityCodes = authorityService.findCodesByRoleCodes(roleCodes);
+//        return Stream.concat(roleCodes.stream().map(e -> !e.startsWith(ROLE_PREFIX) ? ROLE_PREFIX + e : e), authorityCodes.stream())
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
+
+        return Collections.emptyList();
     }
 
 }

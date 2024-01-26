@@ -8,7 +8,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.core.converter.ClaimConversionService;
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenIntrospection;
@@ -55,7 +54,6 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         OAuth2TokenIntrospectionAuthenticationToken tokenIntrospectionAuthentication = (OAuth2TokenIntrospectionAuthenticationToken) authentication;
-
         OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(tokenIntrospectionAuthentication);
 
         OAuth2Authorization authorization = this.authorizationService.findByToken(tokenIntrospectionAuthentication.getToken(), null);

@@ -1,9 +1,9 @@
 package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
 
 import com.inmaytide.exception.web.AccessDeniedException;
-import com.inmaytide.orbit.commons.consts.CacheNames;
-import com.inmaytide.orbit.commons.consts.Is;
-import com.inmaytide.orbit.commons.consts.Marks;
+import com.inmaytide.orbit.commons.constants.Constants;
+import com.inmaytide.orbit.commons.constants.Is;
+import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
@@ -67,13 +67,13 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
         Map<String, Object> additionalParameters = resourceOwnerPasswordAuthentication.getAdditionalParameters();
         String username = (String) additionalParameters.get(OAuth2ParameterNames.USERNAME);
         String password = (String) additionalParameters.get(OAuth2ParameterNames.PASSWORD);
-        String platform = (String) additionalParameters.get(PARAMETER_NAME_PLATFORM);
+        Platforms platform = Platforms.valueOf((String) additionalParameters.get(PARAMETER_NAME_PLATFORM));
         // 当用户在其他地方已登录时, 是否强制登录
         String forcedReplacement = (String) additionalParameters.get(PARAMETER_NAME_FORCED_REPLACEMENT);
 
         // 免密码登录标记
-        if (Objects.equals(password, Marks.LOGIN_WITHOUT_PASSWORD.getValue())) {
-            username += Marks.LOGIN_WITHOUT_PASSWORD.getValue();
+        if (Objects.equals(password, Constants.Markers.LOGIN_WITHOUT_PASSWORD)) {
+            username += Constants.Markers.LOGIN_WITHOUT_PASSWORD;
         }
 
         try {
@@ -96,7 +96,6 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                             // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
                             for (OAuth2Authorization authorization : authorizations) {
                                 service.remove(authorization);
-                                ValueCaches.put(CacheNames.REFRESH_TOKEN_STORE, authorization.getAccessToken().getToken().getTokenValue(), Marks.USER_FORCE_LOGOUT.getValue());
                             }
                         } else {
                             throw new AccessDeniedException(ErrorCode.E_0x00100001);
@@ -160,9 +159,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
     @Override
     public boolean supports(Class<?> authentication) {
-        boolean supports = OAuth2ResourceOwnerPasswordAuthenticationToken.class.isAssignableFrom(authentication);
-        LOG.debug("Supports authentication=" + authentication + " returning " + supports);
-        return supports;
+        return OAuth2ResourceOwnerPasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     private OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {

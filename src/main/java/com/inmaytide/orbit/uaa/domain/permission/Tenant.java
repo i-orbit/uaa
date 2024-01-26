@@ -1,35 +1,29 @@
-package com.inmaytide.orbit.uaa.domain.tenant;
+package com.inmaytide.orbit.uaa.domain.permission;
 
-import com.inmaytide.orbit.commons.consts.Is;
-import com.inmaytide.orbit.commons.consts.TenantState;
+import com.inmaytide.orbit.commons.constants.TenantState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author inmaytide
- * @since 2023/4/7
+ * @since 2024/1/19
  */
-@Schema(title = "租户信息")
+@Schema(name = "租户信息")
 public class Tenant extends TombstoneEntity {
 
-    @NotBlank
-    @Schema(title = "租户名称")
+    @Schema(name = "租户全称")
     private String name;
 
-    @Schema(title = "租户别名(简称)", description = "不填默认等于租户名称")
+    @Schema(name = "租户别称/简称")
     private String alias;
 
-    @Schema(title = "租户状态")
+    @Schema(name = "租户状态")
     private TenantState state;
 
-    @Schema(title = "LOGO图片存储地址")
+    @Schema(name = "LOGO图片存储地址")
     private String logo;
 
-    @Schema(title = "定制化菜单是否已同步生成", accessMode = Schema.AccessMode.READ_ONLY)
-    private Is menuSynced;
-
-    @Schema(title = "license文件地址或license内容")
+    @Schema(name = "系统授权码")
     private String license;
 
     public String getName() {
@@ -62,14 +56,6 @@ public class Tenant extends TombstoneEntity {
 
     public void setLogo(String logo) {
         this.logo = logo;
-    }
-
-    public Is getMenuSynced() {
-        return menuSynced;
-    }
-
-    public void setMenuSynced(Is menuSynced) {
-        this.menuSynced = menuSynced;
     }
 
     public String getLicense() {
