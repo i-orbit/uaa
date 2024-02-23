@@ -1,16 +1,12 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.store;
+package com.inmaytide.orbit.uaa.security.oauth2.store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.utils.ApplicationContextHolder;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
-import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -22,9 +18,8 @@ import java.util.stream.Collectors;
  * @author inmaytide
  * @since 2024/1/25
  */
-@Component
-@ConditionalOnMissingBean(OAuth2AccessTokenStore.class)
 public class RedisOAuth2AccessTokenStore implements OAuth2AccessTokenStore {
+
     @Override
     public void store(OAuth2AccessToken token) {
         long timeout = Duration.between(Instant.now(), token.getExpiresAt()).getSeconds();

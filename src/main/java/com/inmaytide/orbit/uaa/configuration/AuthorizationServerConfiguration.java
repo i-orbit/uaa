@@ -1,21 +1,28 @@
 package com.inmaytide.orbit.uaa.configuration;
 
+import com.inmaytide.exception.translator.ThrowableMapper;
+import com.inmaytide.exception.web.BadRequestException;
+import com.inmaytide.exception.web.mapper.PredictableExceptionMapper;
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
-import com.inmaytide.orbit.commons.consts.Roles;
 import com.inmaytide.orbit.commons.domain.OrbitClientDetails;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.security.CustomizedOpaqueTokenIntrospector;
-import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
-import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationConverter;
-import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
-import com.inmaytide.orbit.uaa.configuration.oauth2.service.DefaultUserDetailsService;
+import com.inmaytide.orbit.uaa.security.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
+import com.inmaytide.orbit.uaa.security.oauth2.authentication.OAuth2PasswordAuthenticationConverter;
+import com.inmaytide.orbit.uaa.security.oauth2.authentication.OAuth2PasswordAuthenticationProvider;
+import com.inmaytide.orbit.uaa.security.oauth2.service.DefaultUserDetailsService;
+import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AccessTokenStore;
+import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AuthorizationStore;
+import com.inmaytide.orbit.uaa.security.oauth2.store.RedisOAuth2AccessTokenStore;
+import com.inmaytide.orbit.uaa.security.oauth2.store.RedisOAuth2AuthorizationStore;
+import com.inmaytide.orbit.uaa.service.account.UserService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,10 +32,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
@@ -60,6 +69,10 @@ public class AuthorizationServerConfiguration {
 
     private final RestTemplate restTemplate;
 
+    static {
+        PredictableExceptionMapper.DEFAULT_INSTANT.register(OAuth2AuthenticationException.class, BadRequestException.class);
+    }
+
     public AuthorizationServerConfiguration(ApplicationProperties properties, DefaultHandlerExceptionResolver exceptionResolver, RestTemplate restTemplate) {
         this.properties = properties;
         this.exceptionResolver = exceptionResolver;
@@ -67,13 +80,30 @@ public class AuthorizationServerConfiguration {
     }
 
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public UserDetailsService userDetailsService(UserService userService, PasswordEncoder passwordEncoder) {
+        return new DefaultUserDetailsService(userService, passwordEncoder);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(OAuth2AuthorizationStore.class)
+    public OAuth2AuthorizationStore authorizationStore(RedisConnectionFactory connectionFactory) {
+        return new RedisOAuth2AuthorizationStore(connectionFactory);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(OAuth2AccessTokenStore.class)
+    public OAuth2AccessTokenStore accessTokenStore() {
+        return new RedisOAuth2AccessTokenStore();
+    }
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().build();
     }
 
     @Bean
@@ -84,27 +114,35 @@ public class AuthorizationServerConfiguration {
         return new ProviderManager(provider);
     }
 
-    private OAuth2AuthorizationServerConfigurer authorizationServerConfigurer(RegisteredClientRepository clientRepository,
-                                                                              OAuth2AuthorizationService authorizationService,
-                                                                              AuthenticationManager authenticationManager) {
-        return new OAuth2AuthorizationServerConfigurer()
-                .tokenEndpoint((endpoint) -> {
-                    endpoint.accessTokenRequestConverter(new OAuth2ResourceOwnerPasswordAuthenticationConverter());
-                    endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-                    endpoint.authenticationProvider(new OAuth2ResourceOwnerPasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
-                }).tokenIntrospectionEndpoint(endpoint -> {
-                    endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
-                });
-    }
-
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-                                                          RegisteredClientRepository clientRepository,
-                                                          OAuth2AuthorizationService authorizationService,
-                                                          AuthenticationManager authenticationManager) throws Exception {
-        http.apply(authorizationServerConfigurer(clientRepository, authorizationService, authenticationManager));
-        http.apply()
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+                                                                      RegisteredClientRepository clientRepository,
+                                                                      OAuth2AuthorizationService authorizationService,
+                                                                      AuthenticationManager authenticationManager) throws Exception {
+        final OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+        http.with(authorizationServerConfigurer, c -> {
+            c.tokenEndpoint((endpoint) -> {
+                endpoint.accessTokenRequestConverter(new OAuth2PasswordAuthenticationConverter());
+                endpoint.authenticationProvider(new OAuth2PasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
+                endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            }).tokenIntrospectionEndpoint(endpoint -> {
+                endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
+            });
+        });
+        http.authorizeHttpRequests(c -> {
+            // Swagger文档及认证服务相关端点不需要登录
+            c.requestMatchers("/v3/api-docs/**").permitAll();
+            c.requestMatchers("/swagger-ui/**").permitAll();
+            c.requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).permitAll();
+            // 剩余所有接口需要登录
+            c.anyRequest().authenticated();
+        });
+        http.oauth2ResourceServer(c -> {
+            c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(restTemplate)));
+        });
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
         http.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -113,24 +151,6 @@ public class AuthorizationServerConfiguration {
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-        });
-        http.authorizeHttpRequests(c -> {
-            // api 文档不需要登录
-            c.requestMatchers("/v3/api-docs/**").permitAll();
-            c.requestMatchers("/swagger-ui/**").permitAll();
-            // 所有oauth2相关不需要登录
-            c.requestMatchers("/oauth2/**").permitAll();
-            // 租户管理员可以调用修改租户基本信息接口, 且在代码中验证只能修改自己租户的信息
-            c.requestMatchers(HttpMethod.PUT, "/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_T_ADMINISTRATOR.name());
-            // 租户其他接口只有超级管理员或机器人可以调用
-            c.requestMatchers("/api/tenants").hasAnyAuthority(Roles.ROLE_S_ADMINISTRATOR.name(), Roles.ROLE_ROBOT.name());
-            // 剩余所有接口需要登录
-            c.anyRequest().authenticated();
-        });
-        http.oauth2ResourceServer(c -> {
-            c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-            c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(restTemplate)));
         });
         return http.build();
     }
@@ -182,7 +202,6 @@ public class AuthorizationServerConfiguration {
                 .tokenSettings(tokenSettings)
                 .build();
     }
-
 
 }
 

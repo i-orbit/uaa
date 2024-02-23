@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
+package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM;
 
 public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements AuthenticationProvider {
 
@@ -93,8 +91,8 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements
 
         tokenClaims.clientId(authorizedClient.getClientId());
         tokenClaims.username(authorization.getPrincipalName());
-        if (authorization.getAttribute(PARAMETER_NAME_PLATFORM) != null) {
-            tokenClaims.claim(PARAMETER_NAME_PLATFORM, authorization.getAttribute(PARAMETER_NAME_PLATFORM));
+        if (authorization.getAttribute(OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM) != null) {
+            tokenClaims.claim(OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM, authorization.getAttribute(OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
         }
         UsernamePasswordAuthenticationToken principal = authorization.getAttribute("java.security.Principal");
         if (principal != null && org.apache.commons.collections4.CollectionUtils.isNotEmpty(principal.getAuthorities())) {

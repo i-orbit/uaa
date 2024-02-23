@@ -1,5 +1,6 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
+package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
+import com.inmaytide.orbit.commons.constants.Platforms;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class OAuth2ResourceOwnerPasswordAuthenticationConverter implements AuthenticationConverter {
+public class OAuth2PasswordAuthenticationConverter implements AuthenticationConverter {
 
     private static final String ACCESS_TOKEN_REQUEST_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
@@ -30,6 +31,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationConverter implements Authe
         if (!AuthorizationGrantType.PASSWORD.getValue().equals(grantType)) {
             return null;
         }
+
 
         MultiValueMap<String, String> parameters = getParameters(request);
 
@@ -56,6 +58,13 @@ public class OAuth2ResourceOwnerPasswordAuthenticationConverter implements Authe
             throwError(OAuth2ParameterNames.PASSWORD);
         }
 
+        String platform = parameters.getFirst(OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM);
+        try {
+            Platforms.valueOf(platform);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST, "Request parameter \"" + OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM + "\" must have a valid value", null));
+        }
+
         Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
         if (clientPrincipal == null) {
             throwError(OAuth2ErrorCodes.INVALID_CLIENT);
@@ -66,15 +75,15 @@ public class OAuth2ResourceOwnerPasswordAuthenticationConverter implements Authe
                 .stream()
                 .filter(e -> !e.getKey().equals(OAuth2ParameterNames.GRANT_TYPE) && !e.getKey().equals(OAuth2ParameterNames.SCOPE))
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getFirst()));
-        return new OAuth2ResourceOwnerPasswordAuthenticationToken(AuthorizationGrantType.PASSWORD, clientPrincipal, requestedScopes, additionalParameters);
+        return new OAuth2PasswordAuthenticationToken(AuthorizationGrantType.PASSWORD, clientPrincipal, requestedScopes, additionalParameters);
     }
 
-    private static void throwError(String parameterName) {
+    private void throwError(String parameterName) {
         OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST, "OAuth 2.0 Parameter: " + parameterName, ACCESS_TOKEN_REQUEST_ERROR_URI);
         throw new OAuth2AuthenticationException(error);
     }
 
-    private static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+    private MultiValueMap<String, String> getParameters(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
         parameterMap.forEach((key, values) -> {

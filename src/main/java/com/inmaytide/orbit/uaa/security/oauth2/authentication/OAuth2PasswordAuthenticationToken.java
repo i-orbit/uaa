@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
+package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 import java.io.Serial;
 import java.util.*;
 
-public class OAuth2ResourceOwnerPasswordAuthenticationToken extends AbstractAuthenticationToken {
+public class OAuth2PasswordAuthenticationToken extends AbstractAuthenticationToken {
 
     @Serial
     private static final long serialVersionUID = -8824025217860487220L;
@@ -23,10 +23,10 @@ public class OAuth2ResourceOwnerPasswordAuthenticationToken extends AbstractAuth
 
     private final Map<String, Object> additionalParameters;
 
-    public OAuth2ResourceOwnerPasswordAuthenticationToken(AuthorizationGrantType authorizationGrantType,
-                                                          Authentication clientPrincipal,
-                                                          @Nullable Set<String> scopes,
-                                                          @Nullable Map<String, Object> additionalParameters) {
+    public OAuth2PasswordAuthenticationToken(AuthorizationGrantType authorizationGrantType,
+                                             Authentication clientPrincipal,
+                                             @Nullable Set<String> scopes,
+                                             @Nullable Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
         Assert.notNull(authorizationGrantType, "authorizationGrantType cannot be null");
         Assert.notNull(clientPrincipal, "clientPrincipal cannot be null");

@@ -5,16 +5,13 @@ spring:
     active: dev
   cloud:
     nacos:
+      server-addr: 192.168.26.160:31500
+      username: nacos
+      password: nacos
       discovery:
-        server-addr: 192.168.26.195:8848
-        namespace: orbit-${spring.profiles.active}
-        username: nacos
-        password: nacos
+        namespace: ${spring.profiles.active}
       config:
-        server-addr: 192.168.26.195:8848
-        username: nacos
-        password: nacos
-        namespace: orbit-${spring.profiles.active}
+        namespace: ${spring.profiles.active}
         file-extension: yaml
         extension-configs:
           - common.yaml

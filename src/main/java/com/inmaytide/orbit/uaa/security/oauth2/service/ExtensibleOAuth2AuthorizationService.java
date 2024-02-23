@@ -1,9 +1,9 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.service;
+package com.inmaytide.orbit.uaa.security.oauth2.service;
 
 import com.inmaytide.orbit.commons.constants.Platforms;
-import com.inmaytide.orbit.uaa.configuration.oauth2.authentication.OAuth2ResourceOwnerPasswordAuthenticationProvider;
-import com.inmaytide.orbit.uaa.configuration.oauth2.store.OAuth2AccessTokenStore;
-import com.inmaytide.orbit.uaa.configuration.oauth2.store.OAuth2AuthorizationStore;
+import com.inmaytide.orbit.uaa.security.oauth2.authentication.OAuth2PasswordAuthenticationProvider;
+import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AccessTokenStore;
+import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AuthorizationStore;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -24,11 +24,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 可以通过自定义 {@link OAuth2AuthorizationStore} 和 {@link OAuth2AccessTokenStore} 扩展的其他 Authorization 存储方式
+ *
  * @author inmaytide
  * @since 2023/04/29
+ * @see OAuth2AuthorizationStore
+ * @see OAuth2AccessTokenStore
  */
 @Component
-public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
+public class ExtensibleOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
     private final Map<String, OAuth2Authorization> initializedAuthorizations = new ConcurrentHashMap<>();
 
@@ -36,7 +40,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 
     private final OAuth2AccessTokenStore accessTokenStore;
 
-    public RedisOAuth2AuthorizationService(OAuth2AuthorizationStore authorizationStore, OAuth2AccessTokenStore accessTokenStore) {
+    public ExtensibleOAuth2AuthorizationService(OAuth2AuthorizationStore authorizationStore, OAuth2AccessTokenStore accessTokenStore) {
         this.authorizationStore = authorizationStore;
         this.accessTokenStore = accessTokenStore;
     }
@@ -95,7 +99,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
             return false;
         }
         return Objects.equals(username, authorization.getPrincipalName())
-                && platform == Platforms.valueOf(authorization.getAttribute(OAuth2ResourceOwnerPasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
+                && platform == Platforms.valueOf(authorization.getAttribute(OAuth2PasswordAuthenticationProvider.PARAMETER_NAME_PLATFORM));
 
     }
 

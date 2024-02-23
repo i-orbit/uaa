@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.store;
+package com.inmaytide.orbit.uaa.security.oauth2.store;
 
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 

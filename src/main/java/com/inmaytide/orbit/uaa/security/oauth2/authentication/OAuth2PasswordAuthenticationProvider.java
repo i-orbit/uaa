@@ -1,14 +1,14 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.authentication;
+package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.constants.Is;
 import com.inmaytide.orbit.commons.constants.Platforms;
-import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
-import com.inmaytide.orbit.uaa.configuration.oauth2.service.RedisOAuth2AuthorizationService;
+import com.inmaytide.orbit.uaa.security.oauth2.service.ExtensibleOAuth2AuthorizationService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,11 +31,12 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements AuthenticationProvider {
+public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OAuth2ResourceOwnerPasswordAuthenticationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OAuth2PasswordAuthenticationProvider.class);
 
     private static final StringKeyGenerator DEFAULT_TOKEN_GENERATOR = new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding(), 96);
 
@@ -49,7 +50,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
     private final ApplicationProperties properties;
 
-    public OAuth2ResourceOwnerPasswordAuthenticationProvider(AuthenticationManager authenticationManager, OAuth2AuthorizationService authorizationService, ApplicationProperties properties) {
+    public OAuth2PasswordAuthenticationProvider(AuthenticationManager authenticationManager, OAuth2AuthorizationService authorizationService, ApplicationProperties properties) {
         this.authenticationManager = authenticationManager;
         this.authorizationService = authorizationService;
         this.properties = properties;
@@ -57,7 +58,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        OAuth2ResourceOwnerPasswordAuthenticationToken resourceOwnerPasswordAuthentication = (OAuth2ResourceOwnerPasswordAuthenticationToken) authentication;
+        OAuth2PasswordAuthenticationToken resourceOwnerPasswordAuthentication = (OAuth2PasswordAuthenticationToken) authentication;
         OAuth2ClientAuthenticationToken clientPrincipal = getAuthenticatedClientElseThrowInvalidClient(resourceOwnerPasswordAuthentication);
         RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
@@ -68,8 +69,13 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
         String username = (String) additionalParameters.get(OAuth2ParameterNames.USERNAME);
         String password = (String) additionalParameters.get(OAuth2ParameterNames.PASSWORD);
         Platforms platform = Platforms.valueOf((String) additionalParameters.get(PARAMETER_NAME_PLATFORM));
+
         // 当用户在其他地方已登录时, 是否强制登录
-        String forcedReplacement = (String) additionalParameters.get(PARAMETER_NAME_FORCED_REPLACEMENT);
+        Object value = additionalParameters.get(PARAMETER_NAME_FORCED_REPLACEMENT);
+        if (value == null || !Pattern.compile("[YN]").asPredicate().test(value.toString())) {
+            value = "N";
+        }
+        Is forcedReplacement = Is.valueOf(value.toString());
 
         // 免密码登录标记
         if (Objects.equals(password, Constants.Markers.LOGIN_WITHOUT_PASSWORD)) {
@@ -82,7 +88,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
             Authentication usernamePasswordAuthentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-            if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof RedisOAuth2AuthorizationService service) {
+            if (usernamePasswordAuthentication.isAuthenticated() && authorizationService instanceof ExtensibleOAuth2AuthorizationService service) {
                 // 移除已过期的
                 List<OAuth2Authorization> authorizations = service.findByUsernameAndPlatform(usernamePasswordAuthentication.getName(), platform);
                 authorizations.stream().filter(e -> e.getAccessToken().isExpired()).forEach(authorizationService::remove);
@@ -92,7 +98,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                     // 不允许用户在多个地方同时登录
                     if (!properties.isAllowUsersToLoginSimultaneously()) {
                         // 当用户在其他地方已登录时, 强制登录
-                        if (Is.Y.name().equals(forcedReplacement)) {
+                        if (Is.Y == forcedReplacement) {
                             // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
                             for (OAuth2Authorization authorization : authorizations) {
                                 service.remove(authorization);
@@ -133,7 +139,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
                     .authorizationGrantType(AuthorizationGrantType.PASSWORD)
                     .accessToken(accessToken)
                     .authorizedScopes(authorizedScopes)
-                    .attribute(PARAMETER_NAME_PLATFORM, platform)
+                    .attribute(PARAMETER_NAME_PLATFORM, platform.name())
                     .attribute(Principal.class.getName(), usernamePasswordAuthentication);
 
 
@@ -159,7 +165,7 @@ public class OAuth2ResourceOwnerPasswordAuthenticationProvider implements Authen
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return OAuth2ResourceOwnerPasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return OAuth2PasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     private OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(Authentication authentication) {

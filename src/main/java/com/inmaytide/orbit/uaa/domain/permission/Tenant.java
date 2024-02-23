@@ -8,22 +8,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author inmaytide
  * @since 2024/1/19
  */
-@Schema(name = "租户信息")
+@Schema(title = "租户信息")
 public class Tenant extends TombstoneEntity {
 
-    @Schema(name = "租户全称")
+    @Schema(title = "租户全称")
     private String name;
 
-    @Schema(name = "租户别称/简称")
+    @Schema(title = "租户别称/简称")
     private String alias;
 
-    @Schema(name = "租户状态")
+    @Schema(title = "租户状态")
     private TenantState state;
 
-    @Schema(name = "LOGO图片存储地址")
+    @Schema(title = "LOGO图片存储地址")
     private String logo;
 
-    @Schema(name = "系统授权码")
+    @Schema(title = "系统授权码")
     private String license;
 
     public String getName() {

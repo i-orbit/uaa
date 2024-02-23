@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.service;
+package com.inmaytide.orbit.uaa.security.oauth2.service;
 
 import com.inmaytide.exception.web.BadCredentialsException;
 import com.inmaytide.orbit.commons.constants.Constants;
@@ -8,7 +8,6 @@ import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.service.account.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author inmaytide
@@ -36,7 +33,6 @@ public class DefaultUserDetailsService implements org.springframework.security.c
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

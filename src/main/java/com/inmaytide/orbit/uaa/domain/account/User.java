@@ -1,5 +1,6 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.constants.Is;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
@@ -14,83 +15,84 @@ import java.time.LocalDate;
  * @author inmaytide
  * @since 2024/1/19
  */
-@Schema(name = "用户信息")
+@Schema(title = "用户信息")
 public class User extends TombstoneEntity {
 
     @NotNull
-    @Schema(name = "所属租户唯一标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title = "所属租户唯一标识", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long tenant;
 
-    @Schema(name = "用户是否为所属租户的管理员", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "N")
+    @Schema(title = "用户是否为所属租户的管理员", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "N")
     private Is isTenantAdministrator;
 
-    @Schema(name = "用户职级", description = "对应数据字典编码")
+    @TableField("`rank`")
+    @Schema(title = "用户职级", description = "对应数据字典编码")
     private String rank;
 
-    @Schema(name = "用户排序", minimum = "0")
+    @Schema(title = "用户排序", minimum = "0")
     private Integer sequence;
 
-    @Schema(name = "用户性别")
+    @Schema(title = "用户性别")
     private String name;
 
-    @Schema(name = "用户性别", description = "对应数据字典编码")
+    @Schema(title = "用户性别", description = "对应数据字典编码")
     private String gender;
 
-    @Schema(name = "出生日期")
+    @Schema(title = "出生日期")
     private LocalDate birthday;
 
-    @Schema(name = "身份证号码")
+    @Schema(title = "身份证号码")
     private String identificationNumber;
 
-    @Schema(name = "用户登录名")
+    @Schema(title = "用户登录名")
     private String loginName;
 
-    @Schema(name = "用户登录密码", description = "加密后")
+    @Schema(title = "用户登录密码", description = "加密后")
     private String password;
 
-    @Schema(name = "密码过期时间", description = "用户根据相关配置在密码过期时是否强制修改密码")
+    @Schema(title = "密码过期时间", description = "用户根据相关配置在密码过期时是否强制修改密码")
     private Instant passwordExpireAt;
 
-    @Schema(name = "手机号码")
+    @Schema(title = "手机号码")
     private String telephoneNumber;
 
-    @Schema(name = "电子邮箱地址")
+    @Schema(title = "电子邮箱地址")
     private String email;
 
-    @Schema(name = "系统默认语言")
+    @Schema(title = "系统默认语言", description = "预留字段-后期可扩展多语言支持, 目前只支持简体中文")
     private Languages lang;
 
-    @Schema(name = "用户头像存储地址")
+    @Schema(title = "用户头像存储地址")
     private String avatar;
 
-    @Schema(name = "用户电子签名图片存储地址")
+    @Schema(title = "用户电子签名图片存储地址")
     private String signature;
 
-    @Schema(name = "用户个人照片存储地址")
+    @Schema(title = "用户个人照片存储地址")
     private String photo;
 
-    @Schema(name = "用户状态")
+    @Schema(title = "用户状态")
     private UserState state;
 
-    @Schema(name = "用户状态变更时间")
+    @Schema(title = "用户状态变更时间")
     private Instant stateTime;
 
-    @Schema(name = "用户系统功能代理人", description = "当用户状态为不在岗时，系统相关功能待办自动转发给代理人")
+    @Schema(title = "用户系统功能代理人", description = "当用户状态为不在岗时，系统相关功能待办自动转发给代理人")
     private Long proxy;
 
-    @Schema(name = "用户人事状态")
+    @Schema(title = "用户人事状态")
     private String personnelStatus;
 
-    @Schema(name = "员工编号")
+    @Schema(title = "员工编号")
     private String employeeId;
 
-    @Schema(name = "入职日期")
+    @Schema(title = "入职日期")
     private LocalDate joinDate;
 
-    @Schema(name = "转正日期")
+    @Schema(title = "转正日期")
     private LocalDate employmentConfirmationDate;
 
-    @Schema(name = "离职日期")
+    @Schema(title = "离职日期")
     private LocalDate resignationDate;
 
     public Long getTenant() {

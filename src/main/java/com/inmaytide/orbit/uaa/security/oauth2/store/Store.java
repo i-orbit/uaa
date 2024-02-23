@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.configuration.oauth2.store;
+package com.inmaytide.orbit.uaa.security.oauth2.store;
 
 import java.io.Serializable;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Optional;
  * @author inmaytide
  * @since 2024/1/25
  */
-public interface Store<T>{
+public interface Store<T extends Serializable>{
 
     void store(T t);
 
