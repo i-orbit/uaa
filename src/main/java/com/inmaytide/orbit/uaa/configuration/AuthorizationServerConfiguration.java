@@ -1,6 +1,5 @@
 package com.inmaytide.orbit.uaa.configuration;
 
-import com.inmaytide.exception.translator.ThrowableMapper;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.mapper.PredictableExceptionMapper;
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
@@ -15,7 +14,6 @@ import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AccessTokenStore;
 import com.inmaytide.orbit.uaa.security.oauth2.store.OAuth2AuthorizationStore;
 import com.inmaytide.orbit.uaa.security.oauth2.store.RedisOAuth2AccessTokenStore;
 import com.inmaytide.orbit.uaa.security.oauth2.store.RedisOAuth2AuthorizationStore;
-import com.inmaytide.orbit.uaa.service.account.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,16 +21,14 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -57,8 +53,6 @@ import java.time.temporal.ChronoUnit;
  * @author inmaytide
  * @since 2023/4/12
  */
-@EnableWebSecurity
-@EnableMethodSecurity
 @DependsOn("exceptionResolver")
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfiguration {
@@ -82,11 +76,6 @@ public class AuthorizationServerConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(UserService userService, PasswordEncoder passwordEncoder) {
-        return new DefaultUserDetailsService(userService, passwordEncoder);
     }
 
     @Bean
@@ -135,6 +124,8 @@ public class AuthorizationServerConfiguration {
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
             c.requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).permitAll();
+            // 重置密码
+            c.requestMatchers(HttpMethod.PUT, "/api/users/passwords/change-with-validation-code").permitAll();
             // 剩余所有接口需要登录
             c.anyRequest().authenticated();
         });

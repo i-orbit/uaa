@@ -6,6 +6,7 @@ import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import org.wildfly.common.annotation.NotNull;
 
 import java.time.Instant;
@@ -32,7 +33,8 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户排序", minimum = "0")
     private Integer sequence;
 
-    @Schema(title = "用户性别")
+    @NotBlank
+    @Schema(title = "用户姓名")
     private String name;
 
     @Schema(title = "用户性别", description = "对应数据字典编码")
@@ -44,6 +46,7 @@ public class User extends TombstoneEntity {
     @Schema(title = "身份证号码")
     private String identificationNumber;
 
+    @NotBlank
     @Schema(title = "用户登录名")
     private String loginName;
 

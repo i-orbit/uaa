@@ -61,19 +61,40 @@
         </createTable>
         <createTable tableName="user_association" remarks="用户关联其他数据实例关联关系表">
             <column name="user" type="bigint" remarks="用户唯一标识"/>
-            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
             <column name="category" type="varchar(16)" remarks="关联数据类型"/>
+            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
             <column name="defaulted" type="varchar(2)" remarks="是否默认"/>
         </createTable>
         <addPrimaryKey tableName="user_association" columnNames="user, associated, category"/>
         <sql>
-            INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `sequence`, `name`, `login_name`,
-                                      `password`, `password_expire_at`, `lang`, `state`, `state_time`, `created_time`,
-                                      `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
-                VALUES (9999, 3721, 'N', 1, '系统管理员', 'admin',
-                        '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', TIMESTAMPADD(day, 3, now()),
-                        'SIMPLIFIED_CHINESE', 'INITIALIZATION', now(), now(), 9999, now(), 9999, 'N', 1);
+            INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `sequence`, `name`, `login_name`, `password`, `password_expire_at`, `lang`, `state`, `state_time`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
+                VALUES (9999, 3721, 'N', 1, '系统管理员', 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', TIMESTAMPADD(day, 3, now()), 'SIMPLIFIED_CHINESE', 'INITIALIZATION', now(), now(), 9999, now(), 9999, 'N', 1);
         </sql>
+    </changeSet>
+
+    <changeSet id="000000000000002" author="inmaytide">
+        <createTable tableName="role" remarks="角色信息">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="code" type="varchar(50)" remarks="角色编码"/>
+            <column name="name" type="varchar(50)" remarks="角色名称"/>
+            <column name="description" type="varchar(200)" remarks="角色说明"/>
+            <column name="weight" type="decimal(16, 2)" remarks="角色权重"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="role_association" remarks="角色与相关权限信息关联表">
+            <column name="role" type="bigint" remarks="角色唯一标识"/>
+            <column name="category" type="varchar(16)" remarks="关联数据类型"/>
+            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>
