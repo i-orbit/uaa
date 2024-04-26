@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
  * @author inmaytide
  * @since 2024/1/19
  */
-@Primary
 @Service
 public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implements UserService {
 
@@ -82,32 +81,6 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
                 .or().eq(User::getEmail, loginName)
                 .or().eq(User::getEmployeeId, loginName);
         return Optional.ofNullable(baseMapper.selectOne(wrapper));
-    }
-
-    @Override
-    public SystemUser get(Serializable id) {
-        if (Objects.equals(id, Robot.getInstance().getId())) {
-            return Robot.getInstance().toSystemUser();
-        }
-        User user = baseMapper.selectById(id);
-        if (user == null) {
-            throw new ObjectNotFoundException(String.valueOf(id));
-        }
-        return transferUserToSystemUser(user);
-    }
-
-    private SystemUser transferUserToSystemUser(User user) {
-        Objects.requireNonNull(user);
-        SystemUser systemUser = new SystemUser();
-        BeanUtils.copyProperties(user, systemUser);
-        // 加载用户所属组织
-        List<UserAssociation> associations = userAssociationService.findByUserAndCategory(user.getId(), UserAssociationCategory.ORGANIZATION);
-        systemUser.setUnderOrganizations(associations.stream().map(UserAssociation::getAssociated).collect(Collectors.toList()));
-        systemUser.setDefaultUnderOrganization(associations.stream().filter(e -> e.getDefaulted() == Bool.Y).findFirst().map(UserAssociation::getAssociated).orElse(null));
-        // 加载数据权限
-        Perspective perspective = new Perspective();
-        systemUser.setPerspective(perspective);
-        return systemUser;
     }
 
 }

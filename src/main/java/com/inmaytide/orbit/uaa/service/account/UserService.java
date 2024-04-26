@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author inmaytide
  * @since 2024/1/19
  */
-public interface UserService extends BasicService<User>, SystemUserService {
+public interface UserService extends BasicService<User> {
 
     Optional<User> findByLoginName(String loginName);
 
