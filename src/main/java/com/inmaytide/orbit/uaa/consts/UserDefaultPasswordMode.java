@@ -6,6 +6,6 @@ package com.inmaytide.orbit.uaa.consts;
  */
 public enum UserDefaultPasswordMode {
 
-    RANDOM, SPECIFIED, TEL_L6,
+    RANDOM, SPECIFIED, TEL_LAST6,
 
 }

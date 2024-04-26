@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.inmaytide.orbit.commons.utils.CodecUtils;
 
 /**
  * @author inmaytide
@@ -8,8 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 public class PasswordEncoderTester {
 
-    public static void main(String... args) {
-        System.out.println(new BCryptPasswordEncoder().encode("Ssgm888888"));
+    public static void main(String... args) throws Exception {
+        ;
+        System.out.println(CodecUtils.encrypt("111111"));
     }
 
 }

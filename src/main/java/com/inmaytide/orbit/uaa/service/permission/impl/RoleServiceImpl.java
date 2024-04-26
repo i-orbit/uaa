@@ -1,26 +1,24 @@
 package com.inmaytide.orbit.uaa.service.permission.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
-import com.inmaytide.orbit.commons.constants.Is;
+import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Roles;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
-import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
 import com.inmaytide.orbit.uaa.mapper.account.UserMapper;
+import com.inmaytide.orbit.uaa.mapper.permission.RoleMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,7 +28,7 @@ import java.util.stream.Collectors;
  * @since 2024/2/23
  */
 @Service
-public class RoleServiceImpl extends BasicServiceImpl<Role> implements RoleService {
+public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implements RoleService {
 
     private final UserAssociationService userAssociationService;
 
@@ -69,7 +67,7 @@ public class RoleServiceImpl extends BasicServiceImpl<Role> implements RoleServi
             codes.add(Roles.ROLE_S_ADMINISTRATOR.name());
         }
         // 用户是否是租户管理员
-        if (user.getIsTenantAdministrator() == Is.Y) {
+        if (user.getIsTenantAdministrator() == Bool.Y) {
             codes.add(Roles.ROLE_T_ADMINISTRATOR.name());
         }
         // 用户是否为配置的系统内部机器人

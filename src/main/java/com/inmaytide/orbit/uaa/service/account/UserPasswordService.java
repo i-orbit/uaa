@@ -1,9 +1,11 @@
 package com.inmaytide.orbit.uaa.service.account;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.uaa.domain.account.User;
-import com.inmaytide.orbit.uaa.domain.account.dto.ChangePassword;
-import com.inmaytide.orbit.uaa.domain.account.dto.ResetPassword;
+import com.inmaytide.orbit.uaa.service.account.dto.ApplyVerificationCode;
+import com.inmaytide.orbit.uaa.service.account.dto.ChangePassword;
+import com.inmaytide.orbit.uaa.service.account.dto.ResetPassword;
 
 import java.time.Instant;
 import java.util.regex.Pattern;
@@ -12,7 +14,7 @@ import java.util.regex.Pattern;
  * @author inmaytide
  * @since 2024/2/26
  */
-public interface UserPasswordService {
+public interface UserPasswordService extends IService<User> {
 
     /**
      * 密码规则正则表达式，至少8个字符，至少1个字母，1个数字和1个特殊字符
@@ -42,4 +44,6 @@ public interface UserPasswordService {
     String generateDefaultPassword(User entity);
 
     Instant getPasswordExpireAt(Long tenant);
+
+    void applyVerificationCode(ApplyVerificationCode dto);
 }

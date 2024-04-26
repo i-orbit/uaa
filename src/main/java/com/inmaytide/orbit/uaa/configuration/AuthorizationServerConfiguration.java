@@ -1,12 +1,12 @@
 package com.inmaytide.orbit.uaa.configuration;
 
-import com.inmaytide.exception.web.BadRequestException;
-import com.inmaytide.exception.web.mapper.PredictableExceptionMapper;
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
 import com.inmaytide.orbit.commons.domain.OrbitClientDetails;
 import com.inmaytide.orbit.commons.domain.Robot;
+import com.inmaytide.orbit.commons.security.CustomizedBearerTokenResolver;
 import com.inmaytide.orbit.commons.security.CustomizedOpaqueTokenIntrospector;
 import com.inmaytide.orbit.uaa.security.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationProvider;
+import com.inmaytide.orbit.uaa.security.oauth2.authentication.CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler;
 import com.inmaytide.orbit.uaa.security.oauth2.authentication.OAuth2PasswordAuthenticationConverter;
 import com.inmaytide.orbit.uaa.security.oauth2.authentication.OAuth2PasswordAuthenticationProvider;
 import com.inmaytide.orbit.uaa.security.oauth2.service.DefaultUserDetailsService;
@@ -33,7 +33,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
@@ -63,9 +62,6 @@ public class AuthorizationServerConfiguration {
 
     private final RestTemplate restTemplate;
 
-    static {
-        PredictableExceptionMapper.DEFAULT_INSTANT.register(OAuth2AuthenticationException.class, BadRequestException.class);
-    }
 
     public AuthorizationServerConfiguration(ApplicationProperties properties, DefaultHandlerExceptionResolver exceptionResolver, RestTemplate restTemplate) {
         this.properties = properties;
@@ -112,11 +108,13 @@ public class AuthorizationServerConfiguration {
         final OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
         http.with(authorizationServerConfigurer, c -> {
             c.tokenEndpoint((endpoint) -> {
+                endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
                 endpoint.accessTokenRequestConverter(new OAuth2PasswordAuthenticationConverter());
                 endpoint.authenticationProvider(new OAuth2PasswordAuthenticationProvider(authenticationManager, authorizationService, properties));
-                endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             }).tokenIntrospectionEndpoint(endpoint -> {
+                endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
                 endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
+                endpoint.introspectionResponseHandler(new CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler());
             });
         });
         http.authorizeHttpRequests(c -> {
@@ -124,7 +122,8 @@ public class AuthorizationServerConfiguration {
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
             c.requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).permitAll();
-            // 重置密码
+            // 自助重置密码
+            c.requestMatchers(HttpMethod.POST, "/api/users/passwords/apply-verification-code").permitAll();
             c.requestMatchers(HttpMethod.PUT, "/api/users/passwords/change-with-validation-code").permitAll();
             // 剩余所有接口需要登录
             c.anyRequest().authenticated();
@@ -132,6 +131,7 @@ public class AuthorizationServerConfiguration {
         http.oauth2ResourceServer(c -> {
             c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
+            c.bearerTokenResolver(new CustomizedBearerTokenResolver());
             c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(restTemplate)));
         });
         http.csrf(AbstractHttpConfigurer::disable);
@@ -141,7 +141,6 @@ public class AuthorizationServerConfiguration {
         http.exceptionHandling(c -> {
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
-            c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
         });
         return http.build();
     }

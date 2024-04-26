@@ -21,7 +21,9 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
     /**
      * 通过手机号码/电子邮箱获取验证码修改密码时，验证码输入错误
      */
-    E_0x00100013("0x00100013", "验证码输入错误");
+    E_0x00100013("0x00100013", "验证码输入错误"),
+    E_0x00100014("0x00100014", "申请重置密码的验证码失败"),
+    ;
 
     private final String value;
 

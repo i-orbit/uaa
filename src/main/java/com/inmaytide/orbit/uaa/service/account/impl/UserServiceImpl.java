@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
-import com.inmaytide.orbit.commons.constants.Is;
+import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.Perspective;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Primary
 @Service
-public class UserServiceImpl extends BasicServiceImpl<User> implements UserService {
+public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implements UserService {
 
     private final UserMapper userMapper;
 
@@ -53,7 +53,7 @@ public class UserServiceImpl extends BasicServiceImpl<User> implements UserServi
     @Override
     public User create(User entity) {
         // 只有超级管理员和对应租户的租户管理员允许新建租户管理员
-        if (entity.getIsTenantAdministrator() == Is.Y) {
+        if (entity.getIsTenantAdministrator() == Bool.Y) {
             if (!SecurityUtils.isSuperAdministrator() && !SecurityUtils.isTenantAdministrator(entity.getTenant())) {
                 throw new AccessDeniedException(ErrorCode.E_0x00100006);
             }
@@ -103,7 +103,7 @@ public class UserServiceImpl extends BasicServiceImpl<User> implements UserServi
         // 加载用户所属组织
         List<UserAssociation> associations = userAssociationService.findByUserAndCategory(user.getId(), UserAssociationCategory.ORGANIZATION);
         systemUser.setUnderOrganizations(associations.stream().map(UserAssociation::getAssociated).collect(Collectors.toList()));
-        systemUser.setDefaultUnderOrganization(associations.stream().filter(e -> e.getDefaulted() == Is.Y).findFirst().map(UserAssociation::getAssociated).orElse(null));
+        systemUser.setDefaultUnderOrganization(associations.stream().filter(e -> e.getDefaulted() == Bool.Y).findFirst().map(UserAssociation::getAssociated).orElse(null));
         // 加载数据权限
         Perspective perspective = new Perspective();
         systemUser.setPerspective(perspective);

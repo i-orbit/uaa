@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.inmaytide.orbit.commons.constants.Is;
+import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
@@ -24,7 +24,7 @@ public class User extends TombstoneEntity {
     private Long tenant;
 
     @Schema(title = "用户是否为所属租户的管理员", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "N")
-    private Is isTenantAdministrator;
+    private Bool isTenantAdministrator;
 
     @TableField("`rank`")
     @Schema(title = "用户职级", description = "对应数据字典编码")
@@ -106,11 +106,11 @@ public class User extends TombstoneEntity {
         this.tenant = tenant;
     }
 
-    public Is getIsTenantAdministrator() {
+    public Bool getIsTenantAdministrator() {
         return isTenantAdministrator;
     }
 
-    public void setIsTenantAdministrator(Is isTenantAdministrator) {
+    public void setIsTenantAdministrator(Bool isTenantAdministrator) {
         this.isTenantAdministrator = isTenantAdministrator;
     }
 

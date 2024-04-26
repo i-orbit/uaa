@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
-import com.inmaytide.orbit.commons.constants.Is;
+import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wildfly.common.annotation.NotNull;
@@ -27,7 +27,7 @@ public class UserAssociation implements Serializable {
     private UserAssociationCategory category;
 
     @Schema(title = "是否用户默认", description = "例如标识用户默认组织等")
-    private Is defaulted;
+    private Bool defaulted;
 
     public Long getUser() {
         return user;
@@ -53,11 +53,11 @@ public class UserAssociation implements Serializable {
         this.category = category;
     }
 
-    public Is getDefaulted() {
+    public Bool getDefaulted() {
         return defaulted;
     }
 
-    public void setDefaulted(Is defaulted) {
+    public void setDefaulted(Bool defaulted) {
         this.defaulted = defaulted;
     }
 }

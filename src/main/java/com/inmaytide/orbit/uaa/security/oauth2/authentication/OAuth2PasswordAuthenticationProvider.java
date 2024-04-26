@@ -1,14 +1,17 @@
 package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
 import com.inmaytide.exception.web.AccessDeniedException;
+import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Constants;
-import com.inmaytide.orbit.commons.constants.Is;
 import com.inmaytide.orbit.commons.constants.Platforms;
+import com.inmaytide.orbit.commons.domain.SystemUser;
+import com.inmaytide.orbit.commons.security.SecurityUtils;
+import com.inmaytide.orbit.commons.utils.ApplicationContextHolder;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.security.oauth2.service.ExtensibleOAuth2AuthorizationService;
+import com.inmaytide.orbit.uaa.service.account.UserService;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -75,7 +78,7 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
         if (value == null || !Pattern.compile("[YN]").asPredicate().test(value.toString())) {
             value = "N";
         }
-        Is forcedReplacement = Is.valueOf(value.toString());
+        Bool forcedReplacement = Bool.valueOf(value.toString());
 
         // 免密码登录标记
         if (Objects.equals(password, Constants.Markers.LOGIN_WITHOUT_PASSWORD)) {
@@ -98,7 +101,7 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
                     // 不允许用户在多个地方同时登录
                     if (!properties.isAllowUsersToLoginSimultaneously()) {
                         // 当用户在其他地方已登录时, 强制登录
-                        if (Is.Y == forcedReplacement) {
+                        if (Bool.Y == forcedReplacement) {
                             // 重新登录时将上一次登陆的authorization移除，并将token标记为强制登出
                             for (OAuth2Authorization authorization : authorizations) {
                                 service.remove(authorization);
@@ -150,7 +153,14 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
             authorizationService.save(authorizationBuilder.build());
             LOG.debug("OAuth2Authorization saved successfully");
             LOG.debug("Returning OAuth2AccessTokenAuthenticationToken");
-            return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken);
+
+            Map<String, Object> additionalResponseValues = new HashMap<>();
+            ApplicationContextHolder.getInstance().getBean(UserService.class).findByLoginName(username).ifPresent(user -> {
+                additionalResponseValues.put("userId", user.getId());
+                additionalResponseValues.put("tenant", user.getTenant());
+                additionalResponseValues.put("username", user.getName());
+            });
+            return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken, additionalResponseValues);
 
         } catch (Exception ex) {
             if (ex instanceof BadCredentialsException) {

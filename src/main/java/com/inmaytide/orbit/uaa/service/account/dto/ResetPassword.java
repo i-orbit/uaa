@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain.account.dto;
+package com.inmaytide.orbit.uaa.service.account.dto;
 
 import com.inmaytide.orbit.commons.utils.CommonUtils;
 import io.swagger.v3.oas.annotations.media.Schema;

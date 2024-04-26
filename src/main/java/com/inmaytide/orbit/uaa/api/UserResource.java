@@ -2,10 +2,8 @@ package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.domain.SystemUser;
-import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.account.User;
-import com.inmaytide.orbit.uaa.domain.account.dto.ChangePassword;
 import com.inmaytide.orbit.uaa.service.account.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
