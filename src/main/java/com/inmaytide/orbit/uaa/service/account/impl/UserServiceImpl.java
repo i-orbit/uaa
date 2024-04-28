@@ -39,13 +39,10 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
 
     private final UserMapper userMapper;
 
-    private final UserAssociationService userAssociationService;
-
     private final UserPasswordService passwordService;
 
-    public UserServiceImpl(UserMapper userMapper, UserAssociationService userAssociationService, UserPasswordService passwordService) {
+    public UserServiceImpl(UserMapper userMapper, UserPasswordService passwordService) {
         this.userMapper = userMapper;
-        this.userAssociationService = userAssociationService;
         this.passwordService = passwordService;
     }
 

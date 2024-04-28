@@ -17,12 +17,22 @@ public class ApplicationProperties extends GlobalProperties {
 
     public boolean allowUsersToLoginSimultaneously;
 
+    public boolean hideUserPasswordsFromExternal;
+
     public boolean isAllowUsersToLoginSimultaneously() {
         return allowUsersToLoginSimultaneously;
     }
 
     public void setAllowUsersToLoginSimultaneously(boolean allowUsersToLoginSimultaneously) {
         this.allowUsersToLoginSimultaneously = allowUsersToLoginSimultaneously;
+    }
+
+    public boolean isHideUserPasswordsFromExternal() {
+        return hideUserPasswordsFromExternal;
+    }
+
+    public void setHideUserPasswordsFromExternal(boolean hideUserPasswordsFromExternal) {
+        this.hideUserPasswordsFromExternal = hideUserPasswordsFromExternal;
     }
 
     public UserDefaultPassword getUserDefaultPassword() {
