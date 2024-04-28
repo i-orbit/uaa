@@ -10,7 +10,6 @@ spring:
       password: nacos
       discovery:
         namespace: ${spring.profiles.active}
-        ip: 172.16.3.192
       config:
         namespace: ${spring.profiles.active}
         file-extension: yaml
