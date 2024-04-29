@@ -33,6 +33,12 @@ public class UserResource {
         return service.create(entity);
     }
 
+    @PutMapping
+    @Operation(summary = "修改用户")
+    public User update(@Validated @RequestBody User entity) {
+        return service.update(entity);
+    }
+
     @GetMapping("{id}")
     @Operation(summary = "查询指定用户详情")
     public User get(@PathVariable Long id) {

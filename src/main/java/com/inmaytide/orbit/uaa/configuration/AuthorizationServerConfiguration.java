@@ -62,7 +62,6 @@ public class AuthorizationServerConfiguration {
 
     private final RestTemplate restTemplate;
 
-
     public AuthorizationServerConfiguration(ApplicationProperties properties, DefaultHandlerExceptionResolver exceptionResolver, RestTemplate restTemplate) {
         this.properties = properties;
         this.exceptionResolver = exceptionResolver;

@@ -57,7 +57,7 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler impl
                 UserActivity activity = ValueCaches
                         .getFor(USER_ACTIVITY, getUserActivityCacheKey(platform, userId), UserActivity.class)
                         .orElseGet(UserActivity::new);
-                activity.setId(userId);
+                activity.setUser(userId);
                 activity.setLastActivityTime(Instant.now());
                 activity.setIpAddress(getClientIpAddress(request));
                 activity.setPlatform(platform);

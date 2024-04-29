@@ -1,21 +1,22 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.constants.Platforms;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
  * @author inmaytide
  * @since 2024/4/23
  */
-public class UserActivity implements Serializable {
+public class UserActivity extends Entity {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private Long user;
 
     private Platforms platform;
 
@@ -23,18 +24,21 @@ public class UserActivity implements Serializable {
 
     private String ipAddress;
 
+    @TableField(exist = false)
     private Instant lastActivityTime;
+
+    public Instant offlineTime;
 
     public UserActivity() {
         this.onlineTime = Instant.now();
     }
 
-    public Long getId() {
-        return id;
+    public Long getUser() {
+        return user;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUser(Long user) {
+        this.user = user;
     }
 
     public Platforms getPlatform() {
@@ -63,5 +67,13 @@ public class UserActivity implements Serializable {
 
     public void setLastActivityTime(Instant lastActivityTime) {
         this.lastActivityTime = lastActivityTime;
+    }
+
+    public Instant getOfflineTime() {
+        return offlineTime;
+    }
+
+    public void setOfflineTime(Instant offlineTime) {
+        this.offlineTime = offlineTime;
     }
 }

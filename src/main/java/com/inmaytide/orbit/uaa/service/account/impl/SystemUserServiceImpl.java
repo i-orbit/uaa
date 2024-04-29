@@ -3,6 +3,7 @@ package com.inmaytide.orbit.uaa.service.account.impl;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.business.SystemUserService;
 import com.inmaytide.orbit.commons.constants.Bool;
+import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.SystemUser;
@@ -14,6 +15,7 @@ import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.account.UserService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
+    @Cacheable(cacheNames = Constants.CacheNames.USER_DETAILS, key = "#id")
     public SystemUser get(Serializable id) {
         if (Objects.equals(id, Robot.getInstance().getId())) {
             return Robot.getInstance().toSystemUser();
@@ -47,8 +50,7 @@ public class SystemUserServiceImpl implements SystemUserService {
         if (!NumberUtils.isCreatable(Objects.toString(id, ""))) {
             throw new ObjectNotFoundException(ErrorCode.E_0x00100002, Objects.toString(id, "null"));
         }
-
-        User user =  userService.get(NumberUtils.createLong(Objects.toString(id))).orElseThrow(() -> new ObjectNotFoundException(ErrorCode.E_0x00100002, Objects.toString(id, "null")));
+        User user = userService.get(NumberUtils.createLong(Objects.toString(id))).orElseThrow(() -> new ObjectNotFoundException(ErrorCode.E_0x00100002, Objects.toString(id, "null")));
         return transferUserToSystemUser(user);
     }
 
