@@ -1,8 +1,11 @@
 package com.inmaytide.orbit.uaa.domain.permission;
 
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.TenantState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.Serial;
 
 /**
  * @author inmaytide
@@ -10,6 +13,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(title = "租户信息")
 public class Tenant extends TombstoneEntity {
+
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     @Schema(title = "租户全称")
     private String name;

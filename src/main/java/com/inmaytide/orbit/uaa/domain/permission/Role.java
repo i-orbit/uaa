@@ -1,8 +1,11 @@
 package com.inmaytide.orbit.uaa.domain.permission;
 
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.wildfly.common.annotation.NotNull;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 
 /**
@@ -11,6 +14,12 @@ import java.math.BigDecimal;
  */
 @Schema(title = "角色信息")
 public class Role extends TombstoneEntity {
+
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
+
+    @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
+    private Long tenant;
 
     @Schema(title = "角色名称")
     private String name;
@@ -23,6 +32,14 @@ public class Role extends TombstoneEntity {
 
     @Schema(title = "角色权重", description = "影响角色在列表中的排序")
     private BigDecimal weight;
+
+    public Long getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
+    }
 
     public String getName() {
         return name;

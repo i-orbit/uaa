@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import org.wildfly.common.annotation.NotNull;
 
+import java.io.Serial;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -19,8 +21,10 @@ import java.time.LocalDate;
 @Schema(title = "用户信息")
 public class User extends TombstoneEntity {
 
-    @NotNull
-    @Schema(title = "所属租户唯一标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
+
+    @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
     private Long tenant;
 
     @Schema(title = "用户是否为所属租户的管理员", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "N")
@@ -30,7 +34,7 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户职级", description = "对应数据字典编码")
     private String rank;
 
-    @Schema(title = "用户排序", minimum = "0")
+    @Schema(title = "用户排序", minimum = "1")
     private Integer sequence;
 
     @NotBlank

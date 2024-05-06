@@ -11,16 +11,19 @@ import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
-import com.inmaytide.orbit.uaa.mapper.account.UserMapper;
 import com.inmaytide.orbit.uaa.mapper.permission.RoleMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
+import com.inmaytide.orbit.uaa.service.account.UserService;
 import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -32,13 +35,12 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
 
     private final UserAssociationService userAssociationService;
 
-    private final UserMapper userMapper;
+    private UserService userService;
 
     private final ApplicationProperties properties;
 
-    public RoleServiceImpl(UserAssociationService userAssociationService, UserMapper userMapper, ApplicationProperties properties) {
+    public RoleServiceImpl(UserAssociationService userAssociationService, ApplicationProperties properties) {
         this.userAssociationService = userAssociationService;
-        this.userMapper = userMapper;
         this.properties = properties;
     }
 
@@ -55,10 +57,11 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
 
     @Override
     public List<String> findCodesByUser(Long userId) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
+        Optional<User> op = userService.get(userId);
+        if (op.isEmpty()) {
             throw new ObjectNotFoundException(String.valueOf(userId));
         }
+        User user = op.get();
         // 用户绑定的角色
         List<UserAssociation> userAssociations = userAssociationService.findByUserAndCategory(user.getId(), UserAssociationCategory.ROLE);
         List<String> codes = findCodesByIds(userAssociations.stream().map(UserAssociation::getAssociated).collect(Collectors.toList()));
@@ -75,5 +78,11 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
             codes.add(Roles.ROLE_ROBOT.name());
         }
         return codes;
+    }
+
+    @Lazy
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

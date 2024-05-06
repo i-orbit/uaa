@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 
@@ -14,7 +15,7 @@ import java.time.Instant;
 public class UserActivity extends Entity {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     private Long user;
 

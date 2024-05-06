@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 @EnableCaching
 @SpringBootApplication(scanBasePackages = {"com.inmaytide.orbit.commons", "com.inmaytide.orbit.uaa"})
 public class UaaApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(UaaApplication.class, args);
     }
@@ -30,19 +31,17 @@ public class UaaApplication {
 
     @Bean
     public OpenAPI openAPI() {
+        Info info = new Info().title("Orbit UAA API")
+                .description("User Account and Authentication Service For Orbit System")
+                .version("1.0.0")
+                .license(new License().name("MIT").url("https://opensource.org/licenses/MIT"));
+        ExternalDocumentation externalDocs = new ExternalDocumentation()
+                .description("UAA Wiki Documentation")
+                .url("https://github.com/i-orbit/uaa");
         return new OpenAPI()
                 .specVersion(SpecVersion.V30)
-                .info(
-                        new Info().title("Orbit UAA API")
-                                .description("User Account and Authentication Service For Orbit System")
-                                .version("1.0.0")
-                                .license(new License().name("MIT").url("https://opensource.org/licenses/MIT"))
-                )
-                .externalDocs(
-                        new ExternalDocumentation()
-                                .description("UAA Wiki Documentation")
-                                .url("https://github.com/i-orbit/uaa")
-                );
+                .info(info)
+                .externalDocs(externalDocs);
     }
 
 }

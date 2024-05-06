@@ -114,6 +114,8 @@ public class AuthorizationServerConfiguration {
                 endpoint.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
                 endpoint.authenticationProvider(new CustomizedOAuth2TokenIntrospectionAuthenticationProvider(clientRepository, authorizationService));
                 endpoint.introspectionResponseHandler(new CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler());
+            }).clientAuthentication(customizer-> {
+                customizer.errorResponseHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             });
         });
         http.authorizeHttpRequests(c -> {

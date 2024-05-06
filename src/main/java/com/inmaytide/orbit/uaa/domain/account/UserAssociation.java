@@ -1,10 +1,12 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wildfly.common.annotation.NotNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +15,9 @@ import java.io.Serializable;
  */
 @Schema(title = "用户附属信息关联表")
 public class UserAssociation implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     @NotNull
     @Schema(title = "用户唯一标识")

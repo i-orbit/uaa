@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
@@ -19,15 +20,15 @@ import com.inmaytide.orbit.uaa.mapper.account.UserMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.account.UserPasswordService;
 import com.inmaytide.orbit.uaa.service.account.UserService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +45,19 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
     public UserServiceImpl(UserMapper userMapper, UserPasswordService passwordService) {
         this.userMapper = userMapper;
         this.passwordService = passwordService;
+    }
+
+    @Override
+    public Optional<User> get(Long id) {
+        if (Objects.equals(Robot.getInstance().getId(), id)) {
+            User robot = new User();
+            robot.setId(id);
+            robot.setName(Robot.getInstance().getName());
+            robot.setPassword(Robot.getInstance().getPassword());
+            robot.setLoginName(Robot.getInstance().getLoginName());
+            return Optional.of(robot);
+        }
+        return super.get(id);
     }
 
     @Override
@@ -65,9 +79,12 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
 
     @Override
     public User update(User entity) {
-
-
-        return super.update(entity);
+        User original = baseMapper.selectById(entity.getId());
+        if (original == null) {
+            throw new ObjectNotFoundException(String.valueOf(entity.getId()));
+        }
+        BeanUtils.copyProperties(entity, original, "state", "stateTime", "password", "passwordExpireAt", "sequence");
+        return super.update(original);
     }
 
     @Override
@@ -78,6 +95,31 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
                 .or().eq(User::getEmail, loginName)
                 .or().eq(User::getEmployeeId, loginName);
         return Optional.ofNullable(baseMapper.selectOne(wrapper));
+    }
+
+    @Override
+    public Map<Long, String> findEmailsByIds(List<Long> ids) {
+        return findFieldValueByIds(ids, User::getEmail);
+    }
+
+    @Override
+    public Map<Long, String> findTelephoneNumbersByIds(List<Long> ids) {
+        return findFieldValueByIds(ids, User::getTelephoneNumber);
+    }
+
+    @Override
+    public Map<Long, String> findNamesByIds(List<Long> ids) {
+        return findFieldValueByIds(ids, User::getName);
+    }
+
+    private Map<Long, String> findFieldValueByIds(List<Long> ids, SFunction<User, String> fieldGetter) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Map.of();
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(fieldGetter, User::getId);
+        wrapper.in(User::getId, ids);
+        return baseMapper.selectList(wrapper).stream().collect(Collectors.toMap(User::getId, fieldGetter));
     }
 
 }

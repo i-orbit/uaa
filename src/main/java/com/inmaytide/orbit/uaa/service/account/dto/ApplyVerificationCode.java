@@ -1,7 +1,9 @@
 package com.inmaytide.orbit.uaa.service.account.dto;
 
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.MessageSendingMode;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,9 @@ import java.io.Serializable;
  * @since 2024/2/27
  */
 public class ApplyVerificationCode implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     private String loginName;
 

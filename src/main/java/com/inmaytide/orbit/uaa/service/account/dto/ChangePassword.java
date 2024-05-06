@@ -1,11 +1,13 @@
 package com.inmaytide.orbit.uaa.service.account.dto;
 
 import com.inmaytide.exception.web.BadRequestException;
+import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.utils.CodecUtils;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,6 +16,9 @@ import java.io.Serializable;
  */
 @Schema(title = "修改用户密码的接口请求参数")
 public class ChangePassword implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     @NotBlank
     @Schema(title = "用户名")

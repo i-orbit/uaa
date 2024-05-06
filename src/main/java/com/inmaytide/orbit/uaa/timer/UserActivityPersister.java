@@ -2,7 +2,7 @@ package com.inmaytide.orbit.uaa.timer;
 
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.constants.Platforms;
-import com.inmaytide.orbit.commons.metrics.AbstractJob;
+import com.inmaytide.orbit.commons.metrics.JobAdapter;
 import com.inmaytide.orbit.commons.metrics.JobParameter;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.domain.account.UserActivity;
@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author inmaytide
  * @since 2024/4/29
  */
-public class UserActivityPersister extends AbstractJob {
+public class UserActivityPersister implements JobAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(UserActivityPersister.class);
 
@@ -47,13 +47,13 @@ public class UserActivityPersister extends AbstractJob {
 
     @NonNull
     @Override
-    protected JobParameter getParameters() {
+    public JobParameter getParameters() {
         return parameter;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected void exec(JobExecutionContext context) {
+    public void exec(JobExecutionContext context) {
         List<UserActivity> entities = ValueCaches.keys(Constants.CacheNames.USER_ACTIVITY).stream()
                 .map(k -> ValueCaches.getFor(Constants.CacheNames.USER_ACTIVITY, k, UserActivity.class))
                 .filter(Optional::isPresent)
