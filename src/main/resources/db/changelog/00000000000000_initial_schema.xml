@@ -108,4 +108,47 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="000000000000003" author="inmaytide">
+        <createTable tableName="organization" remarks="组织信息">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="code" type="varchar(50)" remarks="组织编码"/>
+            <column name="name" type="varchar(50)" remarks="组织名称"/>
+            <column name="parent" type="bigint" remarks="上级组织"/>
+            <column name="category" type="varchar(20)" remarks="组织分类"/>
+            <column name="introduction" type="varchar(500)" remarks="简介"/>
+            <column name="cover" type="varchar(500)" remarks="鸟瞰/封面图片地址"/>
+            <column name="principal" type="bigint" remarks="负责人"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="position" remarks="岗位信息">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="organization" type="bigint" remarks="所属组织"/>
+            <column name="code" type="varchar(50)" remarks="岗位编码"/>
+            <column name="name" type="varchar(50)" remarks="岗位名称"/>
+            <column name="parent" type="bigint" remarks="上级岗位"/>
+            <column name="responsibilities" type="varchar(200)" remarks="岗位职责"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

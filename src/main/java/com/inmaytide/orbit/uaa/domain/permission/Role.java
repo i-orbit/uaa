@@ -3,7 +3,6 @@ package com.inmaytide.orbit.uaa.domain.permission;
 import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.wildfly.common.annotation.NotNull;
 
 import java.io.Serial;
 import java.math.BigDecimal;

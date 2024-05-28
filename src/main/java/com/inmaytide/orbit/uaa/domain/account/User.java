@@ -6,6 +6,7 @@ import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
+import com.inmaytide.orbit.uaa.domain.permission.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import org.wildfly.common.annotation.NotNull;
@@ -13,6 +14,8 @@ import org.wildfly.common.annotation.NotNull;
 import java.io.Serial;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author inmaytide
@@ -34,6 +37,10 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户职级", description = "对应数据字典编码")
     private String rank;
 
+    @TableField(exist = false)
+    @Schema(title = "用户职级描述")
+    private String rankName;
+
     @Schema(title = "用户排序", minimum = "1")
     private Integer sequence;
 
@@ -43,6 +50,10 @@ public class User extends TombstoneEntity {
 
     @Schema(title = "用户性别", description = "对应数据字典编码")
     private String gender;
+
+    @TableField(exist = false)
+    @Schema(title = "用户性别描述")
+    private String genderName;
 
     @Schema(title = "出生日期")
     private LocalDate birthday;
@@ -87,8 +98,11 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户系统功能代理人", description = "当用户状态为不在岗时，系统相关功能待办自动转发给代理人")
     private Long proxy;
 
-    @Schema(title = "用户人事状态")
+    @Schema(title = "用户人事状态", description = "对应数据字典编码")
     private String personnelStatus;
+
+    @Schema(title = "用户人事状态描述")
+    private String personnelStatusName;
 
     @Schema(title = "员工编号")
     private String employeeId;
@@ -101,6 +115,18 @@ public class User extends TombstoneEntity {
 
     @Schema(title = "离职日期")
     private LocalDate resignationDate;
+
+    @TableField(exist = false)
+    @Schema(title = "用户所属组织")
+    private List<Organization> organizations;
+
+    @TableField(exist = false)
+    @Schema(title = "用户岗位")
+    private List<Position> positions;
+
+    @TableField(exist = false)
+    @Schema(title = "用户角色")
+    private List<Role> roles;
 
     public Long getTenant() {
         return tenant;
@@ -300,5 +326,62 @@ public class User extends TombstoneEntity {
 
     public void setResignationDate(LocalDate resignationDate) {
         this.resignationDate = resignationDate;
+    }
+
+    public List<Organization> getOrganizations() {
+        if (organizations == null) {
+            organizations = new ArrayList<>();
+        }
+        return organizations;
+    }
+
+    public void setOrganizations(List<Organization> organizations) {
+        this.organizations = organizations;
+    }
+
+    public List<Position> getPositions() {
+        if (positions == null) {
+            positions = new ArrayList<>();
+        }
+        return positions;
+    }
+
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
+    }
+
+    public List<Role> getRoles() {
+        if (roles == null) {
+            roles = new ArrayList<>();
+        }
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getRankName() {
+        return rankName;
+    }
+
+    public void setRankName(String rankName) {
+        this.rankName = rankName;
+    }
+
+    public String getGenderName() {
+        return genderName;
+    }
+
+    public void setGenderName(String genderName) {
+        this.genderName = genderName;
+    }
+
+    public String getPersonnelStatusName() {
+        return personnelStatusName;
+    }
+
+    public void setPersonnelStatusName(String personnelStatusName) {
+        this.personnelStatusName = personnelStatusName;
     }
 }

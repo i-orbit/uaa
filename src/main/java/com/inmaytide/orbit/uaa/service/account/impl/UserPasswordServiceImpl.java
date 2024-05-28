@@ -10,7 +10,7 @@ import com.inmaytide.orbit.commons.domain.Message;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
-import com.inmaytide.orbit.commons.service.library.SystemPropertyService;
+import com.inmaytide.orbit.commons.service.core.SystemPropertyService;
 import com.inmaytide.orbit.commons.service.message.MessageService;
 import com.inmaytide.orbit.commons.utils.CodecUtils;
 import com.inmaytide.orbit.commons.utils.ValueCaches;

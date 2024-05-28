@@ -7,6 +7,7 @@ import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.domain.Perspective;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.SystemUser;
+import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.User;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author inmaytide
@@ -60,7 +60,7 @@ public class SystemUserServiceImpl implements SystemUserService {
         BeanUtils.copyProperties(user, systemUser);
         // 加载用户所属组织
         List<UserAssociation> associations = userAssociationService.findByUserAndCategory(user.getId(), UserAssociationCategory.ORGANIZATION);
-        systemUser.setUnderOrganizations(associations.stream().map(UserAssociation::getAssociated).collect(Collectors.toList()));
+        systemUser.setUnderOrganizations(user.getOrganizations().stream().map(Entity::getId).toList());
         systemUser.setDefaultUnderOrganization(associations.stream().filter(e -> e.getDefaulted() == Bool.Y).findFirst().map(UserAssociation::getAssociated).orElse(null));
         // 加载数据权限
         Perspective perspective = new Perspective();

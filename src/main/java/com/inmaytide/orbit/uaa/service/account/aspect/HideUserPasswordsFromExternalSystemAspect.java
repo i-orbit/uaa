@@ -42,10 +42,11 @@ public class HideUserPasswordsFromExternalSystemAspect {
         if (CollectionUtils.isEmpty(users)) {
             return;
         }
-        users.stream()
-                .filter(e -> e instanceof User)
-                .map(User.class::cast)
-                .forEach(e -> e.setPassword(Constants.Markers.NOT_APPLICABLE));
+        for (Object entity : users) {
+            if (entity instanceof User user) {
+                user.setPassword(Constants.Markers.NOT_APPLICABLE);
+            }
+        }
     }
 
 }
