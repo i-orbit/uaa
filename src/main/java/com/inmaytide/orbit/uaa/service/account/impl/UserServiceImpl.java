@@ -25,9 +25,11 @@ import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,6 +78,7 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
     }
 
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public User create(User entity) {
         // 只有超级管理员和对应租户的租户管理员允许新建租户管理员
         if (entity.getIsTenantAdministrator() == Bool.Y) {
@@ -89,16 +92,23 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
         entity.setPasswordExpireAt(passwordService.getPasswordExpireAt(entity.getTenant()));
         entity.setLang(Languages.SIMPLIFIED_CHINESE);
         entity.setSequence(userMapper.findNewSequence());
-        return super.create(entity);
+        User res = super.create(entity);
+        // 保存关联信息
+        entity.setId(res.getId());
+        associationService.persist(entity);
+        return res;
     }
 
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public User update(User entity) {
         User original = baseMapper.selectById(entity.getId());
         if (original == null) {
             throw new ObjectNotFoundException(String.valueOf(entity.getId()));
         }
         BeanUtils.copyProperties(entity, original, "state", "stateTime", "password", "passwordExpireAt", "sequence");
+        // 保存关联信息
+        associationService.persist(entity);
         return super.update(original);
     }
 
@@ -134,44 +144,48 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
         }
         List<Long> ids = CommonUtils.map(entities, Function.identity(), User::getId);
         Map<Long, Map<UserAssociationCategory, List<UserAssociation>>> associations = associationService.findByUsers(ids);
-        List<Long> organizationIds = associations.values().stream()
-                .flatMap(e -> e.getOrDefault(UserAssociationCategory.ORGANIZATION, Collections.emptyList()).stream())
+        BiFunction<Collection<Map<UserAssociationCategory, List<UserAssociation>>>, UserAssociationCategory, List<Long>> fetchIds = (p, c) -> p.stream()
+                .flatMap(e -> e.getOrDefault(c, Collections.emptyList()).stream())
                 .map(UserAssociation::getAssociated)
                 .toList();
+        List<Long> organizationIds = fetchIds.apply(associations.values(), UserAssociationCategory.ORGANIZATION);
         Map<Long, Organization> organizations = organizationService.findByIds(organizationIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-
-        List<Long> positionsIds = associations.values().stream()
-                .flatMap(e -> e.getOrDefault(UserAssociationCategory.POSITION, Collections.emptyList()).stream())
-                .map(UserAssociation::getAssociated)
-                .toList();
+        List<Long> positionsIds = fetchIds.apply(associations.values(), UserAssociationCategory.POSITION);
         Map<Long, Position> positions = positionService.findByIds(positionsIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-
-        List<Long> roleIds = associations.values().stream()
-                .flatMap(e -> e.getOrDefault(UserAssociationCategory.ROLE, Collections.emptyList()).stream())
-                .map(UserAssociation::getAssociated)
-                .toList();
+        List<Long> roleIds = fetchIds.apply(associations.values(), UserAssociationCategory.ROLE);
         Map<Long, Role> roles = roleService.findByIds(roleIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-
         List<String> dictionaryCodes = CommonUtils.map(entities, Function.identity(), User::getGender, User::getPersonnelStatus, User::getRank);
         Map<String, String> dictionaryNames = dictionaryService.findNamesByCodes(dictionaryCodes);
 
         for (User entity : entities) {
             List<Role> userRoles = associations.getOrDefault(entity.getId(), Collections.emptyMap())
                     .getOrDefault(UserAssociationCategory.ROLE, Collections.emptyList())
-                    .stream().map(UserAssociation::getAssociated)
+                    .stream()
+                    .map(UserAssociation::getAssociated)
                     .map(roles::get)
                     .toList();
             List<Position> userPositions = associations.getOrDefault(entity.getId(), Collections.emptyMap())
                     .getOrDefault(UserAssociationCategory.POSITION, Collections.emptyList())
-                    .stream().map(UserAssociation::getAssociated)
+                    .stream()
+                    .peek(e -> {
+                        if (e.getDefaulted() == Bool.Y) {
+                            entity.setDefaultPosition(e.getAssociated());
+                        }
+                    })
+                    .map(UserAssociation::getAssociated)
                     .map(positions::get)
                     .toList();
             List<Organization> userOrganizations = associations.getOrDefault(entity.getId(), Collections.emptyMap())
                     .getOrDefault(UserAssociationCategory.ORGANIZATION, Collections.emptyList())
-                    .stream().map(UserAssociation::getAssociated)
+                    .stream()
+                    .peek(e -> {
+                        if (e.getDefaulted() == Bool.Y) {
+                            entity.setDefaultOrganization(e.getAssociated());
+                        }
+                    })
+                    .map(UserAssociation::getAssociated)
                     .map(organizations::get)
                     .toList();
-
             entity.setRoles(userRoles);
             entity.setPositions(userPositions);
             entity.setOrganizations(userOrganizations);

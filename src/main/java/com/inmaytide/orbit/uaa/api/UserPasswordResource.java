@@ -44,7 +44,7 @@ public class UserPasswordResource {
     }
 
     @PostMapping("apply-verification-code")
-    @Operation(summary = "通过手机号码/电子邮箱修改用户密码时申请验证码")
+    @Operation(summary = "通过手机号码/电子邮箱修改用户密码-申请验证码")
     public void applyVerificationCode(@RequestBody ApplyVerificationCode dto) {
         service.applyVerificationCode(dto);
     }

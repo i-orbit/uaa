@@ -116,6 +116,14 @@ public class User extends TombstoneEntity {
     @Schema(title = "离职日期")
     private LocalDate resignationDate;
 
+    @Schema(title = "默认组织")
+    @TableField(exist = false)
+    private Long defaultOrganization;
+
+    @Schema(title = "默认岗位")
+    @TableField(exist = false)
+    private Long defaultPosition;
+
     @TableField(exist = false)
     @Schema(title = "用户所属组织")
     private List<Organization> organizations;
@@ -383,5 +391,21 @@ public class User extends TombstoneEntity {
 
     public void setPersonnelStatusName(String personnelStatusName) {
         this.personnelStatusName = personnelStatusName;
+    }
+
+    public Long getDefaultOrganization() {
+        return defaultOrganization;
+    }
+
+    public void setDefaultOrganization(Long defaultOrganization) {
+        this.defaultOrganization = defaultOrganization;
+    }
+
+    public Long getDefaultPosition() {
+        return defaultPosition;
+    }
+
+    public void setDefaultPosition(Long defaultPosition) {
+        this.defaultPosition = defaultPosition;
     }
 }

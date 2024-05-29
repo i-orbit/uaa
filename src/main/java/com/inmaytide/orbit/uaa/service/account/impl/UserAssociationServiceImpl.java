@@ -1,16 +1,23 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.inmaytide.orbit.commons.constants.Bool;
+import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.account.Organization;
+import com.inmaytide.orbit.uaa.domain.account.Position;
+import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
+import com.inmaytide.orbit.uaa.domain.permission.Role;
 import com.inmaytide.orbit.uaa.mapper.account.UserAssociationMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import javax.swing.text.html.parser.Entity;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +25,7 @@ import java.util.stream.Collectors;
  * @since 2024/2/23
  */
 @Service
-public class UserAssociationServiceImpl implements UserAssociationService {
+public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMapper, UserAssociation> implements UserAssociationService {
 
     private final UserAssociationMapper mapper;
 
@@ -51,4 +58,39 @@ public class UserAssociationServiceImpl implements UserAssociationService {
                 ));
     }
 
+    @Override
+    public void erase(Long userId) {
+        LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
+        mapper.delete(wrapper);
+    }
+
+    @Override
+    public void erase(Long userId, UserAssociationCategory category) {
+        LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
+        wrapper.eq(UserAssociation::getCategory, Objects.requireNonNull(category));
+        mapper.delete(wrapper);
+    }
+
+    @Override
+    @Transactional
+    public void persist(User user) {
+        erase(user.getId());
+        List<UserAssociation> associations = new ArrayList<>();
+        for (Organization e : user.getOrganizations()) {
+            boolean defaulted = Objects.equals(user.getDefaultOrganization(), e.getId());
+            associations.add(UserAssociation.builder(UserAssociationCategory.ORGANIZATION).user(user).associated(e).defaulted(defaulted).build());
+        }
+        for (Position e : user.getPositions()) {
+            boolean defaulted = Objects.equals(user.getDefaultPosition(), e.getId());
+            associations.add(UserAssociation.builder(UserAssociationCategory.POSITION).user(user).associated(e).defaulted(defaulted).build());
+        }
+        for (Role e : user.getRoles()) {
+            associations.add(UserAssociation.builder(UserAssociationCategory.ROLE).user(user).associated(e).build());
+        }
+        if (!associations.isEmpty()) {
+            saveBatch(associations);
+        }
+    }
 }
