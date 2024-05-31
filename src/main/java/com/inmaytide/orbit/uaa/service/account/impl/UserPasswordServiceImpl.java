@@ -176,7 +176,7 @@ public class UserPasswordServiceImpl extends ServiceImpl<UserMapper, User> imple
         Message message = Message.builder()
                 .title("重置密码")
                 .content("<span style=\"font-size: 16px;\">尊敬的<b>%s</b>您好：<br/><p style=\"text-indent: 2em;\">账号重置密码的验证码为：<b>%s</b>（有效时间为<b>15</b>分钟）</p></span>".formatted(user.getName(), value))
-                .business("SYS_USER")
+                .business(UserService.BUSINESS_KEY)
                 .receiver(dto.getSendingMode(), user.getId())
                 .build();
         messageService.createMessage(message);

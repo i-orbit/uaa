@@ -14,6 +14,8 @@ import java.util.Optional;
  */
 public interface UserService extends BasicService<User> {
 
+    String BUSINESS_KEY = "SYS_USER";
+
     Optional<User> findByLoginName(String loginName);
 
     Map<Long, String> findEmailsByIds(List<Long> ids);

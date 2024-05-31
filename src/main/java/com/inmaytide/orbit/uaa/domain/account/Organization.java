@@ -1,9 +1,13 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.inmaytide.orbit.commons.domain.GeographicCoordinate;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import com.inmaytide.orbit.uaa.consts.OrganizationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author inmaytide
@@ -15,15 +19,18 @@ public class Organization extends TombstoneEntity {
     @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
     private Long tenant;
 
+    @NotBlank
     @Schema(title = "组织名称")
     private String name;
 
+    @NotBlank
     @Schema(title = "组织编码", description = "租户唯一")
     private String code;
 
     @Schema(title = "上级组织")
     private Long parent;
 
+    @NotNull
     @Schema(title = "组织分类")
     private OrganizationCategory category;
 
@@ -39,6 +46,13 @@ public class Organization extends TombstoneEntity {
     @TableField(exist = false)
     @Schema(title = "负责人姓名")
     private String principalName;
+
+    @Schema(title = "排序字段")
+    private Integer sequence;
+
+    @Valid
+    @Schema(title = "地理位置")
+    private GeographicCoordinate location;
 
     public Long getTenant() {
         return tenant;
@@ -114,5 +128,21 @@ public class Organization extends TombstoneEntity {
 
     public void setPrincipalName(String principalName) {
         this.principalName = principalName;
+    }
+
+    public Integer getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.sequence = sequence;
+    }
+
+    public GeographicCoordinate getLocation() {
+        return location;
+    }
+
+    public void setLocation(GeographicCoordinate location) {
+        this.location = location;
     }
 }

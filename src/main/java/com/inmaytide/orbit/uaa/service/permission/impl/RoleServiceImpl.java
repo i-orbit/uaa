@@ -46,13 +46,7 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
 
     @Override
     public List<String> findCodesByIds(List<Long> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return new ArrayList<>();
-        }
-        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
-        wrapper.select(Role::getCode);
-        wrapper.in(Role::getId, ids);
-        return baseMapper.selectList(wrapper).stream().map(Role::getCode).collect(Collectors.toList());
+        return new ArrayList<>(findFieldValueByIds(ids, Role::getCode).values());
     }
 
     @Override

@@ -106,6 +106,23 @@
             <column name="category" type="varchar(16)" remarks="关联数据类型"/>
             <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
         </createTable>
+        <createTable tableName="authority" remarks="功能权限信息">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="code" type="varchar(50)" remarks="角色编码"/>
+            <column name="name" type="varchar(50)" remarks="角色名称"/>
+            <column name="web_menu_id" type="bigint" remarks="关联WEB菜单唯一标识"/>
+            <column name="app_menu_id" type="bigint" remarks="关联APP菜单唯一标识"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
     </changeSet>
 
     <changeSet id="000000000000003" author="inmaytide">
@@ -121,6 +138,7 @@
             <column name="introduction" type="varchar(500)" remarks="简介"/>
             <column name="cover" type="varchar(500)" remarks="鸟瞰/封面图片地址"/>
             <column name="principal" type="bigint" remarks="负责人"/>
+            <column name="sequence" type="int" remarks="排序字段"/>
             <column name="created_time" type="timestamp" remarks="创建时间"/>
             <column name="created_by" type="bigint" remarks="创建人"/>
             <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
@@ -140,6 +158,7 @@
             <column name="name" type="varchar(50)" remarks="岗位名称"/>
             <column name="parent" type="bigint" remarks="上级岗位"/>
             <column name="responsibilities" type="varchar(200)" remarks="岗位职责"/>
+            <column name="sequence" type="int" remarks="排序字段"/>
             <column name="created_time" type="timestamp" remarks="创建时间"/>
             <column name="created_by" type="bigint" remarks="创建人"/>
             <column name="modified_time" type="timestamp" remarks="最后修改时间"/>

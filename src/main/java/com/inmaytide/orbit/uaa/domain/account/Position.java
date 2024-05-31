@@ -28,6 +28,9 @@ public class Position extends TombstoneEntity {
     @Schema(title = "岗位职责")
     private String responsibilities;
 
+    @Schema(title = "排序字段")
+    private Integer sequence;
+
     public Long getTenant() {
         return tenant;
     }
@@ -74,5 +77,13 @@ public class Position extends TombstoneEntity {
 
     public void setResponsibilities(String responsibilities) {
         this.responsibilities = responsibilities;
+    }
+
+    public Integer getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.sequence = sequence;
     }
 }

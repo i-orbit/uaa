@@ -1,0 +1,32 @@
+package com.inmaytide.orbit.uaa.service.permission.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
+import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
+import com.inmaytide.orbit.uaa.mapper.permission.RoleAssociationMapper;
+import com.inmaytide.orbit.uaa.service.permission.RoleAssociationService;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * @author inmaytide
+ * @since 2024/5/31
+ */
+@Service
+public class RoleAssociationServiceImpl extends ServiceImpl<RoleAssociationMapper, RoleAssociation> implements RoleAssociationService {
+
+    @Override
+    public List<RoleAssociation> findByRolesAndCategory(List<Long> roles, RoleAssociationCategory category) {
+        if (roles == null || roles.isEmpty()) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<RoleAssociation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(RoleAssociation::getRole, roles);
+        wrapper.eq(RoleAssociation::getCategory, category);
+        return baseMapper.selectList(wrapper);
+    }
+
+}
