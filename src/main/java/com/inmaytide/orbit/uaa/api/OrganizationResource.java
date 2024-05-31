@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * @author inmaytide
@@ -50,7 +51,7 @@ public class OrganizationResource {
 
     @GetMapping("tree-of-organizations")
     @Operation(summary = "查询当前用户有权限的组织架构树")
-    public List<TreeNode<Organization>> treeOfOrganizations() {
+    public TreeSet<TreeNode<Organization>> treeOfOrganizations() {
         return organizationService.treeOfOrganizations();
     }
 

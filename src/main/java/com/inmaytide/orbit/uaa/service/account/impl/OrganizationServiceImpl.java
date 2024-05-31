@@ -3,7 +3,6 @@ package com.inmaytide.orbit.uaa.service.account.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.constants.Constants;
-import com.inmaytide.orbit.commons.domain.GeographicCoordinate;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
@@ -12,7 +11,6 @@ import com.inmaytide.orbit.commons.service.core.GeographicCoordinateService;
 import com.inmaytide.orbit.uaa.domain.account.Organization;
 import com.inmaytide.orbit.uaa.mapper.account.OrganizationMapper;
 import com.inmaytide.orbit.uaa.service.account.OrganizationService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
