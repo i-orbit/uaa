@@ -101,6 +101,7 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户人事状态", description = "对应数据字典编码")
     private String personnelStatus;
 
+    @TableField(exist = false)
     @Schema(title = "用户人事状态描述")
     private String personnelStatusName;
 

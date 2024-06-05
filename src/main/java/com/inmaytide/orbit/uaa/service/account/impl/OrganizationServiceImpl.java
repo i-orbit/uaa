@@ -1,16 +1,22 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.inmaytide.exception.web.BadRequestException;
+import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.domain.SystemUser;
+import com.inmaytide.orbit.commons.domain.dto.params.BatchUpdate;
+import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
 import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.core.GeographicCoordinateService;
+import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.domain.account.Organization;
 import com.inmaytide.orbit.uaa.mapper.account.OrganizationMapper;
 import com.inmaytide.orbit.uaa.service.account.OrganizationService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,19 +36,53 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
         this.geographicCoordinateService = geographicCoordinateService;
     }
 
+    private boolean exist(Organization entity) {
+        LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Organization::getCode, entity.getCode());
+        wrapper.eq(Organization::getTenant, entity.getTenant());
+        wrapper.ne(entity.getId() != null, Organization::getId, entity.getId());
+        return baseMapper.exists(wrapper);
+    }
+
     @Override
     public Organization create(Organization entity) {
+        if (exist(entity)) {
+            throw new BadRequestException(ErrorCode.E_0x00100016, entity.getCode());
+        }
         entity.setSequence(baseMapper.findNextSequence());
         if (entity.getParent() == null) {
             entity.setParent(Constants.Markers.TREE_ROOT);
         }
         Organization res = super.create(entity);
         if (entity.getLocation() != null) {
-            entity.getLocation().setBusinessDataId(res.getId());
-            geographicCoordinateService.persist(Collections.singletonList(entity.getLocation()));
+            geographicCoordinateService.persist(new BatchUpdate<>(res.getId(), List.of(entity.getLocation())));
             res.setLocation(entity.getLocation());
         }
         return res;
+    }
+
+    @Override
+    public Organization update(Organization entity) {
+        if (exist(entity)) {
+            throw new BadRequestException(ErrorCode.E_0x00100016, entity.getCode());
+        }
+        Organization original = baseMapper.selectById(entity.getId());
+        if (original == null) {
+            throw new ObjectNotFoundException(ErrorCode.E_0x00100015, String.valueOf(entity.getId()));
+        }
+        BeanUtils.copyProperties(entity, original, "parent", "tenant", "sequence", "deleted", "createdBy", "createdTime");
+        baseMapper.updateById(entity);
+        if (entity.getLocation() != null) {
+            geographicCoordinateService.persist(new BatchUpdate<>(entity.getId(), List.of(entity.getLocation())));
+        } else {
+            geographicCoordinateService.deleteByBusinessDataId(entity.getId());
+        }
+        return get(entity.getId()).orElseThrow(() -> new ObjectNotFoundException(ErrorCode.E_0x00100015, String.valueOf(entity.getId())));
+    }
+
+    @Override
+    public AffectedResult deleteByIds(List<Long> ids) {
+        return super.deleteByIds(ids);
     }
 
     @Override
@@ -67,24 +107,18 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
     }
 
     private TreeNode<Organization> toTreeNode(Organization organization, int level, Map<Long, Organization> all, List<Long> requiredIds, SystemUser user) {
-        TreeNode<Organization> node = new TreeNode<>();
+        TreeNode<Organization> node = new TreeNode<>(organization);
         node.setId(organization.getId());
         node.setSymbol(SYMBOL);
         node.setLevel(level);
         node.setName(organization.getName());
         node.setParent(organization.getParent());
-        node.setEntity(organization);
         node.setChildren(findTreeNodes(organization.getId(), level + 1, all, requiredIds, user));
         node.setAuthorized(user.getPermission().getOrganizations().contains(organization.getId()));
         node.setSequence(organization.getSequence());
         return node;
     }
 
-    /**
-     * 查询当前用户所有有权限的数据字典数据从根节点开始构成一个树结构集合需要的所有数据字典编码集合
-     *
-     * @param all 所有数据字典集合
-     */
     private List<Long> getRequiredIds(Map<Long, Organization> all, SystemUser user) {
         return all.keySet().stream()
                 .filter(id -> user.getPermission().getSpecifiedOrganizations().contains(id))

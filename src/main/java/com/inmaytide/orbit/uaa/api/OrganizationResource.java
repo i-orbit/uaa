@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -50,7 +49,7 @@ public class OrganizationResource {
     }
 
     @GetMapping("tree-of-organizations")
-    @Operation(summary = "查询当前用户有权限的组织架构树")
+    @Operation(summary = "查询当前用户有权限的组织架构树", description = "包含部分组成树结构时必要的无权限组织")
     public TreeSet<TreeNode<Organization>> treeOfOrganizations() {
         return organizationService.treeOfOrganizations();
     }

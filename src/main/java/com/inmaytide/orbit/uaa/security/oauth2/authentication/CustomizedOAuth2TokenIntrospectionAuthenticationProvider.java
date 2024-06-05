@@ -60,18 +60,15 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationProvider implements
             return tokenIntrospectionAuthentication;
         }
 
-        OAuth2Authorization.Token<AbstractOAuth2Token> authorizedToken =
-                authorization.getToken(tokenIntrospectionAuthentication.getToken());
+        OAuth2Authorization.Token<AbstractOAuth2Token> authorizedToken = authorization.getToken(tokenIntrospectionAuthentication.getToken());
         if (authorizedToken == null || !authorizedToken.isActive()) {
-            return new OAuth2TokenIntrospectionAuthenticationToken(tokenIntrospectionAuthentication.getToken(),
-                    clientPrincipal, OAuth2TokenIntrospection.builder().build());
+            return new OAuth2TokenIntrospectionAuthenticationToken(tokenIntrospectionAuthentication.getToken(), clientPrincipal, OAuth2TokenIntrospection.builder().build());
         }
 
         RegisteredClient authorizedClient = this.registeredClientRepository.findById(authorization.getRegisteredClientId());
         OAuth2TokenIntrospection tokenClaims = withActiveTokenClaims(authorization, authorizedToken, authorizedClient);
 
-        return new OAuth2TokenIntrospectionAuthenticationToken(authorizedToken.getToken().getTokenValue(),
-                clientPrincipal, tokenClaims);
+        return new OAuth2TokenIntrospectionAuthenticationToken(authorizedToken.getToken().getTokenValue(), clientPrincipal, tokenClaims);
     }
 
     @Override

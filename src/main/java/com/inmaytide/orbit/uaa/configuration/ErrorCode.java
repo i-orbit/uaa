@@ -23,6 +23,8 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
      */
     E_0x00100013("0x00100013", "验证码输入错误"),
     E_0x00100014("0x00100014", "申请重置密码的验证码失败"),
+    E_0x00100015("0x00100015", "系统中不存在唯一标识为 {0} 的组织信息"),
+    E_0x00100016("0x00100016", "系统中已存在不编码为 {0} 的组织信息"),
     ;
 
     private final String value;
