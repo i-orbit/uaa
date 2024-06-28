@@ -2,6 +2,8 @@ package com.inmaytide.orbit.uaa.domain.account;
 
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import org.wildfly.common.annotation.NotNull;
 
 /**
  * @author inmaytide
@@ -13,12 +15,15 @@ public class Position extends TombstoneEntity {
     @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
     private Long tenant;
 
+    @NotBlank
     @Schema(title = "岗位编码", description = "租户唯一")
     private String code;
 
+    @NotBlank
     @Schema(title = "岗位名称")
     private String name;
 
+    @NotNull
     @Schema(title = "所属组织")
     private Long organization;
 

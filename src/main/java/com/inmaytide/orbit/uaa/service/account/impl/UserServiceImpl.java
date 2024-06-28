@@ -189,9 +189,15 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
             entity.setRoles(userRoles);
             entity.setPositions(userPositions);
             entity.setOrganizations(userOrganizations);
-            entity.setRankName(dictionaryNames.get(entity.getRank()));
-            entity.setGenderName(dictionaryNames.get(entity.getGender()));
-            entity.setPersonnelStatusName(dictionaryNames.get(entity.getPersonnelStatus()));
+            if (entity.getRank() != null) {
+                entity.setRankName(dictionaryNames.get(entity.getRank()));
+            }
+            if (entity.getGender() != null) {
+                entity.setGenderName(dictionaryNames.get(entity.getGender()));
+            }
+            if (entity.getPersonnelStatus() != null) {
+                entity.setPersonnelStatusName(dictionaryNames.get(entity.getPersonnelStatus()));
+            }
         }
     }
 }

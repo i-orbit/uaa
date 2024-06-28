@@ -1,13 +1,17 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
+import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.uaa.domain.account.Position;
 import com.inmaytide.orbit.uaa.mapper.account.PositionMapper;
 import com.inmaytide.orbit.uaa.service.account.PositionService;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * @author inmaytide
@@ -16,9 +20,22 @@ import java.util.Map;
 @Service
 public class PositionServiceImpl extends BasicServiceImpl<PositionMapper, Position> implements PositionService {
 
+    private boolean exist(Position entity) {
+        LambdaQueryWrapper<Position> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Position::getCode, entity.getCode());
+        wrapper.eq(Position::getTenant, entity.getTenant());
+        wrapper.ne(entity.getId() != null, Position::getId, entity.getId());
+        return baseMapper.exists(wrapper);
+    }
+
     @Override
     public Map<Long, String> findNamesByIds(List<Long> ids) {
         return findFieldValueByIds(ids, Position::getName);
+    }
+
+    @Override
+    public TreeSet<TreeNode<? extends Entity>> treeOfPositions() {
+        return null;
     }
 
 }
