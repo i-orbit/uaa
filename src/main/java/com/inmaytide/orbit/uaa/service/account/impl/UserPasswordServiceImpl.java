@@ -82,6 +82,9 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             wrapper.set(User::getState, UserState.NORMAL.name());
             wrapper.set(User::getStateTime, Instant.now());
         }
+        wrapper.set(User::getPasswordExpireAt, getPasswordExpireAt(user.getTenant()));
+        wrapper.set(User::getModifiedBy, user.getId());
+        wrapper.set(User::getModifiedTime, Instant.now());
         wrapper.eq(User::getId, user.getId());
         return AffectedResult.withAffected(userMapper.update(wrapper));
     }
