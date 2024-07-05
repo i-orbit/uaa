@@ -1,7 +1,6 @@
 package com.inmaytide.orbit.uaa.service.permission.impl;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.permission.Authority;
 import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
