@@ -6,10 +6,7 @@ import com.inmaytide.orbit.uaa.service.permission.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author inmaytide
@@ -32,7 +29,7 @@ public class RoleResource {
         return service.create(entity);
     }
 
-    @PostMapping
+    @PutMapping
     @Operation(summary = "修改角色信息")
     public Role update(@Validated(Add.class) @RequestBody Role entity) {
         return service.create(entity);
