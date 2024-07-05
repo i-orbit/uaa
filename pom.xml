@@ -103,6 +103,10 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-afterburner</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.inmaytide.orbit</groupId>
             <artifactId>commons-metrics</artifactId>
         </dependency>
