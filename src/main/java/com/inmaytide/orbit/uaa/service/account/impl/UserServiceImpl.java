@@ -1,13 +1,15 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
-import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
+import com.inmaytide.orbit.commons.constants.TenantState;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.Robot;
+import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.core.DictionaryService;
@@ -19,9 +21,11 @@ import com.inmaytide.orbit.uaa.domain.account.Position;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
+import com.inmaytide.orbit.uaa.domain.permission.Tenant;
 import com.inmaytide.orbit.uaa.mapper.account.UserMapper;
 import com.inmaytide.orbit.uaa.service.account.*;
 import com.inmaytide.orbit.uaa.service.permission.RoleService;
+import com.inmaytide.orbit.uaa.service.permission.TenantService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -38,9 +42,9 @@ import java.util.stream.Collectors;
  * @since 2024/1/19
  */
 @Service
-public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implements UserService {
+public class UserServiceImpl implements UserService {
 
-    private final UserMapper userMapper;
+    private final UserMapper baseMapper;
 
     private final UserPasswordService passwordService;
 
@@ -54,14 +58,17 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
 
     private final DictionaryService dictionaryService;
 
-    public UserServiceImpl(UserMapper userMapper, UserPasswordService passwordService, UserAssociationService associationService, OrganizationService organizationService, PositionService positionService, RoleService roleService, DictionaryService dictionaryService) {
-        this.userMapper = userMapper;
+    private final TenantService tenantService;
+
+    public UserServiceImpl(UserMapper userMapper, UserPasswordService passwordService, UserAssociationService associationService, OrganizationService organizationService, PositionService positionService, RoleService roleService, DictionaryService dictionaryService, TenantService tenantService) {
+        this.baseMapper = userMapper;
         this.passwordService = passwordService;
         this.associationService = associationService;
         this.organizationService = organizationService;
         this.positionService = positionService;
         this.roleService = roleService;
         this.dictionaryService = dictionaryService;
+        this.tenantService = tenantService;
     }
 
     @Override
@@ -74,7 +81,12 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
             robot.setLoginName(Robot.getInstance().getLoginName());
             return Optional.of(robot);
         }
-        return super.get(id);
+        return UserService.super.get(id);
+    }
+
+    @Override
+    public BaseMapper<User> getBaseMapper() {
+        return baseMapper;
     }
 
     @Override
@@ -86,17 +98,25 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
                 throw new AccessDeniedException(ErrorCode.E_0x00100006);
             }
         }
+        SystemUser authorizedUser = SecurityUtils.getAuthorizedUser();
+        if (entity.getTenant() == null) {
+            entity.setTenant(authorizedUser.getTenant());
+        }
+        TenantState tenantState = tenantService.get(entity.getId()).map(Tenant::getState).orElse(TenantState.DISABLED);
+        if (tenantState != TenantState.NORMAL) {
+            throw new AccessDeniedException(ErrorCode.E_0x00100020);
+        }
         entity.setState(UserState.INITIALIZATION);
         entity.setStateTime(Instant.now());
         entity.setPassword(passwordService.generateDefaultPassword(entity));
         entity.setPasswordExpireAt(passwordService.getPasswordExpireAt(entity.getTenant()));
         entity.setLang(Languages.SIMPLIFIED_CHINESE);
-        entity.setSequence(userMapper.findNewSequence());
-        User res = super.create(entity);
+        entity.setSequence(baseMapper.findNewSequence());
+        baseMapper.insert(entity);
         // 保存关联信息
-        entity.setId(res.getId());
+        entity.setId(entity.getId());
         associationService.persist(entity);
-        return res;
+        return get(entity.getId()).orElseThrow(ObjectNotFoundException::new);
     }
 
     @Override
@@ -109,7 +129,8 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
         BeanUtils.copyProperties(entity, original, "state", "stateTime", "password", "passwordExpireAt", "sequence");
         // 保存关联信息
         associationService.persist(entity);
-        return super.update(original);
+        baseMapper.updateById(original);
+        return get(entity.getId()).orElseThrow(ObjectNotFoundException::new);
     }
 
     @Override
@@ -138,7 +159,7 @@ public class UserServiceImpl extends BasicServiceImpl<UserMapper, User> implemen
     }
 
     @Override
-    public void setExtraAttributes(Collection<User> entities) {
+    public void setExtraFields(Collection<User> entities) {
         if (CollectionUtils.isEmpty(entities)) {
             return;
         }

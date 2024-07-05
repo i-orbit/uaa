@@ -1,9 +1,6 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.inmaytide.orbit.commons.constants.Bool;
-import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.Organization;
 import com.inmaytide.orbit.uaa.domain.account.Position;
@@ -16,7 +13,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,12 +21,12 @@ import java.util.stream.Collectors;
  * @since 2024/2/23
  */
 @Service
-public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMapper, UserAssociation> implements UserAssociationService {
+public class UserAssociationServiceImpl implements UserAssociationService {
 
-    private final UserAssociationMapper mapper;
+    private final UserAssociationMapper baseMapper;
 
-    public UserAssociationServiceImpl(UserAssociationMapper mapper) {
-        this.mapper = mapper;
+    public UserAssociationServiceImpl(UserAssociationMapper baseMapper) {
+        this.baseMapper = baseMapper;
     }
 
     @Override
@@ -38,7 +34,7 @@ public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMappe
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, user);
         wrapper.eq(UserAssociation::getCategory, category);
-        return mapper.selectList(wrapper);
+        return baseMapper.selectList(wrapper);
     }
 
     @Override
@@ -48,7 +44,7 @@ public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMappe
         }
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(UserAssociation::getUser, userIds);
-        return mapper.selectList(wrapper).stream().collect(
+        return baseMapper.selectList(wrapper).stream().collect(
                 Collectors.groupingBy(
                         UserAssociation::getUser,
                         Collectors.collectingAndThen(
@@ -62,7 +58,7 @@ public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMappe
     public void erase(Long userId) {
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
-        mapper.delete(wrapper);
+        baseMapper.delete(wrapper);
     }
 
     @Override
@@ -70,7 +66,7 @@ public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMappe
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
         wrapper.eq(UserAssociation::getCategory, Objects.requireNonNull(category));
-        mapper.delete(wrapper);
+        baseMapper.delete(wrapper);
     }
 
     @Override
@@ -90,7 +86,7 @@ public class UserAssociationServiceImpl extends ServiceImpl<UserAssociationMappe
             associations.add(UserAssociation.builder(UserAssociationCategory.ROLE).user(user).associated(e).build());
         }
         if (!associations.isEmpty()) {
-            saveBatch(associations);
+            associations.forEach(baseMapper::insert);
         }
     }
 }

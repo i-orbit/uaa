@@ -7,7 +7,7 @@ import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
 import java.util.List;
 import java.util.Map;
 
-/**UserAssociationService
+/**
  * @author inmaytide
  * @since 2024/2/23
  */

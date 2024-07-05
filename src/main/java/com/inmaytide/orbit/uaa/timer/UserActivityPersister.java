@@ -62,7 +62,7 @@ public class UserActivityPersister implements JobAdapter {
                 .toList();
         if (!entities.isEmpty()) {
             entities.forEach(e -> e.setOfflineTime(e.getLastActivityTime()));
-            userActivityService.saveBatch(entities);
+            userActivityService.persist(entities);
             entities.stream()
                     .map(e -> getUserActivityCacheKey(e.getPlatform(), e.getUser()))
                     .forEach(k -> ValueCaches.delete(Constants.CacheNames.USER_ACTIVITY, k));

@@ -4,8 +4,6 @@ import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.constants.Platforms;
-import com.inmaytide.orbit.commons.domain.SystemUser;
-import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.utils.ApplicationContextHolder;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
@@ -145,14 +143,10 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
                     .attribute(PARAMETER_NAME_PLATFORM, platform.name())
                     .attribute(Principal.class.getName(), usernamePasswordAuthentication);
 
-
             if (refreshToken != null) {
                 authorizationBuilder.refreshToken(refreshToken);
             }
-
             authorizationService.save(authorizationBuilder.build());
-            LOG.debug("OAuth2Authorization saved successfully");
-            LOG.debug("Returning OAuth2AccessTokenAuthenticationToken");
 
             Map<String, Object> additionalResponseValues = new HashMap<>();
             ApplicationContextHolder.getInstance().getBean(UserService.class).findByLoginName(username).ifPresent(user -> {
@@ -161,7 +155,6 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
                 additionalResponseValues.put("username", user.getName());
             });
             return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken, additionalResponseValues);
-
         } catch (Exception ex) {
             if (ex instanceof BadCredentialsException) {
                 throw new OAuth2AuthenticationException(

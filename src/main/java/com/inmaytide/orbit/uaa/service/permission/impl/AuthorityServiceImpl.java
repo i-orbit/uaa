@@ -1,5 +1,6 @@
 package com.inmaytide.orbit.uaa.service.permission.impl;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.permission.Authority;
@@ -17,12 +18,15 @@ import java.util.List;
  * @since 2024/2/23
  */
 @Service
-public class AuthorityServiceImpl extends BasicServiceImpl<AuthorityMapper, Authority> implements AuthorityService {
+public class AuthorityServiceImpl implements AuthorityService {
 
     private final RoleAssociationService roleAssociationService;
 
-    public AuthorityServiceImpl(RoleAssociationService roleAssociationService) {
+    private final AuthorityMapper baseMapper;
+
+    public AuthorityServiceImpl(RoleAssociationService roleAssociationService, AuthorityMapper baseMapper) {
         this.roleAssociationService = roleAssociationService;
+        this.baseMapper = baseMapper;
     }
 
     @Override
@@ -34,4 +38,8 @@ public class AuthorityServiceImpl extends BasicServiceImpl<AuthorityMapper, Auth
         return new ArrayList<>(findFieldValueByIds(ids, Authority::getCode).values());
     }
 
+    @Override
+    public BaseMapper<Authority> getBaseMapper() {
+        return baseMapper;
+    }
 }

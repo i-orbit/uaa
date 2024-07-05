@@ -32,6 +32,9 @@ public class Tenant extends TombstoneEntity {
     @Schema(title = "系统授权码")
     private String license;
 
+    @Schema(title = "资源限制")
+    private String limits;
+
     public String getName() {
         return name;
     }
@@ -70,5 +73,13 @@ public class Tenant extends TombstoneEntity {
 
     public void setLicense(String license) {
         this.license = license;
+    }
+
+    public String getLimits() {
+        return limits;
+    }
+
+    public void setLimits(String limits) {
+        this.limits = limits;
     }
 }

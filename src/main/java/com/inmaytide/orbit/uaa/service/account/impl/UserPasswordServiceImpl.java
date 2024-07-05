@@ -1,7 +1,6 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.orbit.commons.constants.Constants;
@@ -43,7 +42,7 @@ import java.util.Objects;
  * @since 2024/2/26
  */
 @Service
-public class UserPasswordServiceImpl extends ServiceImpl<UserMapper, User> implements UserPasswordService {
+public class UserPasswordServiceImpl implements UserPasswordService {
 
     private final UserMapper userMapper;
 
@@ -122,7 +121,7 @@ public class UserPasswordServiceImpl extends ServiceImpl<UserMapper, User> imple
         }
         boolean isSuperAdministrator = SecurityUtils.isSuperAdministrator();
         SystemUser authorizedUser = SecurityUtils.getAuthorizedUser();
-        List<User> users = userService.listByIds(dto.getUserIds());
+        List<User> users = userService.findByIds(dto.getUserIds());
         for (User user : users) {
             // 非超级管理员且修改的用户与操作人不在同一租户下
             if (!isSuperAdministrator && Objects.equals(user.getTenant(), authorizedUser.getTenant())) {
@@ -133,7 +132,7 @@ public class UserPasswordServiceImpl extends ServiceImpl<UserMapper, User> imple
             user.setState(UserState.INITIALIZATION);
             user.setStateTime(Instant.now());
         }
-        saveOrUpdateBatch(users);
+        users.forEach(userMapper::updateById);
         return AffectedResult.withAffected(users.size());
     }
 

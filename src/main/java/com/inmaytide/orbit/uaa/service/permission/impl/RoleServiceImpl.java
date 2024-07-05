@@ -1,8 +1,7 @@
 package com.inmaytide.orbit.uaa.service.permission.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.exception.web.ObjectNotFoundException;
-import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Roles;
 import com.inmaytide.orbit.commons.domain.Robot;
@@ -15,7 +14,6 @@ import com.inmaytide.orbit.uaa.mapper.permission.RoleMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;
 import com.inmaytide.orbit.uaa.service.account.UserService;
 import com.inmaytide.orbit.uaa.service.permission.RoleService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
  * @since 2024/2/23
  */
 @Service
-public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implements RoleService {
+public class RoleServiceImpl implements RoleService {
 
     private final UserAssociationService userAssociationService;
 
@@ -39,9 +37,12 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
 
     private final ApplicationProperties properties;
 
-    public RoleServiceImpl(UserAssociationService userAssociationService, ApplicationProperties properties) {
+    private final RoleMapper baseMapper;
+
+    public RoleServiceImpl(UserAssociationService userAssociationService, ApplicationProperties properties, RoleMapper baseMapper) {
         this.userAssociationService = userAssociationService;
         this.properties = properties;
+        this.baseMapper = baseMapper;
     }
 
     @Override
@@ -78,5 +79,10 @@ public class RoleServiceImpl extends BasicServiceImpl<RoleMapper, Role> implemen
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
+    }
+
+    @Override
+    public BaseMapper<Role> getBaseMapper() {
+        return baseMapper;
     }
 }

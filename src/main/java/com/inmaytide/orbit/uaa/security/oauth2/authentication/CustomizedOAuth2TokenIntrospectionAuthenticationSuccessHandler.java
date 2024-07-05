@@ -1,14 +1,11 @@
 package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.utils.ApplicationContextHolder;
-import com.inmaytide.orbit.commons.utils.ValueCaches;
-import com.inmaytide.orbit.uaa.domain.account.UserActivity;
+import com.inmaytide.orbit.uaa.service.account.UserActivityService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,10 +17,6 @@ import org.springframework.security.oauth2.server.authorization.http.converter.O
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.time.Instant;
-
-import static com.inmaytide.orbit.commons.constants.Constants.CacheNames.USER_ACTIVITY;
-import static com.inmaytide.orbit.commons.utils.HttpUtils.getClientIpAddress;
 
 /**
  * @author inmaytide
@@ -35,7 +28,7 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler impl
 
     private final HttpMessageConverter<OAuth2TokenIntrospection> tokenIntrospectionHttpResponseConverter = new OAuth2TokenIntrospectionHttpMessageConverter();
 
-    private ObjectMapper objectMapper;
+    private UserActivityService userActivityService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -45,39 +38,14 @@ public class CustomizedOAuth2TokenIntrospectionAuthenticationSuccessHandler impl
         this.tokenIntrospectionHttpResponseConverter.write(tokenClaims, null, httpResponse);
 
         if (tokenClaims.isActive()) {
-            Thread.ofVirtual().start(() -> setUserActivity(request, tokenClaims));
+            Thread.ofVirtual().start(() -> getUserActivityService().alterUserActivity(request, tokenClaims));
         }
     }
 
-    private void setUserActivity(HttpServletRequest request, OAuth2TokenIntrospection tokenClaims) {
-        try {
-            Platforms platform = Platforms.valueOf(tokenClaims.getClaimAsString("platform"));
-            Long userId = NumberUtils.createLong(tokenClaims.getUsername());
-            try {
-                UserActivity activity = ValueCaches
-                        .getFor(USER_ACTIVITY, getUserActivityCacheKey(platform, userId), UserActivity.class)
-                        .orElseGet(UserActivity::new);
-                activity.setUser(userId);
-                activity.setLastActivityTime(Instant.now());
-                activity.setIpAddress(getClientIpAddress(request));
-                activity.setPlatform(platform);
-                ValueCaches.put(USER_ACTIVITY, getUserActivityCacheKey(platform, userId), getObjectMapper().writeValueAsString(activity));
-            } catch (Exception e) {
-                log.error("Record User{id = {}, platform = {}} activity failed", userId, platform.name(), e);
-            }
-        } catch (Exception e) {
-            log.error("Get platform and userId from authentication failed", e);
+    public UserActivityService getUserActivityService() {
+        if (userActivityService == null) {
+            userActivityService = ApplicationContextHolder.getInstance().getBean(UserActivityService.class);
         }
-    }
-
-    private String getUserActivityCacheKey(Platforms platform, Long userId) {
-        return platform.name() + "::" + userId;
-    }
-
-    private ObjectMapper getObjectMapper() {
-        if (objectMapper == null) {
-            objectMapper = ApplicationContextHolder.getInstance().getBean(ObjectMapper.class);
-        }
-        return objectMapper;
+        return userActivityService;
     }
 }

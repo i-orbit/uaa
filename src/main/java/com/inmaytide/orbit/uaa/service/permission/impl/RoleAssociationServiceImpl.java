@@ -16,7 +16,13 @@ import java.util.List;
  * @since 2024/5/31
  */
 @Service
-public class RoleAssociationServiceImpl extends ServiceImpl<RoleAssociationMapper, RoleAssociation> implements RoleAssociationService {
+public class RoleAssociationServiceImpl implements RoleAssociationService {
+
+    private final RoleAssociationMapper baseMapper;
+
+    public RoleAssociationServiceImpl(RoleAssociationMapper baseMapper) {
+        this.baseMapper = baseMapper;
+    }
 
     @Override
     public List<RoleAssociation> findByRolesAndCategory(List<Long> roles, RoleAssociationCategory category) {

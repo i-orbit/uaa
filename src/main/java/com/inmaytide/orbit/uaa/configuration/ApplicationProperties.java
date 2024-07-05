@@ -15,9 +15,11 @@ public class ApplicationProperties extends GlobalProperties {
 
     private UserDefaultPassword userDefaultPassword;
 
-    public boolean allowUsersToLoginSimultaneously;
+    public boolean allowUsersToLoginSimultaneously = false;
 
-    public boolean hideUserPasswordsFromExternal;
+    public boolean hideUserPasswordsFromExternal = true;
+
+    public Integer restrictedTenantMaximumOnlineUsers = 3;
 
     public boolean isAllowUsersToLoginSimultaneously() {
         return allowUsersToLoginSimultaneously;
@@ -33,6 +35,14 @@ public class ApplicationProperties extends GlobalProperties {
 
     public void setHideUserPasswordsFromExternal(boolean hideUserPasswordsFromExternal) {
         this.hideUserPasswordsFromExternal = hideUserPasswordsFromExternal;
+    }
+
+    public Integer getRestrictedTenantMaximumOnlineUsers() {
+        return restrictedTenantMaximumOnlineUsers;
+    }
+
+    public void setRestrictedTenantMaximumOnlineUsers(Integer restrictedTenantMaximumOnlineUsers) {
+        this.restrictedTenantMaximumOnlineUsers = restrictedTenantMaximumOnlineUsers;
     }
 
     public UserDefaultPassword getUserDefaultPassword() {

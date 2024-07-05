@@ -1,9 +1,9 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
-import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.params.BatchUpdate;
@@ -28,12 +28,15 @@ import java.util.stream.Collectors;
  * @since 2024/5/28
  */
 @Service
-public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
+public class OrganizationServiceImpl implements OrganizationService {
 
     private final GeographicCoordinateService geographicCoordinateService;
 
-    public OrganizationServiceImpl(GeographicCoordinateService geographicCoordinateService) {
+    private final OrganizationMapper baseMapper;
+
+    public OrganizationServiceImpl(GeographicCoordinateService geographicCoordinateService, OrganizationMapper baseMapper) {
         this.geographicCoordinateService = geographicCoordinateService;
+        this.baseMapper = baseMapper;
     }
 
     private boolean exist(Organization entity) {
@@ -41,7 +44,7 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
         wrapper.eq(Organization::getCode, entity.getCode());
         wrapper.eq(Organization::getTenant, entity.getTenant());
         wrapper.ne(entity.getId() != null, Organization::getId, entity.getId());
-        return baseMapper.exists(wrapper);
+        return getBaseMapper().exists(wrapper);
     }
 
     @Override
@@ -53,12 +56,12 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
         if (entity.getParent() == null) {
             entity.setParent(Constants.Markers.TREE_ROOT);
         }
-        Organization res = super.create(entity);
+        baseMapper.insert(entity);
         if (entity.getLocation() != null) {
-            geographicCoordinateService.persist(new BatchUpdate<>(res.getId(), List.of(entity.getLocation())));
-            res.setLocation(entity.getLocation());
+            geographicCoordinateService.persist(new BatchUpdate<>(entity.getId(), List.of(entity.getLocation())));
+            entity.setLocation(entity.getLocation());
         }
-        return res;
+        return get(entity.getId()).orElseThrow(ObjectNotFoundException::new);
     }
 
     @Override
@@ -82,7 +85,7 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
 
     @Override
     public AffectedResult deleteByIds(List<Long> ids) {
-        return super.deleteByIds(ids);
+        return AffectedResult.withAffected(getBaseMapper().deleteBatchIds(ids));
     }
 
     @Override
@@ -144,7 +147,12 @@ public class OrganizationServiceImpl extends BasicServiceImpl<OrganizationMapper
     private List<Organization> all(Long tenant) {
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Organization::getTenant, tenant);
-        return baseMapper.selectList(wrapper);
+        return getBaseMapper().selectList(wrapper);
+    }
+
+    @Override
+    public BaseMapper<Organization> getBaseMapper() {
+        return baseMapper;
     }
 
 }

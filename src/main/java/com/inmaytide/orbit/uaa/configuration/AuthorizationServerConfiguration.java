@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.configuration;
 
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
+import com.inmaytide.orbit.commons.constants.Roles;
 import com.inmaytide.orbit.commons.domain.OrbitClientDetails;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.security.CustomizedBearerTokenResolver;
@@ -123,6 +124,8 @@ public class AuthorizationServerConfiguration {
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
             c.requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).permitAll();
+            c.requestMatchers("/api/tenants/{id}").authenticated();
+            c.requestMatchers("/api/tenants").hasAuthority(Roles.ROLE_S_ADMINISTRATOR.name());
             // 自助重置密码
             c.requestMatchers(HttpMethod.POST, "/api/users/passwords/apply-verification-code").permitAll();
             c.requestMatchers(HttpMethod.PUT, "/api/users/passwords/change-with-validation-code").permitAll();

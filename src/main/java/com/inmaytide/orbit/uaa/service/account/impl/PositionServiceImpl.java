@@ -1,7 +1,6 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.inmaytide.orbit.commons.business.impl.BasicServiceImpl;
 import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.uaa.domain.account.Position;
 import com.inmaytide.orbit.uaa.mapper.account.PositionMapper;
@@ -18,7 +17,13 @@ import java.util.TreeSet;
  * @since 2024/5/28
  */
 @Service
-public class PositionServiceImpl extends BasicServiceImpl<PositionMapper, Position> implements PositionService {
+public class PositionServiceImpl implements PositionService {
+
+    private final PositionMapper baseMapper;
+
+    public PositionServiceImpl(PositionMapper baseMapper) {
+        this.baseMapper = baseMapper;
+    }
 
     private boolean exist(Position entity) {
         LambdaQueryWrapper<Position> wrapper = new LambdaQueryWrapper<>();
@@ -38,4 +43,8 @@ public class PositionServiceImpl extends BasicServiceImpl<PositionMapper, Positi
         return null;
     }
 
+    @Override
+    public PositionMapper getBaseMapper() {
+        return baseMapper;
+    }
 }
