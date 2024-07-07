@@ -11,6 +11,7 @@ import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.core.SystemPropertyService;
 import com.inmaytide.orbit.commons.service.message.MessageService;
 import com.inmaytide.orbit.commons.utils.CodecUtils;
+import com.inmaytide.orbit.commons.utils.CommonUtils;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
@@ -25,6 +26,8 @@ import com.inmaytide.orbit.uaa.service.account.dto.ResetPassword;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * @author inmaytide
@@ -53,17 +57,30 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     private final MessageService messageService;
 
+    private final CacheManager cacheManager;
+
     /**
      * 不能直接注入，避免循环依赖
      */
     private UserService userService;
 
-    public UserPasswordServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, ApplicationProperties properties, SystemPropertyService propertyService, MessageService messageService) {
+    public UserPasswordServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, ApplicationProperties properties, SystemPropertyService propertyService, MessageService messageService, CacheManager cacheManager) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.properties = properties;
         this.propertyService = propertyService;
         this.messageService = messageService;
+        this.cacheManager = cacheManager;
+    }
+
+    private void eraseUserCache(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        Cache cache = cacheManager.getCache(Constants.CacheNames.USER_DETAILS);
+        if (cache != null) {
+            ids.forEach(cache::evictIfPresent);
+        }
     }
 
     private AffectedResult change(User user, ChangePassword dto) {
@@ -84,6 +101,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         user.setModifiedBy(user.getId());
         user.setModifiedTime(Instant.now());
         userMapper.updateById(user);
+        eraseUserCache(List.of(user.getId()));
         return AffectedResult.withAffected(1);
     }
 
@@ -134,6 +152,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             user.setStateTime(Instant.now());
         }
         users.forEach(userMapper::updateById);
+        eraseUserCache(CommonUtils.map(users, Function.identity(), User::getId));
         return AffectedResult.withAffected(users.size());
     }
 
