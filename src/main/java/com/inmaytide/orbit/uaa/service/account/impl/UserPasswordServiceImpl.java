@@ -1,6 +1,5 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.orbit.commons.constants.Constants;
@@ -76,17 +75,16 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         if (!REG_PASSWORD.asPredicate().test(dto.getNewPassword())) {
             throw new BadRequestException(ErrorCode.E_0x00100011);
         }
-        LambdaUpdateWrapper<User> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.set(User::getPassword, getEncryptedPassword(dto.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         if (user.getState() == UserState.INITIALIZATION) {
-            wrapper.set(User::getState, UserState.NORMAL.name());
-            wrapper.set(User::getStateTime, Instant.now());
+            user.setState(UserState.NORMAL);
+            user.setStateTime(Instant.now());
         }
-        wrapper.set(User::getPasswordExpireAt, getPasswordExpireAt(user.getTenant()));
-        wrapper.set(User::getModifiedBy, user.getId());
-        wrapper.set(User::getModifiedTime, Instant.now());
-        wrapper.eq(User::getId, user.getId());
-        return AffectedResult.withAffected(userMapper.update(wrapper));
+        user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
+        user.setModifiedBy(user.getId());
+        user.setModifiedTime(Instant.now());
+        userMapper.updateById(user);
+        return AffectedResult.withAffected(1);
     }
 
     @Override
