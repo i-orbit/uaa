@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.ObjectNotFoundException;
+import com.inmaytide.orbit.commons.business.SystemUserService;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.commons.log.annotation.OperationLogging;
@@ -27,8 +28,11 @@ public class UserResource {
 
     private final UserService service;
 
-    public UserResource(UserService service) {
+    private final SystemUserService systemUserService;
+
+    public UserResource(UserService service, SystemUserService systemUserService) {
         this.service = service;
+        this.systemUserService = systemUserService;
     }
 
     @PostMapping
@@ -63,6 +67,12 @@ public class UserResource {
     @Operation(summary = "获取当前登录用户详细信息(包含权限、视角等相关信息)")
     public SystemUser getAuthorizedUser() {
         return SecurityUtils.getAuthorizedUser();
+    }
+
+    @GetMapping("/systemd/{id}")
+    @Operation(summary = "获取指定用户详细信息(包含权限、视角等相关信息)")
+    public SystemUser getSystemUser(@PathVariable Long id) {
+        return systemUserService.get(id);
     }
 
     @GetMapping("names")
