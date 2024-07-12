@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.constants.Constants;
+import com.inmaytide.orbit.commons.constants.Roles;
+import com.inmaytide.orbit.commons.domain.Role;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.params.BatchUpdate;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
@@ -13,9 +15,12 @@ import com.inmaytide.orbit.commons.domain.pattern.Entity;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.core.GeographicCoordinateService;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
+import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.Organization;
+import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
 import com.inmaytide.orbit.uaa.mapper.account.OrganizationMapper;
 import com.inmaytide.orbit.uaa.service.account.OrganizationService;
+import com.inmaytide.orbit.uaa.service.permission.RoleAssociationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +39,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationMapper baseMapper;
 
-    public OrganizationServiceImpl(GeographicCoordinateService geographicCoordinateService, OrganizationMapper baseMapper) {
+    private final RoleAssociationService roleAssociationService;
+
+    public OrganizationServiceImpl(GeographicCoordinateService geographicCoordinateService, OrganizationMapper baseMapper, RoleAssociationService roleAssociationService) {
         this.geographicCoordinateService = geographicCoordinateService;
         this.baseMapper = baseMapper;
+        this.roleAssociationService = roleAssociationService;
     }
 
     private boolean exist(Organization entity) {
@@ -45,6 +53,33 @@ public class OrganizationServiceImpl implements OrganizationService {
         wrapper.eq(Organization::getTenant, entity.getTenant());
         wrapper.ne(entity.getId() != null, Organization::getId, entity.getId());
         return getBaseMapper().exists(wrapper);
+    }
+
+    @Override
+    public List<Long> findAuthorizedIds(SystemUser user) {
+        List<String> roleCodes = user.getRoles().stream().map(Role::getCode).toList();
+        // 超级管理员没有组织权限
+        if (roleCodes.contains(Roles.ROLE_S_ADMINISTRATOR.name())) {
+            return List.of();
+        }
+        // 租户管理员拥有租户所有组织权限
+        if (roleCodes.contains(Roles.ROLE_T_ADMINISTRATOR.name())) {
+            LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+            wrapper.select(Organization::getId);
+            wrapper.eq(Organization::getTenant, user.getTenant());
+            return baseMapper.selectList(wrapper).stream().map(Entity::getId).toList();
+        }
+        // 内部机器人拥有所有权限
+        if (roleCodes.contains(Roles.ROLE_ROBOT.name())) {
+            LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
+            wrapper.select(Organization::getId);
+            return baseMapper.selectList(wrapper).stream().map(Entity::getId).toList();
+        }
+        return roleAssociationService
+                .findByRolesAndCategory(user.getRoles().stream().map(Role::getId).toList(), RoleAssociationCategory.ORGANIZATION)
+                .stream()
+                .map(RoleAssociation::getAssociated)
+                .toList();
     }
 
     @Override

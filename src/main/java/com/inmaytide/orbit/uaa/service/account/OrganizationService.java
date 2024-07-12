@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.service.account;
 
 import com.inmaytide.orbit.commons.business.BasicService;
+import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.TreeNode;
 import com.inmaytide.orbit.uaa.domain.account.Organization;
 
@@ -20,4 +21,5 @@ public interface OrganizationService extends BasicService<Organization> {
 
     TreeSet<TreeNode<Organization>> treeOfOrganizations();
 
+    List<Long> findAuthorizedIds(SystemUser user);
 }

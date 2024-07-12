@@ -2,16 +2,16 @@ package com.inmaytide.orbit.uaa.service.permission;
 
 import com.inmaytide.orbit.commons.business.BasicService;
 import com.inmaytide.orbit.commons.domain.SystemUser;
-import com.inmaytide.orbit.uaa.domain.permission.Authority;
+import com.inmaytide.orbit.uaa.domain.permission.Area;
 
 import java.util.List;
 
 /**
  * @author inmaytide
- * @since 2024/2/23
+ * @since 2024/7/12
  */
-public interface AuthorityService extends BasicService<Authority> {
+public interface AreaService extends BasicService<Area> {
 
-    List<String> findCodesBySystemUser(SystemUser user);
+    List<Long> findAuthorizedIds(SystemUser user);
 
 }
