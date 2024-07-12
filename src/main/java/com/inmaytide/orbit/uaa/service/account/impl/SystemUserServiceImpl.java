@@ -141,7 +141,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     private void setPermissions(SystemUser user) {
         Permission permission = new Permission();
         List<Long> roleIds = user.getRoles().stream().map(Role::getId).toList();
-        permission.setRoles(user.getRoles().stream().map(Role::getCode).toList());
+        permission.setRoles(roleService.findCodesByUser(user.getId()));
         permission.setAuthorities(authorityService.findCodesByRoleIds(roleIds));
         permission.setOrganizations(roleAssociationService.findByRolesAndCategory(roleIds, RoleAssociationCategory.ORGANIZATION).stream().map(RoleAssociation::getAssociated).toList());
         permission.setSpecifiedOrganizations(permission.getOrganizations());
