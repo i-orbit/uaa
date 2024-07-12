@@ -2,11 +2,11 @@ package com.inmaytide.orbit.uaa.api;
 
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
-import com.inmaytide.orbit.commons.domain.dto.params.Pageable;
 import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.permission.Tenant;
 import com.inmaytide.orbit.uaa.service.permission.TenantService;
+import com.inmaytide.orbit.uaa.service.permission.dto.TenantQuery.TenantQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +31,8 @@ public class TenantResource {
 
     @GetMapping
     @Operation(summary = "分页查询租户信息")
-    public PageResult<Tenant> pagination(@ModelAttribute Pageable<Tenant> pageable) {
-        return tenantService.pagination(pageable);
+    public PageResult<Tenant> pagination(@ModelAttribute TenantQuery query) {
+        return tenantService.pagination(query);
     }
 
     @PostMapping
