@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.service.account.impl;
+package com.inmaytide.orbit.uaa.service.permission.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -16,10 +16,10 @@ import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.commons.service.core.GeographicCoordinateService;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
 import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
-import com.inmaytide.orbit.uaa.domain.account.Organization;
+import com.inmaytide.orbit.uaa.domain.permission.Organization;
 import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
-import com.inmaytide.orbit.uaa.mapper.account.OrganizationMapper;
-import com.inmaytide.orbit.uaa.service.account.OrganizationService;
+import com.inmaytide.orbit.uaa.mapper.permission.OrganizationMapper;
+import com.inmaytide.orbit.uaa.service.permission.OrganizationService;
 import com.inmaytide.orbit.uaa.service.permission.RoleAssociationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

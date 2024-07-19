@@ -120,15 +120,22 @@ public class AuthorizationServerConfiguration {
             });
         });
         http.authorizeHttpRequests(c -> {
-            // Swagger文档及认证服务相关端点不需要登录
+            // 不需要登录可直接访问
+            // API docs
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
+            // Oauth2 endpoints
             c.requestMatchers(authorizationServerConfigurer.getEndpointsMatcher()).permitAll();
-            c.requestMatchers("/api/tenants/{id}").authenticated();
-            c.requestMatchers("/api/tenants").hasAuthority(Roles.ROLE_S_ADMINISTRATOR.name());
             // 自助重置密码
             c.requestMatchers(HttpMethod.POST, "/api/users/passwords/apply-verification-code").permitAll();
             c.requestMatchers(HttpMethod.PUT, "/api/users/passwords/change-with-validation-code").permitAll();
+
+            // 系统后台管理相关功能-除个别外需要超级管理员角色权限
+            c.requestMatchers("/api/tenants/{id}").authenticated();
+            c.requestMatchers("/api/features/tree-of-features").authenticated();
+            c.requestMatchers("/api/tenants").hasAuthority(Roles.ROLE_S_ADMINISTRATOR.name());
+            c.requestMatchers("/api/features").hasAuthority(Roles.ROLE_S_ADMINISTRATOR.name());
+
             // 剩余所有接口需要登录
             c.anyRequest().authenticated();
         });

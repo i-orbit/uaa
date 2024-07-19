@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.domain.account;
+package com.inmaytide.orbit.uaa.domain.permission;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.commons.domain.GeographicCoordinate;

@@ -17,6 +17,9 @@ public class ApplicationProperties extends GlobalProperties {
 
     public boolean allowUsersToLoginSimultaneously = false;
 
+    /**
+     * @see com.inmaytide.orbit.uaa.service.account.aspect.HideUserPasswordsFromExternalSystemAspect
+     */
     public boolean hideUserPasswordsFromExternal = true;
 
     public Integer restrictedTenantMaximumOnlineUsers = 3;

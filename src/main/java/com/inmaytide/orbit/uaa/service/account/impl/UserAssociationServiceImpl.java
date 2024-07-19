@@ -2,10 +2,10 @@ package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
-import com.inmaytide.orbit.uaa.domain.account.Organization;
 import com.inmaytide.orbit.uaa.domain.account.Position;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;
+import com.inmaytide.orbit.uaa.domain.permission.Organization;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
 import com.inmaytide.orbit.uaa.mapper.account.UserAssociationMapper;
 import com.inmaytide.orbit.uaa.service.account.UserAssociationService;

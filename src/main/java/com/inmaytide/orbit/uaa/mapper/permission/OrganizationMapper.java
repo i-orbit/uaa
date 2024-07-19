@@ -1,7 +1,7 @@
-package com.inmaytide.orbit.uaa.mapper.account;
+package com.inmaytide.orbit.uaa.mapper.permission;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.inmaytide.orbit.uaa.domain.account.Organization;
+import com.inmaytide.orbit.uaa.domain.permission.Organization;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

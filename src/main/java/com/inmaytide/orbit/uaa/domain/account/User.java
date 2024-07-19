@@ -6,10 +6,10 @@ import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
 import com.inmaytide.orbit.commons.constants.UserState;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
+import com.inmaytide.orbit.uaa.domain.permission.Organization;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import org.wildfly.common.annotation.NotNull;
 
 import java.io.Serial;
 import java.time.Instant;

@@ -30,6 +30,10 @@ public enum ErrorCode implements com.inmaytide.exception.web.domain.ErrorCode {
     E_0x00100018("0x00100018", "用户所属租户已过期"),
     E_0x00100019("0x00100019", "用户所属租户已禁用"),
     E_0x00100020("0x00100020", "指定租户当前状态不允许新建用户"),
+
+    E_0x00100021("0x00100021", "功能模块编码已被使用"),
+    E_0x00100022("0x00100022", "重复的功能菜单编码"),
+    E_0x00100023("0x00100023", "重复的功能菜单功能点编码"),
     ;
 
     private final String value;
