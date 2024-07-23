@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
-import com.inmaytide.orbit.commons.constants.UserState;
+import com.inmaytide.orbit.commons.constants.UserStatus;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import com.inmaytide.orbit.uaa.domain.permission.Organization;
 import com.inmaytide.orbit.uaa.domain.permission.Role;
@@ -90,7 +90,7 @@ public class User extends TombstoneEntity {
     private String photo;
 
     @Schema(title = "用户状态")
-    private UserState state;
+    private UserStatus status;
 
     @Schema(title = "用户状态变更时间")
     private Instant stateTime;
@@ -273,12 +273,12 @@ public class User extends TombstoneEntity {
         this.photo = photo;
     }
 
-    public UserState getState() {
-        return state;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setState(UserState state) {
-        this.state = state;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public Instant getStateTime() {

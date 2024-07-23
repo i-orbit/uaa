@@ -27,6 +27,51 @@ public class TenantSubscription extends TombstoneEntity {
 
     private String paymentMethod;
 
+    public Long getTenant() {
+        return tenant;
+    }
 
+    public void setTenant(Long tenant) {
+        this.tenant = tenant;
+    }
 
+    public Instant getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
+
+    public Instant getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
+    }
+
+    public TenantSubscriptionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TenantSubscriptionStatus status) {
+        this.status = status;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 }
