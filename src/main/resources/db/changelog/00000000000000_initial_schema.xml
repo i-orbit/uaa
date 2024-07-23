@@ -11,9 +11,39 @@
             </column>
             <column name="name" type="varchar(32)" remarks="名称"/>
             <column name="alias" type="varchar(32)" remarks="别名(简称)"/>
-            <column name="state" type="varchar(20)" remarks="状态"/>
-            <column name="logo" type="varchar(512)" remarks="logo图片地址"/>
-            <column name="license" type="text" remarks="授权码"/>
+            <column name="description" type="varchar(500)" remarks="租户描述/介绍"/>
+            <column name="status" type="varchar(20)" remarks="状态"/>
+            <column name="full_logo" type="varchar(512)" remarks="大LOGO图片地址"/>
+            <column name="icon_logo" type="varchar(512)" remarks="小LOGO图片地址"/>
+            <column name="subscription_expire_at" type="timestamp" remarks="订阅到期时间"/>
+            <column name="primary_concat" type="varchar(50)" remarks="联系人"/>
+            <column name="primary_concat_phone" type="varchar(50)" remarks="联系电话"/>
+            <column name="secondary_concat" type="varchar(50)" remarks="第二联系人"/>
+            <column name="secondary_concat_phone" type="varchar(50)" remarks="第二联系人联系电话"/>
+            <column name="billing_address" type="varchar(500)" remarks="账单地址"/>
+            <column name="payment_method" type="varchar(20)" remarks="支付方式"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="tenant_permission" remarks="租户权限表">
+            <column name="tenant" type="bigint" remarks="租户唯一标识"/>
+            <column name="category" type="varchar(16)" remarks="关联数据类型"/>
+            <column name="value" type="varchar(50)" remarks="配置值(如用户限制数量/功能编码等)"/>
+        </createTable>
+        <createTable tableName="tenant_subscription" remarks="租户订阅记录">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="tenant" type="bigint" remarks="租户唯一标识"/>
+            <column name="start_date" type="timestamp" remarks="开始时间"/>
+            <column name="end_date" type="timestamp" remarks="结束时间"/>
+            <column name="status" type="varchar(20)" remarks="状态"/>
+            <column name="amount" type="decimal(16,2)" remarks="金额"/>
+            <column name="payment_method" type="varchar(20)" remarks="支付方式"/>
             <column name="created_time" type="timestamp" remarks="创建时间"/>
             <column name="created_by" type="bigint" remarks="创建人"/>
             <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
@@ -42,8 +72,8 @@
             <column name="avatar" type="varchar(512)" remarks="用户头像存储地址"/>
             <column name="signature" type="varchar(512)" remarks="用户签名图片存储地址"/>
             <column name="photo" type="varchar(512)" remarks="用户个人照片存储地址"/>
-            <column name="state" type="varchar(20)" remarks="用户状态"/>
-            <column name="state_time" type="timestamp" remarks="状态更改时间"/>
+            <column name="status" type="varchar(20)" remarks="用户状态"/>
+            <column name="status_time" type="timestamp" remarks="状态更改时间"/>
             <column name="proxy" type="bigint" remarks="代理人"/>
             <column name="personnel_status" type="varchar(64)" remarks="人事状态"/>
             <column name="employee_id" type="varchar(64)" remarks="员工编号"/>
@@ -77,7 +107,7 @@
             <column name="ip_address" type="varchar(30)" remarks="登录IP"/>
         </createTable>
         <sql>
-            INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `sequence`, `name`, `login_name`, `password`, `password_expire_at`, `lang`, `state`, `state_time`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
+            INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `sequence`, `name`, `login_name`, `password`, `password_expire_at`, `lang`, `status`, `status_time`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
                 VALUES (9999, 3721, 'N', 1, '系统管理员', 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', TIMESTAMPADD(day, 3, now()), 'SIMPLIFIED_CHINESE', 'INITIALIZATION', now(), now(), 9999, now(), 9999, 'N', 1);
         </sql>
     </changeSet>

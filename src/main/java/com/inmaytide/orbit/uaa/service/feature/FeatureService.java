@@ -13,6 +13,10 @@ import java.util.TreeSet;
  */
 public interface FeatureService extends BasicService<Feature> {
 
+    String ROOT_CODE = "ROOT";
+
+    String SYMBOL = "feature";
+
     TreeSet<TreeNode<Object>> treeOfFeatures(Bool includeMenus);
 
 }

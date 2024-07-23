@@ -39,7 +39,7 @@ public class FeatureResource {
 
     @PutMapping
     @Operation(summary = "添加系统功能模块")
-    public Feature uupdate(@RequestBody @Validated Feature entity) {
+    public Feature update(@RequestBody @Validated Feature entity) {
         return featureService.update(entity);
     }
 

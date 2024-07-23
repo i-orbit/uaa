@@ -1,11 +1,12 @@
 package com.inmaytide.orbit.uaa.domain.permission;
 
 import com.inmaytide.orbit.Version;
-import com.inmaytide.orbit.commons.constants.TenantState;
+import com.inmaytide.orbit.commons.constants.TenantStatus;
 import com.inmaytide.orbit.commons.domain.pattern.TombstoneEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serial;
+import java.time.Instant;
 
 /**
  * @author inmaytide
@@ -23,17 +24,41 @@ public class Tenant extends TombstoneEntity {
     @Schema(title = "租户别称/简称")
     private String alias;
 
+    @Schema(title = "租户描述/介绍")
+    private String description;
+
     @Schema(title = "租户状态")
-    private TenantState state;
+    private TenantStatus status;
 
-    @Schema(title = "LOGO图片存储地址")
-    private String logo;
+    @Schema(title = "大LOGO图片存储地址")
+    private String fullLogo;
 
-    @Schema(title = "系统授权码")
-    private String license;
+    @Schema(title = "小LOGO图片存储地址")
+    private String iconLogo;
 
-    @Schema(title = "资源限制")
-    private String limits;
+    @Schema(title = "当前订阅到期时间")
+    private Instant subscriptionExpireAt;
+
+    @Schema(title = "主要联系人")
+    private String primaryConcat;
+
+    @Schema(title = "主要联系人电话")
+    private String primaryConcatPhone;
+
+    @Schema(title = "第二联系人")
+    private String secondaryConcat;
+
+    @Schema(title = "第二联系人电话")
+    private String secondaryConcatPhone;
+
+    @Schema(title = "账单地址")
+    private String billingAddress;
+
+    @Schema(title = "支付方法", description = "数据字典编码")
+    private String paymentMethod;
+
+    @Schema(title = "支付方法描述")
+    private String paymentMethodName;
 
     public String getName() {
         return name;
@@ -51,35 +76,99 @@ public class Tenant extends TombstoneEntity {
         this.alias = alias;
     }
 
-    public TenantState getState() {
-        return state;
+    public String getDescription() {
+        return description;
     }
 
-    public void setState(TenantState state) {
-        this.state = state;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getLogo() {
-        return logo;
+    public TenantStatus getStatus() {
+        return status;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setStatus(TenantStatus status) {
+        this.status = status;
     }
 
-    public String getLicense() {
-        return license;
+    public String getFullLogo() {
+        return fullLogo;
     }
 
-    public void setLicense(String license) {
-        this.license = license;
+    public void setFullLogo(String fullLogo) {
+        this.fullLogo = fullLogo;
     }
 
-    public String getLimits() {
-        return limits;
+    public String getIconLogo() {
+        return iconLogo;
     }
 
-    public void setLimits(String limits) {
-        this.limits = limits;
+    public void setIconLogo(String iconLogo) {
+        this.iconLogo = iconLogo;
+    }
+
+    public Instant getSubscriptionExpireAt() {
+        return subscriptionExpireAt;
+    }
+
+    public void setSubscriptionExpireAt(Instant subscriptionExpireAt) {
+        this.subscriptionExpireAt = subscriptionExpireAt;
+    }
+
+    public String getPrimaryConcat() {
+        return primaryConcat;
+    }
+
+    public void setPrimaryConcat(String primaryConcat) {
+        this.primaryConcat = primaryConcat;
+    }
+
+    public String getPrimaryConcatPhone() {
+        return primaryConcatPhone;
+    }
+
+    public void setPrimaryConcatPhone(String primaryConcatPhone) {
+        this.primaryConcatPhone = primaryConcatPhone;
+    }
+
+    public String getSecondaryConcat() {
+        return secondaryConcat;
+    }
+
+    public void setSecondaryConcat(String secondaryConcat) {
+        this.secondaryConcat = secondaryConcat;
+    }
+
+    public String getSecondaryConcatPhone() {
+        return secondaryConcatPhone;
+    }
+
+    public void setSecondaryConcatPhone(String secondaryConcatPhone) {
+        this.secondaryConcatPhone = secondaryConcatPhone;
+    }
+
+    public String getBillingAddress() {
+        return billingAddress;
+    }
+
+    public void setBillingAddress(String billingAddress) {
+        this.billingAddress = billingAddress;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentMethodName() {
+        return paymentMethodName;
+    }
+
+    public void setPaymentMethodName(String paymentMethodName) {
+        this.paymentMethodName = paymentMethodName;
     }
 }

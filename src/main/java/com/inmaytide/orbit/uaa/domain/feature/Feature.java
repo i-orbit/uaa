@@ -20,8 +20,8 @@ public class Feature extends TombstoneEntity {
     @Schema(title = "功能模块编码")
     private String code;
 
-    @Schema(title = "父功能模块唯一标识, 无上级默认为 0")
-    private Long parent;
+    @Schema(title = "父功能模块唯一标识, 无上级默认为 ROOT")
+    private String parent;
 
     @Schema(title = "功能介绍")
     private String description;
@@ -52,11 +52,11 @@ public class Feature extends TombstoneEntity {
         this.code = code;
     }
 
-    public Long getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 
