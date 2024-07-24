@@ -5,8 +5,8 @@ import com.inmaytide.exception.web.BadCredentialsException;
 import com.inmaytide.orbit.commons.business.SystemUserService;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Constants;
-import com.inmaytide.orbit.commons.constants.TenantState;
-import com.inmaytide.orbit.commons.constants.UserState;
+import com.inmaytide.orbit.commons.constants.TenantStatus;
+import com.inmaytide.orbit.commons.constants.UserStatus;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.uaa.configuration.ApplicationProperties;
 import com.inmaytide.orbit.uaa.configuration.ErrorCode;
@@ -69,8 +69,8 @@ public class DefaultUserDetailsService implements org.springframework.security.c
         SystemUser systemUser = systemUserService.get(user.getId());
         return org.springframework.security.core.userdetails.User.withUsername(String.valueOf(user.getId()))
                 .password(withoutPassword ? passwordEncoder.encode(Constants.Markers.LOGIN_WITHOUT_PASSWORD) : user.getPassword())
-                .accountLocked(user.getState() == UserState.LOCKED)
-                .disabled(user.getState() == UserState.DISABLED)
+                .accountLocked(user.getStatus() == UserStatus.LOCKED)
+                .disabled(user.getStatus() == UserStatus.DISABLED)
                 .authorities(createAuthoritiesWithUser(systemUser))
                 .build();
     }
@@ -97,11 +97,11 @@ public class DefaultUserDetailsService implements org.springframework.security.c
         }
         Tenant tenant = op.get();
         // 用户所属租户已禁用
-        if (tenant.getState() == TenantState.DISABLED) {
+        if (tenant.getStatus() == TenantStatus.DISABLED) {
             throw new AccessDeniedException(ErrorCode.E_0x00100019);
         }
         // 用户所属租户已过期
-        if (tenant.getState() == TenantState.EXPIRED) {
+        if (tenant.getStatus() == TenantStatus.EXPIRED) {
             if (user.getIsTenantAdministrator() != Bool.Y) {
                 throw new AccessDeniedException(ErrorCode.E_0x00100018);
             }

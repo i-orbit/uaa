@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class TenantQuery extends Pageable<Tenant> {
 
-    private String states;
+    private String statuses;
 
     @Override
     public LambdaQueryWrapper<Tenant> toWrapper() {
@@ -20,16 +20,16 @@ public class TenantQuery extends Pageable<Tenant> {
         if (StringUtils.isNotBlank(getQueryName())) {
             wrapper.and(w -> w.like(Tenant::getName, getQueryName()).or().like(Tenant::getAlias, getQueryName()));
         }
-        wrapper.in(StringUtils.isNotBlank(getStates()), Tenant::getState, CommonUtils.splitByCommas(getStates()));
+        wrapper.in(StringUtils.isNotBlank(getStatuses()), Tenant::getStatus, CommonUtils.splitByCommas(getStatuses()));
         wrapper.orderByDesc(Tenant::getCreatedTime);
         return null;
     }
 
-    public String getStates() {
-        return states;
+    public String getStatuses() {
+        return statuses;
     }
 
-    public void setStates(String states) {
-        this.states = states;
+    public void setStatuses(String statuses) {
+        this.statuses = statuses;
     }
 }

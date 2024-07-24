@@ -3,7 +3,7 @@ package com.inmaytide.orbit.uaa.service.account.impl;
 import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.BadRequestException;
 import com.inmaytide.orbit.commons.constants.Constants;
-import com.inmaytide.orbit.commons.constants.UserState;
+import com.inmaytide.orbit.commons.constants.UserStatus;
 import com.inmaytide.orbit.commons.domain.Message;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.AffectedResult;
@@ -93,8 +93,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             throw new BadRequestException(ErrorCode.E_0x00100011);
         }
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-        if (user.getState() == UserState.INITIALIZATION) {
-            user.setState(UserState.NORMAL);
+        if (user.getStatus() == UserStatus.INITIALIZATION) {
+            user.setStatus(UserStatus.NORMAL);
             user.setStateTime(Instant.now());
         }
         user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
@@ -148,7 +148,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             }
             user.setPassword(generateDefaultPassword(user));
             user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
-            user.setState(UserState.INITIALIZATION);
+            user.setStatus(UserStatus.INITIALIZATION);
             user.setStateTime(Instant.now());
         }
         users.forEach(userMapper::updateById);

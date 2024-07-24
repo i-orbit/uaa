@@ -6,8 +6,8 @@ import com.inmaytide.exception.web.AccessDeniedException;
 import com.inmaytide.exception.web.ObjectNotFoundException;
 import com.inmaytide.orbit.commons.constants.Bool;
 import com.inmaytide.orbit.commons.constants.Languages;
-import com.inmaytide.orbit.commons.constants.TenantState;
-import com.inmaytide.orbit.commons.constants.UserState;
+import com.inmaytide.orbit.commons.constants.TenantStatus;
+import com.inmaytide.orbit.commons.constants.UserStatus;
 import com.inmaytide.orbit.commons.domain.Robot;
 import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
@@ -106,11 +106,11 @@ public class UserServiceImpl implements UserService {
         if (entity.getTenant() == null) {
             entity.setTenant(authorizedUser.getTenant());
         }
-        TenantState tenantState = tenantService.get(entity.getId()).map(Tenant::getState).orElse(TenantState.DISABLED);
-        if (tenantState != TenantState.NORMAL) {
+        TenantStatus tenantStatus = tenantService.get(entity.getId()).map(Tenant::getStatus).orElse(TenantStatus.DISABLED);
+        if (tenantStatus != TenantStatus.NORMAL) {
             throw new AccessDeniedException(ErrorCode.E_0x00100020);
         }
-        entity.setState(UserState.INITIALIZATION);
+        entity.setStatus(UserStatus.INITIALIZATION);
         entity.setStateTime(Instant.now());
         entity.setPassword(passwordService.generateDefaultPassword(entity));
         entity.setPasswordExpireAt(passwordService.getPasswordExpireAt(entity.getTenant()));
