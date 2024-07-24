@@ -13,6 +13,7 @@ import com.inmaytide.orbit.uaa.service.feature.FeatureFunctionService;
 import com.inmaytide.orbit.uaa.service.feature.FeatureMenuService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @author inmaytide
  * @since 2024/7/19
  */
+@Service
 public class FeatureMenuServiceImpl implements FeatureMenuService {
 
     private final FeatureMenuMapper baseMapper;
