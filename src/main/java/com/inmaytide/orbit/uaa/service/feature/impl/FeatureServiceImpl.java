@@ -104,6 +104,19 @@ public class FeatureServiceImpl implements FeatureService {
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
+    /**
+     * 将功能模块对象转换为树节点对象
+     * <p>
+     * 此方法用于将给定的功能模块对象转换为树结构中的一个节点。它详细定义了节点的各种属性，如ID、符号、级别、名称、父节点等，
+     * 并通过递归调用找到该节点的所有子节点，构建出一个完整的树节点对象
+     *
+     * @param feature         功能模块对象，包含了节点的基本信息，如代码、名称、父功能模块等
+     * @param level           当前节点的级别，用于构建树的层次结构
+     * @param all             所有功能模块的集合，用于查找当前节点的子节点
+     * @param requiredCodes   组织完整的数据结构所需要的功能模块编码列表, 包含部分无权限功能模块
+     * @param authorizedCodes 已授权的功能模块编码列表，用于标记节点是否被授权
+     * @return 转换后的树节点对象，包含了节点的所有相关信息
+     */
     private TreeNode<Feature> toTreeNode(Feature feature, int level, Map<String, Feature> all, List<String> requiredCodes, List<String> authorizedCodes) {
         TreeNode<Feature> node = new TreeNode<>();
         node.setId(feature.getCode());
@@ -127,6 +140,7 @@ public class FeatureServiceImpl implements FeatureService {
                 .distinct()
                 .toList();
     }
+
 
     private List<String> getChainCodes(String code, Map<String, Feature> all, List<String> res) {
         res.add(code);

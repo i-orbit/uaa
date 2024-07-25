@@ -93,7 +93,7 @@ public class User extends TombstoneEntity {
     private UserStatus status;
 
     @Schema(title = "用户状态变更时间")
-    private Instant stateTime;
+    private Instant statusTime;
 
     @Schema(title = "用户系统功能代理人", description = "当用户状态为不在岗时，系统相关功能待办自动转发给代理人")
     private Long proxy;
@@ -281,12 +281,12 @@ public class User extends TombstoneEntity {
         this.status = status;
     }
 
-    public Instant getStateTime() {
-        return stateTime;
+    public Instant getStatusTime() {
+        return statusTime;
     }
 
-    public void setStateTime(Instant stateTime) {
-        this.stateTime = stateTime;
+    public void setStatusTime(Instant statusTime) {
+        this.statusTime = statusTime;
     }
 
     public Long getProxy() {
