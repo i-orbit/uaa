@@ -95,7 +95,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         if (user.getStatus() == UserStatus.INITIALIZATION) {
             user.setStatus(UserStatus.NORMAL);
-            user.setStateTime(Instant.now());
+            user.setStatusTime(Instant.now());
         }
         user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
         user.setModifiedBy(user.getId());
@@ -149,7 +149,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             user.setPassword(generateDefaultPassword(user));
             user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
             user.setStatus(UserStatus.INITIALIZATION);
-            user.setStateTime(Instant.now());
+            user.setStatusTime(Instant.now());
         }
         users.forEach(userMapper::updateById);
         eraseUserCache(CommonUtils.map(users, Function.identity(), User::getId));

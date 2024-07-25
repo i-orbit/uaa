@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
             throw new AccessDeniedException(ErrorCode.E_0x00100020);
         }
         entity.setStatus(UserStatus.INITIALIZATION);
-        entity.setStateTime(Instant.now());
+        entity.setStatusTime(Instant.now());
         entity.setPassword(passwordService.generateDefaultPassword(entity));
         entity.setPasswordExpireAt(passwordService.getPasswordExpireAt(entity.getTenant()));
         entity.setLang(Languages.SIMPLIFIED_CHINESE);
