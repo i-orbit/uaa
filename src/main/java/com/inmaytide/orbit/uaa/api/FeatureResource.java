@@ -15,9 +15,9 @@ import java.util.TreeSet;
  * @author inmaytide
  * @since 2024/7/19
  */
-@Tag(name = "系统功能模块管理", description = "除查询当前用户租户功能模块权限接口外, 其他接口仅系统超级管理员可用")
 @RestController
 @RequestMapping("/api/features")
+@Tag(name = "系统功能模块管理", description = "除查询当前用户租户功能模块权限接口外, 其他接口仅系统超级管理员可用")
 public class FeatureResource {
 
     private final FeatureService featureService;

@@ -15,12 +15,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * When the {@link com.inmaytide.orbit.uaa.configuration.ApplicationProperties#hideUserPasswordsFromExternal} configuration is set to true,
+ * When the {@link com.inmaytide.orbit.uaa.configuration.ApplicationProperties#hideUserPasswordsFromExternal}
+ * configuration is set to true,
  * intercept the user information interfaces provided to external systems
  * and automatically erase the user login passwords.
  *
  * @author inmaytide
  * @since 2024/4/28
+ *
+ * @see com.inmaytide.orbit.uaa.configuration.ApplicationProperties#hideUserPasswordsFromExternal
  */
 @Aspect
 @Component

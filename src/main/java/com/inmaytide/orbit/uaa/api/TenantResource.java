@@ -18,9 +18,9 @@ import java.util.Objects;
  * @author inmaytide
  * @since 2024/7/4
  */
-@Tag(name = "租户信息", description = "除查询当前用户自己的租户信息外, 其他接口仅系统超级管理员可用")
 @RestController
 @RequestMapping("/api/tenants")
+@Tag(name = "租户信息", description = "除查询当前用户自己的租户信息外, 其他接口仅系统超级管理员可用")
 public class TenantResource {
 
     private final TenantService tenantService;

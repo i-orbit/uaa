@@ -14,6 +14,9 @@ import java.util.List;
 @Schema(title = "功能菜单")
 public class FeatureMenu extends TombstoneEntity {
 
+    @Schema(title = "所属功能模块编码")
+    private String featureCode;
+
     @Schema(title = "菜单名称")
     private String name;
 
@@ -26,9 +29,10 @@ public class FeatureMenu extends TombstoneEntity {
     @Schema(title = "排序字段")
     private Integer sequence;
 
-    @Schema(title = "父级菜单, 无上级菜单为 0")
-    private Long parent;
+    @Schema(title = "父级菜单, 无上级菜单为 ROOT")
+    private String parent;
 
+    @TableField("`URL`")
     @Schema(title = "菜单URL")
     private String URL;
 
@@ -41,6 +45,14 @@ public class FeatureMenu extends TombstoneEntity {
     @TableField(exist = false)
     @Schema(title = "菜单功能点")
     private List<FeatureFunction> functions;
+
+    public String getFeatureCode() {
+        return featureCode;
+    }
+
+    public void setFeatureCode(String featureCode) {
+        this.featureCode = featureCode;
+    }
 
     public String getName() {
         return name;
@@ -74,11 +86,11 @@ public class FeatureMenu extends TombstoneEntity {
         this.sequence = sequence;
     }
 
-    public Long getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 

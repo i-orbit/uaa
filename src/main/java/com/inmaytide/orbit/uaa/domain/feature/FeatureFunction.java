@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(title = "系统功能模块-菜单功能点")
 public class FeatureFunction extends TombstoneEntity {
 
+    @Schema(title = "所属功能菜单编码")
+    private String featureMenuCode;
+
     @Schema(title = "功能点编码", description = "全局唯一")
     private String code;
 
@@ -18,6 +21,14 @@ public class FeatureFunction extends TombstoneEntity {
 
     @Schema(title = "排序字段")
     private Integer sequence;
+
+    public String getFeatureMenuCode() {
+        return featureMenuCode;
+    }
+
+    public void setFeatureMenuCode(String featureMenuCode) {
+        this.featureMenuCode = featureMenuCode;
+    }
 
     public String getCode() {
         return code;

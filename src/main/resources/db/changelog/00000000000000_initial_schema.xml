@@ -200,4 +200,66 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="1722219788995-1" author="inmaytide">
+        <createTable tableName="feature" remarks="系统功能模块">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(50)" remarks="功能模块名称"/>
+            <column name="code" type="varchar(50)" remarks="功能模块编码"/>
+            <column name="parent" type="varchar(50)" remarks="功能模块上级编码"/>
+            <column name="description" type="varchar(200)" remarks="功能介绍"/>
+            <column name="necessary" type="varchar(2)" remarks="是否必须功能"/>
+            <column name="sequence" type="int" remarks="排序字段"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="feature_menu" remarks="系统功能菜单">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="feature_code" type="varchar(50)" remarks="所属功能模块编码"/>
+            <column name="name" type="varchar(50)" remarks="功能菜单名称"/>
+            <column name="code" type="varchar(50)" remarks="功能菜单编码"/>
+            <column name="parent" type="varchar(50)" remarks="功能菜单上级编码"/>
+            <column name="platforms" type="varchar(20)" remarks="功能菜单所属平台"/>
+            <column name="URL" type="varchar(200)" remarks="菜单URL"/>
+            <column name="target" type="varchar(20)" remarks="打开方式"/>
+            <column name="icon" type="varchar(20)" remarks="菜单图标"/>
+            <column name="sequence" type="int" remarks="排序字段"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <createTable tableName="feature_function" remarks="系统功能菜单-功能点">
+            <column name="id" type="bigint" remarks="唯一标识">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="feature_menu_code" type="varchar(50)" remarks="所属功能菜单编码"/>
+            <column name="name" type="varchar(50)" remarks="功能点名称"/>
+            <column name="code" type="varchar(50)" remarks="功能点编码"/>
+            <column name="sequence" type="int" remarks="排序字段"/>
+            <column name="created_time" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="bigint" remarks="创建人"/>
+            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
+            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本"/>
+        </createTable>
+        <sqlFile path="db/init/features_20240729-1.sql" />
+    </changeSet>
+
 </databaseChangeLog>
