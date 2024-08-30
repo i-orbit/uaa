@@ -1,6 +1,5 @@
 package com.inmaytide.orbit.uaa.security.oauth2.authentication;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmaytide.orbit.commons.utils.ApplicationContextHolder;
 import com.inmaytide.orbit.uaa.service.account.UserActivityService;
 import jakarta.servlet.ServletException;
