@@ -1,0 +1,19 @@
+spring:
+    application:
+        name: uaa
+    profiles:
+        active: dev
+    config:
+        import:
+            - nacos:common.yaml
+            - nacos:redis.yaml
+            - nacos:mysql.yaml
+            - nacos:rabbitmq.yaml
+            - optional:nacos:${spring.application.name}.yaml
+    cloud:
+        nacos:
+            config:
+                server-addr: 192.168.26.160:31500
+                username: nacos
+                password: nacos
+                namespace: ${spring.profiles.active}

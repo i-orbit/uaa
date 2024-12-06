@@ -3,27 +3,22 @@ package com.inmaytide.orbit.uaa.service.account.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserActivity;
 import com.inmaytide.orbit.uaa.mapper.account.UserActivityMapper;
 import com.inmaytide.orbit.uaa.mapper.account.UserMapper;
 import com.inmaytide.orbit.uaa.service.account.UserActivityService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenIntrospection;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 
 import static com.inmaytide.orbit.commons.constants.Constants.CacheNames.USER_ACTIVITY;
-import static com.inmaytide.orbit.commons.utils.HttpUtils.getClientIpAddress;
 
 /**
  * @author inmaytide
@@ -46,31 +41,8 @@ public class UserActivityServiceImpl implements UserActivityService {
         this.baseMapper = baseMapper;
     }
 
-    @Override
-    public void alterUserActivity(HttpServletRequest request, OAuth2TokenIntrospection tokenClaims) {
-        try {
-            Platforms platform = Platforms.valueOf(tokenClaims.getClaimAsString("platform"));
-            Long userId = NumberUtils.createLong(tokenClaims.getUsername());
-            try {
-                UserActivity activity = ValueCaches
-                        .getFor(USER_ACTIVITY, getUserActivityCacheKey(platform, userId), UserActivity.class)
-                        .orElseGet(UserActivity::new);
-                activity.setUser(userId);
-                activity.setLastActivityTime(Instant.now());
-                activity.setIpAddress(getClientIpAddress(request));
-                activity.setPlatform(platform);
-                ValueCaches.put(USER_ACTIVITY, getUserActivityCacheKey(platform, userId), objectMapper.writeValueAsString(activity));
-            } catch (Exception e) {
-                log.error("Record User{id = {}, platform = {}} activity failed", userId, platform.name(), e);
-            }
-        } catch (Exception e) {
-            log.error("Get platform and userId from authentication failed", e);
-        }
-    }
 
-    private String getUserActivityCacheKey(Platforms platform, Long userId) {
-        return platform.name() + "::" + userId;
-    }
+
 
     @Override
     public Long getNumberOfOnlineUsers(Long tenant) {

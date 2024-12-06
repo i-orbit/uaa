@@ -1,6 +1,5 @@
 package com.inmaytide.orbit.uaa.domain.account;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
@@ -25,7 +24,6 @@ public class UserActivity extends Entity {
 
     private String ipAddress;
 
-    @TableField(exist = false)
     private Instant lastActivityTime;
 
     public Instant offlineTime;
