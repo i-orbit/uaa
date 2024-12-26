@@ -49,7 +49,8 @@ public class Oauth2ResourceServerConfiguration {
             // API docs
             c.requestMatchers("/v3/api-docs/**").permitAll();
             c.requestMatchers("/swagger-ui/**").permitAll();
-            c.requestMatchers(HttpMethod.POST, "/api/authorize").permitAll();
+            c.requestMatchers("/api/captcha/**").permitAll();
+            c.requestMatchers(HttpMethod.POST, "/api/authorize/login").permitAll();
             // 自助重置密码
             c.requestMatchers(HttpMethod.POST, "/api/users/passwords/apply-verification-code").permitAll();
             c.requestMatchers(HttpMethod.PUT, "/api/users/passwords/change-with-validation-code").permitAll();
