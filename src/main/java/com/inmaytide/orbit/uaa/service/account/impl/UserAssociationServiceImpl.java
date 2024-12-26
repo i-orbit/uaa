@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.service.account.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
+import com.inmaytide.orbit.commons.constants.UserAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.account.Position;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import com.inmaytide.orbit.uaa.domain.account.UserAssociation;

@@ -1,8 +1,7 @@
 package com.inmaytide.orbit.uaa.service.permission.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
+import com.inmaytide.orbit.commons.constants.RoleAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
 import com.inmaytide.orbit.uaa.mapper.permission.RoleAssociationMapper;
 import com.inmaytide.orbit.uaa.service.permission.RoleAssociationService;

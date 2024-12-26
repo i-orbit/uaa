@@ -1,8 +1,5 @@
 package com.inmaytide.orbit.uaa;
 
-import com.inmaytide.exception.web.BadRequestException;
-import com.inmaytide.exception.web.mapper.PredictableExceptionMapper;
-import com.inmaytide.exception.web.translator.PredictableExceptionTranslator;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
@@ -12,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 
 @EnableCaching
 @SpringBootApplication(scanBasePackages = {"com.inmaytide.orbit.commons", "com.inmaytide.orbit.uaa"})
@@ -20,13 +16,6 @@ public class UaaApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(UaaApplication.class, args);
-    }
-
-    @Bean
-    public PredictableExceptionTranslator predictableExceptionTranslator() {
-        PredictableExceptionMapper mapper = new PredictableExceptionMapper();
-        mapper.register(OAuth2AuthenticationException.class, BadRequestException.class);
-        return new PredictableExceptionTranslator(mapper);
     }
 
     @Bean

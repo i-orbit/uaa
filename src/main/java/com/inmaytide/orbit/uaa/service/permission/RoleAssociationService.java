@@ -1,6 +1,6 @@
 package com.inmaytide.orbit.uaa.service.permission;
 
-import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
+import com.inmaytide.orbit.commons.constants.RoleAssociationCategory;
 import com.inmaytide.orbit.uaa.domain.permission.RoleAssociation;
 
 import java.util.List;

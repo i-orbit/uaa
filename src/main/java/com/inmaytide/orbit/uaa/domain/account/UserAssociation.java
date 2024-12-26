@@ -2,8 +2,8 @@ package com.inmaytide.orbit.uaa.domain.account;
 
 import com.inmaytide.orbit.Version;
 import com.inmaytide.orbit.commons.constants.Bool;
+import com.inmaytide.orbit.commons.constants.UserAssociationCategory;
 import com.inmaytide.orbit.commons.domain.pattern.Entity;
-import com.inmaytide.orbit.uaa.consts.UserAssociationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wildfly.common.annotation.NotNull;
 

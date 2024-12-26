@@ -1,7 +1,7 @@
 package com.inmaytide.orbit.uaa.domain.permission;
 
 import com.inmaytide.orbit.Version;
-import com.inmaytide.orbit.uaa.consts.RoleAssociationCategory;
+import com.inmaytide.orbit.commons.constants.RoleAssociationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.wildfly.common.annotation.NotNull;
 
