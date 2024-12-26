@@ -17,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author inmaytide
@@ -29,11 +28,8 @@ public class Oauth2ResourceServerConfiguration {
 
     private final DefaultHandlerExceptionResolver exceptionResolver;
 
-    private final RestTemplate restTemplate;
-
-    public Oauth2ResourceServerConfiguration(DefaultHandlerExceptionResolver exceptionResolver, RestTemplate restTemplate) {
+    public Oauth2ResourceServerConfiguration(DefaultHandlerExceptionResolver exceptionResolver) {
         this.exceptionResolver = exceptionResolver;
-        this.restTemplate = restTemplate;
     }
 
     @Bean
@@ -43,7 +39,7 @@ public class Oauth2ResourceServerConfiguration {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ApplicationProperties properties) throws Exception {
         http.authorizeHttpRequests(c -> {
             // 不需要登录可直接访问
             // API docs
@@ -66,7 +62,7 @@ public class Oauth2ResourceServerConfiguration {
             c.authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex));
             c.bearerTokenResolver(new CustomizedBearerTokenResolver());
-            c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(restTemplate)));
+            c.opaqueToken(ot -> ot.introspector(new CustomizedOpaqueTokenIntrospector(properties)));
         });
         http.csrf(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
