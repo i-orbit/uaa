@@ -1,6 +1,7 @@
 package com.inmaytide.orbit.uaa.service.account.aspect;
 
 import com.inmaytide.orbit.commons.constants.Constants;
+import com.inmaytide.orbit.commons.domain.SystemUser;
 import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.uaa.domain.account.User;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,9 +22,8 @@ import java.util.List;
  * and automatically erase the user login passwords.
  *
  * @author inmaytide
- * @since 2024/4/28
- *
  * @see com.inmaytide.orbit.uaa.configuration.ApplicationProperties#hideUserPasswordsFromExternal
+ * @since 2024/4/28
  */
 @Aspect
 @Component
@@ -42,6 +42,8 @@ public class HideUserPasswordsFromExternalSystemAspect {
             eraseUserPassword(users);
         } else if (returnVal instanceof PageResult<?> res) {
             eraseUserPassword(res.getElements());
+        } else if (returnVal instanceof SystemUser user) {
+            user.setPassword(Constants.Markers.NOT_APPLICABLE);
         }
     }
 
