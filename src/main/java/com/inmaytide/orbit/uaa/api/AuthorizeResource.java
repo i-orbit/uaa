@@ -7,6 +7,7 @@ import cloud.tianai.captcha.common.constant.CaptchaTypeConstant;
 import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.domain.Oauth2Token;
 import com.inmaytide.orbit.commons.domain.dto.params.LoginParameters;
+import com.inmaytide.orbit.commons.log.annotation.OperationLogging;
 import com.inmaytide.orbit.commons.service.authorization.AuthorizationService;
 import com.inmaytide.orbit.uaa.service.account.dto.CaptchaValidate;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,7 @@ public class AuthorizeResource {
     }
 
 
+    @OperationLogging
     @PostMapping("/authorize/login")
     @Operation(summary = "系统登录")
     public Oauth2Token login(@RequestBody LoginParameters params, HttpServletResponse response) {
