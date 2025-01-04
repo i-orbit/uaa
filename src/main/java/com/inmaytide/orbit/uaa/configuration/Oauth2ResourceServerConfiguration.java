@@ -2,7 +2,7 @@ package com.inmaytide.orbit.uaa.configuration;
 
 import com.inmaytide.exception.web.servlet.DefaultHandlerExceptionResolver;
 import com.inmaytide.orbit.commons.constants.Roles;
-import com.inmaytide.orbit.commons.security.Oauth2ResourceServerConfigurationAdapter;
+import com.inmaytide.orbit.commons.security.OAuth2ResourceServerConfigurationAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @DependsOn("exceptionResolver")
 @Configuration(proxyBeanMethods = false)
-public class Oauth2ResourceServerConfiguration extends Oauth2ResourceServerConfigurationAdapter {
+public class Oauth2ResourceServerConfiguration extends OAuth2ResourceServerConfigurationAdapter {
 
     public Oauth2ResourceServerConfiguration(DefaultHandlerExceptionResolver exceptionResolver, ApplicationProperties properties) {
         super(exceptionResolver, properties);
