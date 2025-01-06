@@ -13,6 +13,7 @@ import com.inmaytide.orbit.uaa.service.account.dto.CaptchaValidate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +53,12 @@ public class AuthorizeResource {
     @OperationLogging(retainArguments = true)
     @PostMapping("/authorize/login")
     @Operation(summary = "系统登录")
-    public Oauth2Token login(@RequestBody LoginParameters params, HttpServletResponse response) {
+    public Oauth2Token login(@RequestBody LoginParameters params, HttpServletResponse response, HttpServletRequest request) {
+        request.getHeaderNames().asIterator().forEachRemaining(e -> {
+            System.out.println(request.getHeader(e));
+        });
+
+
         return authorizationService.getToken(params)
                 .doOnSuccess(token -> setTokenCookies(response, token))
                 .block(Duration.ofSeconds(10));
