@@ -55,7 +55,7 @@ public class AuthorizeResource {
     @Operation(summary = "系统登录")
     public Oauth2Token login(@RequestBody LoginParameters params, HttpServletResponse response, HttpServletRequest request) {
         request.getHeaderNames().asIterator().forEachRemaining(e -> {
-            System.out.println(request.getHeader(e));
+            System.out.printf("%s, %s \r\n", e, request.getHeader(e));
         });
 
 
