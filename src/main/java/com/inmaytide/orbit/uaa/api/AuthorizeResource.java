@@ -49,7 +49,7 @@ public class AuthorizeResource {
     }
 
 
-    @OperationLogging
+    @OperationLogging(retainArguments = true)
     @PostMapping("/authorize/login")
     @Operation(summary = "系统登录")
     public Oauth2Token login(@RequestBody LoginParameters params, HttpServletResponse response) {
