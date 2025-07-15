@@ -6,7 +6,7 @@ import com.inmaytide.orbit.commons.domain.dto.result.PageResult;
 import com.inmaytide.orbit.commons.security.SecurityUtils;
 import com.inmaytide.orbit.uaa.domain.permission.Tenant;
 import com.inmaytide.orbit.uaa.service.permission.TenantService;
-import com.inmaytide.orbit.uaa.service.permission.dto.TenantQuery.TenantQuery;
+import com.inmaytide.orbit.uaa.service.permission.dto.TenantQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
@@ -49,7 +49,7 @@ public class TenantResource {
 
     @GetMapping("{id}")
     @Operation(summary = "查询指定租户信息", description = "除系统超级管理员外其他用户仅可查看自己所属租户的详细信息")
-    public Tenant get(@PathVariable Long id) {
+    public Tenant get(@PathVariable String id) {
         Tenant tenant = tenantService.get(id).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(id)));
         if (SecurityUtils.isSuperAdministrator()) {
             return tenant;

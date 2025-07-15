@@ -42,7 +42,7 @@ public interface UserPasswordService {
 
     String generateDefaultPassword(User entity);
 
-    Instant getPasswordExpireAt(Long tenant);
+    Instant getPasswordExpireAt(String tenant);
 
     void applyVerificationCode(ApplyVerificationCode dto);
 }

@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface RoleService extends BasicService<Role> {
 
-    List<String> findCodesByIds(List<Long> ids);
+    List<String> findCodesByIds(List<String> ids);
 
 }

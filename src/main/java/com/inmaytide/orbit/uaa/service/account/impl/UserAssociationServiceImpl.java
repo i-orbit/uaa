@@ -30,7 +30,7 @@ public class UserAssociationServiceImpl implements UserAssociationService {
     }
 
     @Override
-    public List<UserAssociation> findByUserAndCategory(Long user, UserAssociationCategory category) {
+    public List<UserAssociation> findByUserAndCategory(String user, UserAssociationCategory category) {
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, user);
         wrapper.eq(UserAssociation::getCategory, category);
@@ -38,7 +38,7 @@ public class UserAssociationServiceImpl implements UserAssociationService {
     }
 
     @Override
-    public Map<Long, Map<UserAssociationCategory, List<UserAssociation>>> findByUsers(List<Long> userIds) {
+    public Map<String, Map<UserAssociationCategory, List<UserAssociation>>> findByUsers(List<String> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return Collections.emptyMap();
         }
@@ -55,14 +55,14 @@ public class UserAssociationServiceImpl implements UserAssociationService {
     }
 
     @Override
-    public void erase(Long userId) {
+    public void erase(String userId) {
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
         baseMapper.delete(wrapper);
     }
 
     @Override
-    public void erase(Long userId, UserAssociationCategory category) {
+    public void erase(String userId, UserAssociationCategory category) {
         LambdaQueryWrapper<UserAssociation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserAssociation::getUser, Objects.requireNonNull(userId));
         wrapper.eq(UserAssociation::getCategory, Objects.requireNonNull(category));

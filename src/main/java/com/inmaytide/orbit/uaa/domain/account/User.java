@@ -28,7 +28,7 @@ public class User extends TombstoneEntity {
     private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
 
     @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
-    private Long tenant;
+    private String tenant;
 
     @Schema(title = "用户是否为所属租户的管理员", requiredMode = Schema.RequiredMode.REQUIRED, defaultValue = "N")
     private Bool isTenantAdministrator;
@@ -96,7 +96,7 @@ public class User extends TombstoneEntity {
     private Instant statusTime;
 
     @Schema(title = "用户系统功能代理人", description = "当用户状态为不在岗时，系统相关功能待办自动转发给代理人")
-    private Long proxy;
+    private String proxy;
 
     @Schema(title = "用户人事状态", description = "对应数据字典编码")
     private String personnelStatus;
@@ -119,11 +119,11 @@ public class User extends TombstoneEntity {
 
     @Schema(title = "默认组织")
     @TableField(exist = false)
-    private Long defaultOrganization;
+    private String defaultOrganization;
 
     @Schema(title = "默认岗位")
     @TableField(exist = false)
-    private Long defaultPosition;
+    private String defaultPosition;
 
     @TableField(exist = false)
     @Schema(title = "用户所属组织")
@@ -137,11 +137,11 @@ public class User extends TombstoneEntity {
     @Schema(title = "用户角色")
     private List<Role> roles;
 
-    public Long getTenant() {
+    public String getTenant() {
         return tenant;
     }
 
-    public void setTenant(Long tenant) {
+    public void setTenant(String tenant) {
         this.tenant = tenant;
     }
 
@@ -289,11 +289,11 @@ public class User extends TombstoneEntity {
         this.statusTime = statusTime;
     }
 
-    public Long getProxy() {
+    public String getProxy() {
         return proxy;
     }
 
-    public void setProxy(Long proxy) {
+    public void setProxy(String proxy) {
         this.proxy = proxy;
     }
 
@@ -394,19 +394,19 @@ public class User extends TombstoneEntity {
         this.personnelStatusName = personnelStatusName;
     }
 
-    public Long getDefaultOrganization() {
+    public String getDefaultOrganization() {
         return defaultOrganization;
     }
 
-    public void setDefaultOrganization(Long defaultOrganization) {
+    public void setDefaultOrganization(String defaultOrganization) {
         this.defaultOrganization = defaultOrganization;
     }
 
-    public Long getDefaultPosition() {
+    public String getDefaultPosition() {
         return defaultPosition;
     }
 
-    public void setDefaultPosition(Long defaultPosition) {
+    public void setDefaultPosition(String defaultPosition) {
         this.defaultPosition = defaultPosition;
     }
 }

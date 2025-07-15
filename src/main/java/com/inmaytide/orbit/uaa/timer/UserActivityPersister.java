@@ -4,6 +4,7 @@ import com.inmaytide.orbit.commons.constants.Constants;
 import com.inmaytide.orbit.commons.constants.Platforms;
 import com.inmaytide.orbit.commons.metrics.JobAdapter;
 import com.inmaytide.orbit.commons.metrics.JobParameter;
+import com.inmaytide.orbit.commons.utils.NamedStopWatch;
 import com.inmaytide.orbit.commons.utils.ValueCaches;
 import com.inmaytide.orbit.uaa.domain.account.UserActivity;
 import com.inmaytide.orbit.uaa.service.account.UserActivityService;
@@ -30,7 +31,7 @@ public class UserActivityPersister implements JobAdapter {
     private static final JobParameter parameter = JobParameter.withName("persister_user-activity")
             .active()
             .cronExpression("0 * * * * ?")
-            .reinitializeIfExistingAtServiceStartup()
+            .reinitializeIfExistsOnServiceStartup(true)
             .build();
 
     private UserActivityService userActivityService;
@@ -53,7 +54,7 @@ public class UserActivityPersister implements JobAdapter {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void exec(JobExecutionContext context) {
+    public void exec(JobExecutionContext context, NamedStopWatch stopWatch) {
         List<UserActivity> entities = ValueCaches.keys(Constants.CacheNames.USER_ACTIVITY).stream()
                 .map(k -> ValueCaches.getFor(Constants.CacheNames.USER_ACTIVITY, k, UserActivity.class))
                 .filter(Optional::isPresent)

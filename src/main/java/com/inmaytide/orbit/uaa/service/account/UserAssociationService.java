@@ -13,9 +13,9 @@ import java.util.Map;
  */
 public interface UserAssociationService {
 
-    List<UserAssociation> findByUserAndCategory(Long user, UserAssociationCategory category);
+    List<UserAssociation> findByUserAndCategory(String user, UserAssociationCategory category);
 
-    Map<Long, Map<UserAssociationCategory, List<UserAssociation>>> findByUsers(List<Long> userIds);
+    Map<String, Map<UserAssociationCategory, List<UserAssociation>>> findByUsers(List<String> userIds);
 
     /**
      * 覆盖保存(先删后插)指定用户所有的关联信息
@@ -27,7 +27,7 @@ public interface UserAssociationService {
      *
      * @param userId 指定用户唯一标识
      */
-    void erase(Long userId);
+    void erase(String userId);
 
     /**
      * 抹除指定用户指定类型关联信息
@@ -35,6 +35,6 @@ public interface UserAssociationService {
      * @param userId   指定用户唯一标识
      * @param category 指定类型
      */
-    void erase(Long userId, UserAssociationCategory category);
+    void erase(String userId, UserAssociationCategory category);
 
 }

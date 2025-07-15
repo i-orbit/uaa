@@ -44,8 +44,8 @@ public class FeatureFunctionServiceImpl implements FeatureFunctionService {
         if (menu.getFunctions().stream().collect(Collectors.groupingBy(FeatureFunction::getCode)).values().stream().anyMatch(e -> e.size() > 1)) {
             throw new BadRequestException(ErrorCode.E_0x00100023);
         }
-        List<Long> ids = menu.getFunctions().stream().map(Entity::getId).toList();
-        Map<Long, FeatureFunction> originals = ids.isEmpty() ? Map.of() : baseMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> ids = menu.getFunctions().stream().map(Entity::getId).toList();
+        Map<String, FeatureFunction> originals = ids.isEmpty() ? Map.of() : baseMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
         Map<String, FeatureFunction> exists = findByCodes(menu.getFunctions().stream().map(FeatureFunction::getCode).toList()).stream().collect(Collectors.toMap(FeatureFunction::getCode, Function.identity()));
 
         for (FeatureFunction f : menu.getFunctions()) {

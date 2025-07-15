@@ -63,6 +63,7 @@ public class AuthorizeResource {
         Cookie cookie = new Cookie(Constants.RequestParameters.ACCESS_TOKEN, token.getAccessToken());
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setMaxAge(token.getExpiresIn().intValue() * 2);
         return cookie;
     }
 

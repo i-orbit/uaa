@@ -1,4 +1,4 @@
-package com.inmaytide.orbit.uaa.service.permission.dto.TenantQuery;
+package com.inmaytide.orbit.uaa.service.permission.dto;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.inmaytide.orbit.commons.domain.dto.params.Pageable;
@@ -21,7 +21,7 @@ public class TenantQuery extends Pageable<Tenant> {
             wrapper.and(w -> w.like(Tenant::getName, getQueryName()).or().like(Tenant::getAlias, getQueryName()));
         }
         wrapper.in(StringUtils.isNotBlank(getStatuses()), Tenant::getStatus, CommonUtils.splitByCommas(getStatuses()));
-        wrapper.orderByDesc(Tenant::getCreatedTime);
+        wrapper.orderByDesc(Tenant::getCreatedAt);
         return null;
     }
 

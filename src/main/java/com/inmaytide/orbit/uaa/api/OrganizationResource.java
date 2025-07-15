@@ -45,7 +45,7 @@ public class OrganizationResource {
     @DeleteMapping
     @Operation(summary = "删除指定组织信息")
     public AffectedResult deleteByIds(@RequestParam String ids) {
-        return organizationService.deleteByIds(CommonUtils.splitToLongByCommas(ids));
+        return organizationService.deleteByIds(CommonUtils.splitByCommas(ids));
     }
 
     @GetMapping("tree-of-organizations")
@@ -56,8 +56,8 @@ public class OrganizationResource {
 
     @GetMapping("names")
     @Operation(summary = "查询指定组织名称")
-    public Map<Long, String> findNamesByIds(@RequestParam String ids) {
-        return organizationService.findNamesByIds(CommonUtils.splitToLongByCommas(ids));
+    public Map<String, String> findNamesByIds(@RequestParam String ids) {
+        return organizationService.findNamesByIds(CommonUtils.splitByCommas(ids));
     }
 
 }

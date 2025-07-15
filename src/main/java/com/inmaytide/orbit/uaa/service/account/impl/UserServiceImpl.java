@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> get(Long id) {
+    public Optional<User> get(String id) {
         if (Objects.equals(Robot.getInstance().getId(), id)) {
             User robot = new User();
             robot.setId(id);
@@ -144,17 +144,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<Long, String> findEmailsByIds(List<Long> ids) {
+    public Map<String, String> findEmailsByIds(List<String> ids) {
         return findFieldValueByIds(ids, User::getEmail);
     }
 
     @Override
-    public Map<Long, String> findTelephoneNumbersByIds(List<Long> ids) {
+    public Map<String, String> findTelephoneNumbersByIds(List<String> ids) {
         return findFieldValueByIds(ids, User::getTelephoneNumber);
     }
 
     @Override
-    public Map<Long, String> findNamesByIds(List<Long> ids) {
+    public Map<String, String> findNamesByIds(List<String> ids) {
         return findFieldValueByIds(ids, User::getName);
     }
 
@@ -163,18 +163,18 @@ public class UserServiceImpl implements UserService {
         if (CollectionUtils.isEmpty(entities)) {
             return;
         }
-        List<Long> ids = CommonUtils.map(entities, Function.identity(), User::getId);
-        Map<Long, Map<UserAssociationCategory, List<UserAssociation>>> associations = associationService.findByUsers(ids);
-        BiFunction<Collection<Map<UserAssociationCategory, List<UserAssociation>>>, UserAssociationCategory, List<Long>> fetchIds = (p, c) -> p.stream()
+        List<String> ids = CommonUtils.map(entities, Function.identity(), User::getId);
+        Map<String, Map<UserAssociationCategory, List<UserAssociation>>> associations = associationService.findByUsers(ids);
+        BiFunction<Collection<Map<UserAssociationCategory, List<UserAssociation>>>, UserAssociationCategory, List<String>> fetchIds = (p, c) -> p.stream()
                 .flatMap(e -> e.getOrDefault(c, Collections.emptyList()).stream())
                 .map(UserAssociation::getAssociated)
                 .toList();
-        List<Long> organizationIds = fetchIds.apply(associations.values(), UserAssociationCategory.ORGANIZATION);
-        Map<Long, Organization> organizations = organizationService.findByIds(organizationIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-        List<Long> positionsIds = fetchIds.apply(associations.values(), UserAssociationCategory.POSITION);
-        Map<Long, Position> positions = positionService.findByIds(positionsIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-        List<Long> roleIds = fetchIds.apply(associations.values(), UserAssociationCategory.ROLE);
-        Map<Long, Role> roles = roleService.findByIds(roleIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> organizationIds = fetchIds.apply(associations.values(), UserAssociationCategory.ORGANIZATION);
+        Map<String, Organization> organizations = organizationService.findByIds(organizationIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> positionsIds = fetchIds.apply(associations.values(), UserAssociationCategory.POSITION);
+        Map<String, Position> positions = positionService.findByIds(positionsIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> roleIds = fetchIds.apply(associations.values(), UserAssociationCategory.ROLE);
+        Map<String, Role> roles = roleService.findByIds(roleIds).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
         List<String> dictionaryCodes = CommonUtils.map(entities, Function.identity(), User::getGender, User::getPersonnelStatus, User::getRank);
         Map<String, String> dictionaryNames = dictionaryService.findNamesByCodes(dictionaryCodes);
 

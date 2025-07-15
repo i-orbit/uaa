@@ -73,7 +73,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         this.cacheManager = cacheManager;
     }
 
-    private void eraseUserCache(List<Long> ids) {
+    private void eraseUserCache(List<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
@@ -98,8 +98,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             user.setStatusTime(Instant.now());
         }
         user.setPasswordExpireAt(getPasswordExpireAt(user.getTenant()));
-        user.setModifiedBy(user.getId());
-        user.setModifiedTime(Instant.now());
+        user.setUpdatedBy(user.getId());
+        user.setUpdatedAt(Instant.now());
         userMapper.updateById(user);
         eraseUserCache(List.of(user.getId()));
         return AffectedResult.withAffected(1);
@@ -182,7 +182,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public Instant getPasswordExpireAt(Long tenant) {
+    public Instant getPasswordExpireAt(String tenant) {
         Integer value = propertyService.getIntValue(tenant, Constants.SystemPropertyKeys.USER_PASSWORD_VALID_IN_DAYS).orElse(180);
         return LocalDate.now().plusDays(value).atStartOfDay().toInstant(ZoneOffset.ofHours(8));
     }

@@ -22,8 +22,8 @@ public class ResetPassword implements Serializable {
     @NotBlank
     private String userIds;
 
-    public List<Long> getUserIds() {
-        return CommonUtils.splitToLongByCommas(userIds);
+    public List<String> getUserIds() {
+        return CommonUtils.splitByCommas(userIds);
     }
 
     public void setUserIds(String userIds) {

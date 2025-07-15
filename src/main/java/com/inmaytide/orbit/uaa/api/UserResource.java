@@ -48,7 +48,7 @@ public class UserResource {
     @GetMapping("{id}")
     @OperationLogging
     @Operation(summary = "查询指定用户详情")
-    public User get(@PathVariable Long id) {
+    public User get(@PathVariable String id) {
         return service.get(id).orElseThrow(() -> new ObjectNotFoundException(String.valueOf(id)));
     }
 
@@ -67,20 +67,20 @@ public class UserResource {
 
     @GetMapping("names")
     @Operation(summary = "查询指定用户的姓名")
-    public Map<Long, String> findNamesByIds(@RequestParam("ids") String ids) {
-        return service.findNamesByIds(CommonUtils.splitToLongByCommas(ids));
+    public Map<String, String> findNamesByIds(@RequestParam("ids") String ids) {
+        return service.findNamesByIds(CommonUtils.splitByCommas(ids));
     }
 
     @GetMapping("emails")
     @Operation(summary = "查询指定用户的邮箱地址")
-    public Map<Long, String> findEmailsByIds(@RequestParam("ids") String ids) {
-        return service.findEmailsByIds(CommonUtils.splitToLongByCommas(ids));
+    public Map<String, String> findEmailsByIds(@RequestParam("ids") String ids) {
+        return service.findEmailsByIds(CommonUtils.splitByCommas(ids));
     }
 
     @GetMapping("telephone-numbers")
     @Operation(summary = "查询指定用户的手机号码")
-    public Map<Long, String> findTelephoneNumbersByIds(@RequestParam("ids") String ids) {
-        return service.findTelephoneNumbersByIds(CommonUtils.splitToLongByCommas(ids));
+    public Map<String, String> findTelephoneNumbersByIds(@RequestParam("ids") String ids) {
+        return service.findTelephoneNumbersByIds(CommonUtils.splitByCommas(ids));
     }
 
 

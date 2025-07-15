@@ -23,11 +23,11 @@ public class UserAssociation implements Serializable {
 
     @NotNull
     @Schema(title = "用户唯一标识")
-    private Long user;
+    private String user;
 
     @NotNull
     @Schema(title = "关联唯一标识")
-    private Long associated;
+    private String associated;
 
     @NotNull
     @Schema(title = "关联信息类别")
@@ -41,19 +41,19 @@ public class UserAssociation implements Serializable {
         return builder.category(category);
     }
 
-    public Long getUser() {
+    public String getUser() {
         return user;
     }
 
-    public void setUser(Long user) {
+    public void setUser(String user) {
         this.user = user;
     }
 
-    public Long getAssociated() {
+    public String getAssociated() {
         return associated;
     }
 
-    public void setAssociated(Long associated) {
+    public void setAssociated(String associated) {
         this.associated = associated;
     }
 

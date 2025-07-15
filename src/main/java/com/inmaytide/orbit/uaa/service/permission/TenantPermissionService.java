@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface TenantPermissionService {
 
-    List<TenantPermission> findByTenantAndCategory(Long tenant, TenantPermissionCategory category);
+    List<TenantPermission> findByTenantAndCategory(String tenant, TenantPermissionCategory category);
 
 }

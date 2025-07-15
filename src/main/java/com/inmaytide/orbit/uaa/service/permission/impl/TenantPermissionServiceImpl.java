@@ -23,7 +23,7 @@ public class TenantPermissionServiceImpl implements TenantPermissionService {
     }
 
     @Override
-    public List<TenantPermission> findByTenantAndCategory(Long tenant, TenantPermissionCategory category) {
+    public List<TenantPermission> findByTenantAndCategory(String tenant, TenantPermissionCategory category) {
         LambdaQueryWrapper<TenantPermission> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TenantPermission::getTenant, tenant);
         wrapper.eq(TenantPermission::getCategory, category);

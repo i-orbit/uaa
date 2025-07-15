@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -35,9 +34,13 @@ public enum OrganizationCategory {
 
     @JsonCreator
     public static OrganizationCategory withValue(String value) {
-        return Stream.of(values()).filter(e -> Objects.equals(value, e.getValue()))
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null");
+        }
+        return Stream.of(values())
+                .filter(e -> value.equals(e.getValue()))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Invalid organization category value: " + value));
     }
 
     @JsonValue

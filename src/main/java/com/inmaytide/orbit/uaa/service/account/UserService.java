@@ -1,7 +1,6 @@
 package com.inmaytide.orbit.uaa.service.account;
 
 import com.inmaytide.orbit.commons.business.BasicService;
-import com.inmaytide.orbit.commons.business.SystemUserService;
 import com.inmaytide.orbit.uaa.domain.account.User;
 
 import java.util.List;
@@ -18,10 +17,10 @@ public interface UserService extends BasicService<User> {
 
     Optional<User> findByLoginName(String loginName);
 
-    Map<Long, String> findEmailsByIds(List<Long> ids);
+    Map<String, String> findEmailsByIds(List<String> ids);
 
-    Map<Long, String> findTelephoneNumbersByIds(List<Long> ids);
+    Map<String, String> findTelephoneNumbersByIds(List<String> ids);
 
-    Map<Long, String> findNamesByIds(List<Long> ids);
+    Map<String, String> findNamesByIds(List<String> ids);
 
 }

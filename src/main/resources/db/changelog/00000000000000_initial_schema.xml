@@ -6,7 +6,7 @@
 
     <changeSet id="000000000000001" author="inmaytide">
         <createTable tableName="tenant" remarks="租户表">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(32)" remarks="名称"/>
@@ -22,40 +22,44 @@
             <column name="secondary_concat_phone" type="varchar(50)" remarks="第二联系人联系电话"/>
             <column name="billing_address" type="varchar(500)" remarks="账单地址"/>
             <column name="payment_method" type="varchar(20)" remarks="支付方式"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
-            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="tenant_permission" remarks="租户权限表">
-            <column name="tenant" type="bigint" remarks="租户唯一标识"/>
+            <column name="tenant" type="varchar(32)" remarks="租户唯一标识"/>
             <column name="category" type="varchar(16)" remarks="关联数据类型"/>
             <column name="value" type="varchar(50)" remarks="配置值(如用户限制数量/功能编码等)"/>
         </createTable>
         <createTable tableName="tenant_subscription" remarks="租户订阅记录">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="tenant" type="bigint" remarks="租户唯一标识"/>
+            <column name="tenant" type="varchar(32)" remarks="租户唯一标识"/>
             <column name="start_date" type="timestamp" remarks="开始时间"/>
             <column name="end_date" type="timestamp" remarks="结束时间"/>
             <column name="status" type="varchar(20)" remarks="状态"/>
             <column name="amount" type="decimal(16,2)" remarks="金额"/>
             <column name="payment_method" type="varchar(20)" remarks="支付方式"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
-            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识"/>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
+            <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="user" remarks="用户表">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="tenant" type="varchar(32)" remarks="所属租户"/>
             <column name="is_tenant_administrator" type="varchar(2)" remarks="是否是租户管理员"/>
             <column name="rank" type="varchar(64)" remarks="职级"/>
             <column name="sequence" type="int" remarks="排序"/>
@@ -74,135 +78,148 @@
             <column name="photo" type="varchar(512)" remarks="用户个人照片存储地址"/>
             <column name="status" type="varchar(20)" remarks="用户状态"/>
             <column name="status_time" type="timestamp" remarks="状态更改时间"/>
-            <column name="proxy" type="bigint" remarks="代理人"/>
+            <column name="proxy" type="varchar(32)" remarks="代理人"/>
             <column name="personnel_status" type="varchar(64)" remarks="人事状态"/>
             <column name="employee_id" type="varchar(64)" remarks="员工编号"/>
             <column name="join_date" type="date" remarks="入职日期"/>
             <column name="employment_confirmation_date" type="date" remarks="转正日期"/>
             <column name="resignation_date" type="date" remarks="离职日期"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="user_association" remarks="用户关联其他数据实例关联关系表">
-            <column name="user" type="bigint" remarks="用户唯一标识"/>
+            <column name="user" type="varchar(32)" remarks="用户唯一标识"/>
             <column name="category" type="varchar(16)" remarks="关联数据类型"/>
-            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
+            <column name="associated" type="varchar(32)" remarks="关联数据实例唯一标识"/>
             <column name="defaulted" type="varchar(2)" remarks="是否默认"/>
         </createTable>
         <addPrimaryKey tableName="user_association" columnNames="user, associated, category"/>
         <createTable tableName="user_activity" remarks="用户活动记录">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="user" type="bigint" remarks="用户唯一标识"/>
+            <column name="user" type="varchar(32)" remarks="用户唯一标识"/>
             <column name="online_time" type="timestamp" remarks="上线时间"/>
             <column name="platform" type="varchar(10)" remarks="登录平台"/>
             <column name="offline_time" type="timestamp" remarks="下线时间"/>
             <column name="ip_address" type="varchar(30)" remarks="登录IP"/>
         </createTable>
-        <sql>
-            INSERT INTO `uaa`.`user` (`id`, `tenant`, `is_tenant_administrator`, `sequence`, `name`, `login_name`, `password`, `password_expire_at`, `lang`, `status`, `status_time`, `created_time`, `created_by`, `modified_time`, `modified_by`, `deleted`, `version`)
-                VALUES (9999, 3721, 'N', 1, '系统管理员', 'admin', '$2a$10$F5RyrHC7W5pFlgEcsmTvsOSk6GTfXUGni4T0ajF.kKhzO6E8Xswuq', TIMESTAMPADD(day, 3, now()), 'SIMPLIFIED_CHINESE', 'INITIALIZATION', now(), now(), 9999, now(), 9999, 'N', 1);
-        </sql>
+        <insert tableName="user" schemaName="uaa">
+            <column name="id" value="018ea39f9f86e8d1b3e21d497dcd9caa"/>
+            <column name="tenant" value="018ea39f9f86e8d1b3e21d497dcd9caa"/>
+            <column name="is_tenant_administrator" value="N"/>
+            <column name="sequence" value="1"/>
+            <column name="name" value="系统管理员"/>
+            <column name="login_name" value="admin"/>
+            <column name="password" value="$2a$10$IH.t3G9rB/oV/scMkKOrbO.G9y.KJt.WXYYWmLqqi292UXl45njg2"/>
+            <column name="password_expire_at" valueDate="TIMESTAMPADD(day, 3, now())"/>
+            <column name="lang" value="SIMPLIFIED_CHINESE"/>
+            <column name="status" value="INITIALIZATION"/>
+            <column name="status_time" valueDate="now()"/>
+            <column name="created_at" valueDate="now()"/>
+            <column name="created_by" value="018ea39f9f86e8d1b3e21d497dcd9caa"/>
+            <column name="updated_at" valueDate="now()"/>
+            <column name="updated_by" value="018ea39f9f86e8d1b3e21d497dcd9caa"/>
+        </insert>
     </changeSet>
 
     <changeSet id="000000000000002" author="inmaytide">
         <createTable tableName="role" remarks="角色信息">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="tenant" type="varchar(32)" remarks="所属租户"/>
             <column name="code" type="varchar(50)" remarks="角色编码"/>
             <column name="name" type="varchar(50)" remarks="角色名称"/>
             <column name="description" type="varchar(200)" remarks="角色说明"/>
             <column name="weight" type="decimal(16, 2)" remarks="角色权重"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="role_association" remarks="角色与相关权限信息关联表">
-            <column name="role" type="bigint" remarks="角色唯一标识"/>
+            <column name="role" type="varchar(32)" remarks="角色唯一标识"/>
             <column name="category" type="varchar(16)" remarks="关联数据类型"/>
-            <column name="associated" type="bigint" remarks="关联数据实例唯一标识"/>
+            <column name="associated" type="varchar(32)" remarks="关联数据实例唯一标识"/>
         </createTable>
         <createTable tableName="authority" remarks="功能权限信息">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
             <column name="code" type="varchar(50)" remarks="角色编码"/>
             <column name="name" type="varchar(50)" remarks="角色名称"/>
-            <column name="web_menu_id" type="bigint" remarks="关联WEB菜单唯一标识"/>
-            <column name="app_menu_id" type="bigint" remarks="关联APP菜单唯一标识"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="web_menu_id" type="varchar(32)" remarks="关联WEB菜单唯一标识"/>
+            <column name="app_menu_id" type="varchar(32)" remarks="关联APP菜单唯一标识"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
     </changeSet>
 
     <changeSet id="000000000000003" author="inmaytide">
         <createTable tableName="organization" remarks="组织信息">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
+            <column name="tenant" type="varchar(32)" remarks="所属租户"/>
             <column name="code" type="varchar(50)" remarks="组织编码"/>
             <column name="name" type="varchar(50)" remarks="组织名称"/>
-            <column name="parent" type="bigint" remarks="上级组织"/>
+            <column name="parent" type="varchar(32)" remarks="上级组织"/>
             <column name="category" type="varchar(20)" remarks="组织分类"/>
             <column name="introduction" type="varchar(500)" remarks="简介"/>
             <column name="cover" type="varchar(500)" remarks="鸟瞰/封面图片地址"/>
-            <column name="principal" type="bigint" remarks="负责人"/>
+            <column name="principal" type="varchar(32)" remarks="负责人"/>
             <column name="sequence" type="int" remarks="排序字段"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="position" remarks="岗位信息">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="tenant" type="bigint" remarks="所属租户"/>
-            <column name="organization" type="bigint" remarks="所属组织"/>
+            <column name="tenant" type="varchar(32)" remarks="所属租户"/>
+            <column name="organization" type="varchar(32)" remarks="所属组织"/>
             <column name="code" type="varchar(50)" remarks="岗位编码"/>
             <column name="name" type="varchar(50)" remarks="岗位名称"/>
-            <column name="parent" type="bigint" remarks="上级岗位"/>
+            <column name="parent" type="varchar(32)" remarks="上级岗位"/>
             <column name="responsibilities" type="varchar(200)" remarks="岗位职责"/>
             <column name="sequence" type="int" remarks="排序字段"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
     </changeSet>
 
     <changeSet id="1722219788995-1" author="inmaytide">
         <createTable tableName="feature" remarks="系统功能模块">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(50)" remarks="功能模块名称"/>
@@ -211,17 +228,17 @@
             <column name="description" type="varchar(200)" remarks="功能介绍"/>
             <column name="necessary" type="varchar(2)" remarks="是否必须功能"/>
             <column name="sequence" type="int" remarks="排序字段"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="feature_menu" remarks="系统功能菜单">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
             <column name="feature_code" type="varchar(50)" remarks="所属功能模块编码"/>
@@ -233,33 +250,32 @@
             <column name="target" type="varchar(20)" remarks="打开方式"/>
             <column name="icon" type="varchar(20)" remarks="菜单图标"/>
             <column name="sequence" type="int" remarks="排序字段"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
         <createTable tableName="feature_function" remarks="系统功能菜单-功能点">
-            <column name="id" type="bigint" remarks="唯一标识">
+            <column name="id" type="varchar(32)" remarks="唯一标识">
                 <constraints primaryKey="true"/>
             </column>
             <column name="feature_menu_code" type="varchar(50)" remarks="所属功能菜单编码"/>
             <column name="name" type="varchar(50)" remarks="功能点名称"/>
             <column name="code" type="varchar(50)" remarks="功能点编码"/>
             <column name="sequence" type="int" remarks="排序字段"/>
-            <column name="created_time" type="timestamp" remarks="创建时间"/>
-            <column name="created_by" type="bigint" remarks="创建人"/>
-            <column name="modified_time" type="timestamp" remarks="最后修改时间"/>
-            <column name="modified_by" type="bigint" remarks="最后修改人"/>
+            <column name="created_at" type="timestamp" remarks="创建时间"/>
+            <column name="created_by" type="varchar(32)" remarks="创建人"/>
+            <column name="updated_at" type="timestamp" remarks="最后修改时间"/>
+            <column name="updated_by" type="varchar(32)" remarks="最后修改人"/>
             <column name="deleted" type="varchar(2)" remarks="逻辑删除标识" defaultValue="N">
                 <constraints nullable="false"/>
             </column>
-            <column name="version" type="int" remarks="版本"/>
+            <column name="version" type="int" remarks="版本" defaultValue="1"/>
         </createTable>
-        <sqlFile path="db/init/features_20240729-1.sql" />
     </changeSet>
 
 </databaseChangeLog>

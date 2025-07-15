@@ -56,7 +56,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<Long> findAuthorizedIds(SystemUser user) {
+    public List<String> findAuthorizedIds(SystemUser user) {
         List<String> roleCodes = user.getRoles().stream().map(Role::getCode).toList();
         // 超级管理员没有组织权限
         if (roleCodes.contains(Roles.ROLE_S_ADMINISTRATOR.name())) {
@@ -89,7 +89,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         entity.setSequence(baseMapper.findNextSequence());
         if (entity.getParent() == null) {
-            entity.setParent(Constants.Markers.TREE_ROOT);
+            entity.setParent(Constants.Markers.TREE_ROOT + "");
         }
         baseMapper.insert(entity);
         if (entity.getLocation() != null) {
@@ -119,24 +119,24 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public AffectedResult deleteByIds(List<Long> ids) {
+    public AffectedResult deleteByIds(List<String> ids) {
         return AffectedResult.withAffected(getBaseMapper().deleteBatchIds(ids));
     }
 
     @Override
-    public Map<Long, String> findNamesByIds(List<Long> ids) {
+    public Map<String, String> findNamesByIds(List<String> ids) {
         return findFieldValueByIds(ids, Organization::getName);
     }
 
     @Override
     public TreeSet<TreeNode<Organization>> treeOfOrganizations() {
         SystemUser user = SecurityUtils.getAuthorizedUser();
-        Map<Long, Organization> all = all(user.getTenant()).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
-        List<Long> requiredIds = getRequiredIds(all, user);
-        return findTreeNodes(Constants.Markers.TREE_ROOT, 1, all, requiredIds, user);
+        Map<String, Organization> all = all(user.getTenant()).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> requiredIds = getRequiredIds(all, user);
+        return findTreeNodes(Constants.Markers.TREE_ROOT + "", 1, all, requiredIds, user);
     }
 
-    private TreeSet<TreeNode<Organization>> findTreeNodes(Long parentId, int level, Map<Long, Organization> all, List<Long> requiredIds, SystemUser user) {
+    private TreeSet<TreeNode<Organization>> findTreeNodes(String parentId, int level, Map<String, Organization> all, List<String> requiredIds, SystemUser user) {
         return all.values().stream()
                 .filter(e -> Objects.equals(e.getParent(), parentId))
                 .filter(e -> requiredIds.contains(e.getId()))
@@ -144,7 +144,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private TreeNode<Organization> toTreeNode(Organization organization, int level, Map<Long, Organization> all, List<Long> requiredIds, SystemUser user) {
+    private TreeNode<Organization> toTreeNode(Organization organization, int level, Map<String, Organization> all, List<String> requiredIds, SystemUser user) {
         TreeNode<Organization> node = new TreeNode<>(organization);
         node.setId(organization.getId());
         node.setSymbol(SYMBOL);
@@ -157,7 +157,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         return node;
     }
 
-    private List<Long> getRequiredIds(Map<Long, Organization> all, SystemUser user) {
+    private List<String> getRequiredIds(Map<String, Organization> all, SystemUser user) {
         return all.keySet().stream()
                 .filter(id -> user.getPermission().getSpecifiedOrganizations().contains(id))
                 .map(id -> getChainIds(id, all, new ArrayList<>()))
@@ -166,7 +166,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .toList();
     }
 
-    private List<Long> getChainIds(Long id, Map<Long, Organization> all, List<Long> res) {
+    private List<String> getChainIds(String id, Map<String, Organization> all, List<String> res) {
         res.add(id);
         Organization organization = all.get(id);
         if (organization != null) {
@@ -179,7 +179,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         return res;
     }
 
-    private List<Organization> all(Long tenant) {
+    private List<Organization> all(String tenant) {
         LambdaQueryWrapper<Organization> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Organization::getTenant, tenant);
         return getBaseMapper().selectList(wrapper);

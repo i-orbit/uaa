@@ -17,7 +17,7 @@ import jakarta.validation.constraints.NotNull;
 public class Organization extends TombstoneEntity {
 
     @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
-    private Long tenant;
+    private String tenant;
 
     @NotBlank
     @Schema(title = "组织名称")
@@ -28,7 +28,7 @@ public class Organization extends TombstoneEntity {
     private String code;
 
     @Schema(title = "上级组织")
-    private Long parent;
+    private String parent;
 
     @NotNull
     @Schema(title = "组织分类")
@@ -41,7 +41,7 @@ public class Organization extends TombstoneEntity {
     private String cover;
 
     @Schema(title = "负责人")
-    private Long principal;
+    private String principal;
 
     @TableField(exist = false)
     @Schema(title = "负责人姓名")
@@ -54,11 +54,11 @@ public class Organization extends TombstoneEntity {
     @Schema(title = "地理位置")
     private GeographicCoordinate location;
 
-    public Long getTenant() {
+    public String getTenant() {
         return tenant;
     }
 
-    public void setTenant(Long tenant) {
+    public void setTenant(String tenant) {
         this.tenant = tenant;
     }
 
@@ -78,11 +78,11 @@ public class Organization extends TombstoneEntity {
         this.code = code;
     }
 
-    public Long getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 
@@ -114,11 +114,11 @@ public class Organization extends TombstoneEntity {
         this.cover = cover;
     }
 
-    public Long getPrincipal() {
+    public String getPrincipal() {
         return principal;
     }
 
-    public void setPrincipal(Long principal) {
+    public void setPrincipal(String principal) {
         this.principal = principal;
     }
 

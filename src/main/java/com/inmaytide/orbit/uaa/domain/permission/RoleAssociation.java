@@ -20,29 +20,29 @@ public class RoleAssociation implements Serializable {
 
     @NotNull
     @Schema(title = "角色唯一标识")
-    private Long role;
+    private String role;
 
     @NotNull
     @Schema(title = "关联唯一标识")
-    private Long associated;
+    private String associated;
 
     @NotNull
     @Schema(title = "关联信息类别")
     private RoleAssociationCategory category;
 
-    public Long getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Long role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
-    public Long getAssociated() {
+    public String getAssociated() {
         return associated;
     }
 
-    public void setAssociated(Long associated) {
+    public void setAssociated(String associated) {
         this.associated = associated;
     }
 

@@ -13,7 +13,7 @@ import org.wildfly.common.annotation.NotNull;
 public class Position extends TombstoneEntity {
 
     @Schema(title = "所属租户唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
-    private Long tenant;
+    private String tenant;
 
     @NotBlank
     @Schema(title = "岗位编码", description = "租户唯一")
@@ -25,10 +25,10 @@ public class Position extends TombstoneEntity {
 
     @NotNull
     @Schema(title = "所属组织")
-    private Long organization;
+    private String organization;
 
     @Schema(title = "上级岗位")
-    private Long parent;
+    private String parent;
 
     @Schema(title = "岗位职责")
     private String responsibilities;
@@ -36,11 +36,11 @@ public class Position extends TombstoneEntity {
     @Schema(title = "排序字段")
     private Integer sequence;
 
-    public Long getTenant() {
+    public String getTenant() {
         return tenant;
     }
 
-    public void setTenant(Long tenant) {
+    public void setTenant(String tenant) {
         this.tenant = tenant;
     }
 
@@ -60,19 +60,19 @@ public class Position extends TombstoneEntity {
         this.name = name;
     }
 
-    public Long getOrganization() {
+    public String getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Long organization) {
+    public void setOrganization(String organization) {
         this.organization = organization;
     }
 
-    public Long getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(Long parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 

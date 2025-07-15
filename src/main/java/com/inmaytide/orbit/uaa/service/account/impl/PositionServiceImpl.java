@@ -34,7 +34,7 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
-    public Map<Long, String> findNamesByIds(List<Long> ids) {
+    public Map<String, String> findNamesByIds(List<String> ids) {
         return findFieldValueByIds(ids, Position::getName);
     }
 

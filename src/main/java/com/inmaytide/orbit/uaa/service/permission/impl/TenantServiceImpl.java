@@ -32,7 +32,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     @Cacheable(cacheNames = Constants.CacheNames.TENANT_DETAILS, key = "#id", condition = "#result.present")
-    public Optional<Tenant> get(Long id) {
+    public Optional<Tenant> get(String id) {
         return TenantService.super.get(id);
     }
 

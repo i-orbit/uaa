@@ -23,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<String> findCodesByIds(List<Long> ids) {
+    public List<String> findCodesByIds(List<String> ids) {
         return new ArrayList<>(findFieldValueByIds(ids, Role::getCode).values());
     }
 

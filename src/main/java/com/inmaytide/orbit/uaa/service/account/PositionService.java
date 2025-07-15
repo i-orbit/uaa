@@ -17,7 +17,7 @@ public interface PositionService extends BasicService<Position> {
 
     String SYMBOL = "POSITION";
 
-    Map<Long, String> findNamesByIds(List<Long> ids);
+    Map<String, String> findNamesByIds(List<String> ids);
 
     TreeSet<TreeNode<? extends Entity>> treeOfPositions();
 

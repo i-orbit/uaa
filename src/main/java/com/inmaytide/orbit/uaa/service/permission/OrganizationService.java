@@ -17,9 +17,9 @@ public interface OrganizationService extends BasicService<Organization> {
 
     String SYMBOL = "ORGANIZATION";
 
-    Map<Long, String> findNamesByIds(List<Long> ids);
+    Map<String, String> findNamesByIds(List<String> ids);
 
     TreeSet<TreeNode<Organization>> treeOfOrganizations();
 
-    List<Long> findAuthorizedIds(SystemUser user);
+    List<String> findAuthorizedIds(SystemUser user);
 }

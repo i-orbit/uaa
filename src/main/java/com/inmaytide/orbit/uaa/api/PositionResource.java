@@ -46,7 +46,7 @@ public class PositionResource {
     @DeleteMapping
     @Operation(summary = "删除指定岗位信息")
     public AffectedResult deleteByIds(@RequestParam String ids) {
-        return positionService.deleteByIds(CommonUtils.splitToLongByCommas(ids));
+        return positionService.deleteByIds(CommonUtils.splitByCommas(ids));
     }
 
     @GetMapping("tree-of-positions")
@@ -57,8 +57,8 @@ public class PositionResource {
 
     @GetMapping("names")
     @Operation(summary = "查询指定岗位名称")
-    public Map<Long, String> findNamesByIds(@RequestParam String ids) {
-        return positionService.findNamesByIds(CommonUtils.splitToLongByCommas(ids));
+    public Map<String, String> findNamesByIds(@RequestParam String ids) {
+        return positionService.findNamesByIds(CommonUtils.splitByCommas(ids));
     }
 
 }

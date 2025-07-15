@@ -50,8 +50,8 @@ public class FeatureMenuServiceImpl implements FeatureMenuService {
         if (entity.getMenus().stream().collect(Collectors.groupingBy(FeatureMenu::getCode)).values().stream().anyMatch(e -> e.size() > 1)) {
             throw new BadRequestException(ErrorCode.E_0x00100022);
         }
-        List<Long> ids = entity.getMenus().stream().map(Entity::getId).toList();
-        Map<Long, FeatureMenu> originals = ids.isEmpty() ? Map.of() : baseMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
+        List<String> ids = entity.getMenus().stream().map(Entity::getId).toList();
+        Map<String, FeatureMenu> originals = ids.isEmpty() ? Map.of() : baseMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Entity::getId, Function.identity()));
         Map<String, FeatureMenu> exists = findByCodes(entity.getMenus().stream().map(FeatureMenu::getCode).toList()).stream().collect(Collectors.toMap(FeatureMenu::getCode, Function.identity()));
 
         for (FeatureMenu menu : entity.getMenus()) {
@@ -63,7 +63,7 @@ public class FeatureMenuServiceImpl implements FeatureMenuService {
             }
             if (menu.getId() != null && originals.containsKey(menu.getId())) {
                 FeatureMenu original = originals.get(menu.getId());
-                BeanUtils.copyProperties(menu, original, "deleted", "createdBy", "createdTime", "modifiedBy", "modifiedTime", "code", "platform");
+                BeanUtils.copyProperties(menu, original, "deleted", "createdBy", "createdAt", "updatedBy", "updatedAt", "code", "platform");
                 baseMapper.updateById(original);
             } else {
                 baseMapper.insert(menu);
