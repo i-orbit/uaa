@@ -24,7 +24,7 @@ public class RoleAssociationServiceImpl implements RoleAssociationService {
     }
 
     @Override
-    public List<RoleAssociation> findByRolesAndCategory(List<Long> roles, RoleAssociationCategory category) {
+    public List<RoleAssociation> findByRolesAndCategory(List<String> roles, RoleAssociationCategory category) {
         if (roles == null || roles.isEmpty()) {
             return Collections.emptyList();
         }

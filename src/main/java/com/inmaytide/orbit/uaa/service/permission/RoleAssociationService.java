@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface RoleAssociationService {
 
-    List<RoleAssociation> findByRolesAndCategory(List<Long> roles, RoleAssociationCategory category);
+    List<RoleAssociation> findByRolesAndCategory(List<String> roles, RoleAssociationCategory category);
 
 }
